@@ -1,1 +1,1 @@
-# mff_nprg045
+# MFF Ročníkový projekt
