@@ -1,0 +1,6 @@
+setuptools
+Jinja2
+Markdown
+PyYAML
+nose
+testfixtures
