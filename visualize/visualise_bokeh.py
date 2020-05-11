@@ -14,14 +14,28 @@ from bokeh.layouts import layout
 from numpy import array, reshape
 
 def show_sheets_plots(plots):
+	"""
+	Shows plots for each sheet in a grid.
+	plots: dictionary, structure 'sheet':plot
+	"""
 
 	# todo better layout, this is only for testing
 	height = (int)(plots.__len__() / 2) 
 	graphs_grid = array(list(plots.values()))
 	graphs_grid = reshape(graphs_grid,(height,2)).tolist()
 
-	grid = layout(graphs_grid, sizing_mode = "scale_width")
+	grid = layout(graphs_grid, sizing_mode ="scale_width")
 	show(grid)
+
+def get_plot(data_store, sheet):
+	"""
+	Returns plot for the sheet.
+	"""
+
+	# dsv = queries.param_filter_query(data_store, sheet_name=sheet)
+	# positions = dsv.get_neuron_positions()
+
+	return figure(title=sheet, x_axis_label='x', y_axis_label='y')
 
 
 def __main__():
@@ -32,9 +46,7 @@ def __main__():
 	graphs = {}
 
 	for sheet in data_store.sheets():
-		dsv = queries.param_filter_query(data_store, sheet_name=sheet)
-		positions = dsv.get_neuron_positions()
-		graphs[sheet] = figure(title=sheet, x_axis_label='x', y_axis_label='y')
+		graphs[sheet] = get_plot(data_store,sheet)
 
 	show_sheets_plots(graphs)
 
