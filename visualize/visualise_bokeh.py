@@ -15,20 +15,30 @@ from bokeh.models import ColumnDataSource
 from numpy import array, resize, where
 from math import ceil
 
-def show_sheets_plots(plots, plots_per_line):
+def prepare_plots_grid(plots, plots_per_line):
+	"""
+	Prepare grid list from list of plots.
+	"""
+	# maybe? (not very elegant)
+
+	height = ceil(len(plots) / plots_per_line)
+
+	grid = array(plots)
+	grid.resize(height,plots_per_line)
+
+	grid = where(grid==0, None, grid)
+
+	result = grid.tolist()
+
+	return result
+
+def show_sheets_plots(plots_dict, plots_per_line):
 	"""
 	Shows plot for each sheet in a grid.
-	plots: dictionary, structure 'sheet':plot
+	plots_dict: dictionary, structure 'sheet':plot
 	"""
 
-	height = ceil(plots.__len__() / plots_per_line) 
-
-	# maybe? (not very elegant)
-	graphs_grid = array(list(plots.values()))
-	graphs_grid.resize((height,plots_per_line))
-	graphs_grid = where(graphs_grid==0, None, graphs_grid) 
-
-	grid_to_show = graphs_grid.tolist()
+	grid_to_show = prepare_plots_grid(list(plots_dict.values()), plots_per_line)
 
 	grid = gridplot(grid_to_show, sizing_mode ="scale_width")
 	show(grid)
