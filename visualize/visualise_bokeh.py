@@ -9,22 +9,26 @@ from json import JSONEncoder # right? (source: https://docs.python.org/3/library
 from parameters import ParameterSet
 
 from bokeh.plotting import figure, output_file, show
-from bokeh.layouts import layout
+from bokeh.layouts import layout, gridplot
+from bokeh.models import ColumnDataSource
 
-from numpy import array, reshape
+from numpy import array, reshape, resize, where
+from math import ceil
 
-def show_sheets_plots(plots):
+def show_sheets_plots(plots, plots_per_line):
 	"""
-	Shows plots for each sheet in a grid.
+	Shows plot for each sheet in a grid.
 	plots: dictionary, structure 'sheet':plot
 	"""
 
-	# todo better layout, this is only for testing
-	height = (int)(plots.__len__() / 2) 
+	height = ceil(plots.__len__() / plots_per_line) 
 	graphs_grid = array(list(plots.values()))
-	graphs_grid = reshape(graphs_grid,(height,2)).tolist()
+	graphs_grid.resize((height,plots_per_line))
+	graphs_grid = where(graphs_grid==0, None, graphs_grid) 
 
-	grid = layout(graphs_grid, sizing_mode ="scale_width")
+	grid_to_show = graphs_grid.tolist()
+
+	grid = gridplot(grid_to_show, sizing_mode ="scale_width")
 	show(grid)
 
 def get_plot(data_store, sheet):
@@ -32,10 +36,17 @@ def get_plot(data_store, sheet):
 	Returns plot for the sheet.
 	"""
 
-	# dsv = queries.param_filter_query(data_store, sheet_name=sheet)
-	# positions = dsv.get_neuron_positions()
+	positions = {
+		'x' : data_store.get_neuron_positions()[sheet][0],
+		'y' : data_store.get_neuron_positions()[sheet][1]
+	}
 
-	return figure(title=sheet, x_axis_label='x', y_axis_label='y')
+	plotting_data = ColumnDataSource(data=positions)
+
+	plot = figure(title=sheet)
+	plot.circle(x='x',y='y',source=plotting_data)
+
+	return plot
 
 
 def __main__():
@@ -48,7 +59,7 @@ def __main__():
 	for sheet in data_store.sheets():
 		graphs[sheet] = get_plot(data_store,sheet)
 
-	show_sheets_plots(graphs)
+	show_sheets_plots(graphs,2)
 
 if __name__ == "__main__":
     __main__()
