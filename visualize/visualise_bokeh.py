@@ -12,7 +12,7 @@ from parameters import ParameterSet
 
 from bokeh.plotting import figure, output_file, show
 from bokeh.layouts import gridplot
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, LassoSelectTool
 
 import holoviews as hv 
 
@@ -63,19 +63,24 @@ def show_graphs(graphs_dict,cols_number):
     	hv.opts.Nodes(**defaults)
     )
 
-	layout = hv.Layout()
+	graphs_list = []
 
 	for g in graphs_dict:
 		graph = graphs_dict[g]
-		print(graph.edgepaths)
-  
+
+		graph.opts(edge_line_width=1, node_size=5)
 		graph.opts(hv.opts.Graph(inspection_policy='nodes', tools=['hover', 'box_select'],
-			edge_hover_line_color='green', node_hover_fill_color='red'))
-		graph.opts(node_size=5)
+			edge_hover_line_color='green'))
 
-		layout += graph
+		graphs_list.append(graph)
 
-	hv.save(layout.cols(cols_number), 'hv.html')
+	layout = hv.Layout(graphs_list)
+	layout.cols(cols_number)
+	layout.opts(shared_axes=False)
+ 
+	bokeh_layout = hv.render(layout)
+
+	show(bokeh_layout)
 
 def get_plot(data_store, sheet):
 	"""
@@ -122,8 +127,6 @@ def __main__():
 		graphs[sheet] = get_plot(data_store,sheet)
 
 	show_graphs(graphs,2)
-
-	#show_sheets_plots(graphs,2)
 
 if __name__ == "__main__":
     __main__()
