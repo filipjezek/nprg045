@@ -13,3 +13,7 @@ neo==0.5.2
 pyNN
 requests
 bokeh
+holoviews
+
+datashader
+scikit-image

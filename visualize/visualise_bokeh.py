@@ -15,6 +15,9 @@ from bokeh.layouts import gridplot
 from bokeh.models import ColumnDataSource, LassoSelectTool
 
 import holoviews as hv 
+import datashader as ds
+
+from holoviews.operation.datashader import datashade, shade, dynspread, rasterize, bundle_graph
 
 from numpy import array, resize, where, arange
 from math import ceil
@@ -69,6 +72,11 @@ def show_graphs(graphs_dict,cols_number):
 		graph = graphs_dict[g]
 
 		graph.opts(edge_line_width=1, node_size=5)
+		#graph.opts(min_width=1) #datashade
+		#if type(graph) == hv.element.graphs.Graph:
+		#	print(type(graph))
+		#	graph.nodes.opts(size=5)
+
 		graph.opts(hv.opts.Graph(inspection_policy='nodes', tools=['hover', 'box_select'],
 			edge_hover_line_color='green'))
 
@@ -81,6 +89,23 @@ def show_graphs(graphs_dict,cols_number):
 	bokeh_layout = hv.render(layout)
 
 	show(bokeh_layout)
+
+def connections_inside_layer_bundle(connections,nodes):
+	c_source = [int(i) for (i,j,weight) in connections]
+	c_target = [int(j) for (i,j,weight) in connections]
+	edge_labels = [x for (i,j,x) in connections]
+	g = hv.Graph(((c_source, c_target, edge_labels), nodes), vdims='weight')
+	#return bundle_graph(g)
+	return g
+
+def connections_inside_layer_datashade(connections,nodes):
+	c_source = [int(i) for (i,j,weight) in connections]
+	c_target = [int(j) for (i,j,weight) in connections]
+	edge_labels = [x for (i,j,x) in connections]
+
+	graph = datashade(hv.Graph(((c_source, c_target,edge_labels),nodes)))
+ 
+	return graph
 
 def get_plot(data_store, sheet):
 	"""
@@ -102,11 +127,8 @@ def get_plot(data_store, sheet):
 
 	for conn in connections:
 		if (conn.source_name == sheet and conn.target_name == sheet):
-			w = conn.weights
-			w_source = [int(i) for (i,j,weight) in w]
-			w_target = [int(j) for (i,j,weight) in w]
-			edge_labels = [weight for (i,j,weight) in w]
-			graph = hv.Graph(((w_source, w_target, edge_labels), nodes), vdims='weight')
+			graph = connections_inside_layer_bundle(conn.weights,nodes)
+			
 
 	#-----
 
