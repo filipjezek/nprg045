@@ -77,7 +77,7 @@ def show_graphs(graphs_dict,cols_number):
 		#	print(type(graph))
 		#	graph.nodes.opts(size=5)
 
-		graph.opts(hv.opts.Graph(inspection_policy='nodes', tools=['hover', 'box_select'],
+		graph.opts(hv.opts.Graph(inspection_policy='nodes', tools=['hover', 'lasso_select'],
 			edge_hover_line_color='green'))
 
 		graphs_list.append(graph)
@@ -95,8 +95,11 @@ def connections_inside_layer_bundle(connections,nodes):
 	c_target = [int(j) for (i,j,weight) in connections]
 	edge_labels = [x for (i,j,x) in connections]
 	g = hv.Graph(((c_source, c_target, edge_labels), nodes), vdims='weight')
-	#return bundle_graph(g)
-	return g
+	print("before B") # test
+	bg = bundle_graph(g)
+	print("after B")
+	return bg
+	#return g # without bundle efect
 
 def connections_inside_layer_datashade(connections,nodes):
 	c_source = [int(i) for (i,j,weight) in connections]
