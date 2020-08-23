@@ -99,7 +99,7 @@ def connections_inside_layer_bundle(connections,nodes):
 	bg = bundle_graph(g)
 	print("after B")
 	return bg
-	#return g # without bundle efect
+	#return g # without bundle
 
 def connections_inside_layer_datashade(connections,nodes):
 	c_source = [int(i) for (i,j,weight) in connections]
