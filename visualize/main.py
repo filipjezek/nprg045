@@ -22,6 +22,23 @@ from holoviews.operation.datashader import datashade, shade, dynspread, rasteriz
 from numpy import array, resize, where, arange
 from math import ceil
 
+import networkx as nx
+
+from .graph_functions import *
+
+#------------------------------------------------new
+
+def add_sheet_nodes_to_graph(sheet):
+    
+	positions = {
+		'x' : data_store.get_neuron_positions()[sheet][0],
+		'y' : data_store.get_neuron_positions()[sheet][1]
+	}
+
+	return positions
+
+#---------------------------------------------------
+
 hv.extension('bokeh')
 
 defaults = dict(width=800, height=800)
@@ -59,9 +76,13 @@ def get_plot(data_store, sheet):
  
  
 	connections = data_store.get_analysis_result(identifier='Connections')
+	print(connections)
 	graph = hv.Graph((([],[],[]), nodes), )
 
+	print(connections)
+
 	for conn in connections:
+		print(conn)
 		if (conn.source_name == sheet and conn.target_name == sheet):
 			graph = connections_inside_layer(conn.weights,nodes)
 
@@ -72,11 +93,7 @@ def get_plot(data_store, sheet):
     
 path_to_data = sys.argv[1]
 # for me: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student
-data_store = PickledDataStore(
-					load=True,
-					parameters=ParameterSet(
-						{'root_directory': path_to_data ,'store_stimuli' : False}),
-					replace=False)
+data_store = get_datastore(path_to_data)
 
 graphs = []
 
