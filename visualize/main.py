@@ -25,10 +25,10 @@ import networkx as nx
 
 from graph_functions import *
 
-mapper = linear_cmap(field_name='selected', palette=('#a1cdec', '#440154', '#f20808') ,low=0 ,high=2)
+mapper_nodes = linear_cmap(field_name='selected', palette=('#a1cdec', '#440154', '#f20808') ,low=0 ,high=2)
 tools = [LassoSelectTool(), ResetTool(), WheelZoomTool(), PanTool(),HoverTool()]
 
-    
+	
 path_to_data = sys.argv[1]
 # for me: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student
 datastore = get_datastore(path_to_data)
@@ -40,19 +40,21 @@ plots=[]
 
 
 for sheet in datastore.sheets():
-    sheet_graph_renderer = sheet_graph_to_show(g_to_show,sheet)
-    sheet_graph_renderer.node_renderer.glyph = Circle(size=5, fill_color=mapper)
-    
-    print(sheet_graph_renderer.node_renderer.data_source) # bokeh datasource
-
-    sheet_graph_plot = figure(title=sheet,
+	sheet_graph_renderer = sheet_graph_to_show(g_to_show,sheet)
+	sheet_graph_renderer.node_renderer.glyph = Circle(size=5, fill_color=mapper_nodes)
+	
+	if sheet_graph_renderer.edge_renderer.data_source.data['start'] != []:
+		sheet_graph_renderer.edge_renderer.glyph.line_width = {'field': 'weight' }
+  		# works, but need to be scaled, too small values
+	 
+	sheet_graph_plot = figure(title=sheet,
 				  x_range=(-1,1), y_range=(-1,1),
-	              tools="lasso_select,pan,wheel_zoom,reset")
-    sheet_graph_plot.add_tools(HoverTool(tooltips=[("index", "@index"), ("coordinates", "@coor")]))
-    sheet_graph_plot.renderers.append(sheet_graph_renderer)
+				  tools="lasso_select,pan,wheel_zoom,reset")
+	sheet_graph_plot.add_tools(HoverTool(tooltips=[("index", "@index"), ("coordinates", "@coor")]))
+	sheet_graph_plot.renderers.append(sheet_graph_renderer)
 
-    plots.append(sheet_graph_plot)
-    
+	plots.append(sheet_graph_plot)
+	
 
 
 layout = gridplot(plots, ncols=2,plot_width=800, plot_height=800)
