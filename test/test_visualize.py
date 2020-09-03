@@ -121,3 +121,14 @@ def test_add_connection_edges_attributes():
     
     assert expected_dict == result_dict
     
+def test_get_nodes_layout():
+    G = nx.DiGraph()
+    G.add_nodes_from([(0,{"sheet":"A","coor":(2,1)}),
+                      (1,{"sheet":"A","coor":(2,2)}),
+                      (2,{"sheet":"A","coor":(3,1)})])
+    
+    result = graph_functions.get_nodes_layout(G)
+    expected = {0:(2,1),1:(2,2),2:(3,1)}
+    
+    assert result == expected
+    

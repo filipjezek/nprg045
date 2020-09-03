@@ -14,8 +14,9 @@ from parameters import ParameterSet
 from numpy import arange
 from bokeh.plotting import figure, curdoc, from_networkx, show
 from bokeh.models import (BoxZoomTool, Circle, HoverTool,
-                          MultiLine, Plot, Range1d, ResetTool,)
+						  MultiLine, Plot, Range1d, ResetTool,GraphRenderer)
 import networkx as nx
+from functools import partial
 
 
 def get_datastore(path_to_datastore):
@@ -74,41 +75,50 @@ def create_neuron_connections_graph(datastore):
 	return G
 
 
-def sheet_graph_to_show(G,sheet):
+def sheet_graph(G,sheet):
 	
-	sheet_nodes = [n for n,attr in G.nodes(data=True) if attr["sheet"]==sheet]
-	sheet_subgraph = G.subgraph(sheet_nodes)
-	layout = {n:sheet_subgraph.nodes[n]["coor"] for n in sheet_subgraph.nodes()}
-	graph = from_networkx(sheet_subgraph,layout)
+	sheet_nodes = [(n,attr) for n,attr in G.nodes(data=True) if attr["sheet"]==sheet]
+	sheet_subgraph = nx.DiGraph()
+	sheet_subgraph.add_nodes_from(sheet_nodes)
+	layout = get_nodes_layout(sheet_subgraph)
+	graph_renderer = from_networkx(sheet_subgraph,layout)
 
-	return graph
-
-def graph_according_selection(G,selection=[],edges_in=False):
-
-	selected_edges = []
-	nodes = G.nodes(data=True)
+	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected')
  
-	graph_to_show = nx.DiGraph()
-	graph_to_show.add_nodes_from(nodes, selected=0)
+	return graph_renderer
+
+def get_nodes_layout(G):
+	layout = {n:G.nodes[n]["coor"] for n in G.nodes()}
+	return layout
+
+def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
+
+	for graph_renderer in curdoc().select({"type":GraphRenderer}):
+		update_nodes_and_edges_data(nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 	
-	for selected_node in selection:
-		graph_to_show.nodes[selected_node]["selected"] = 1
+
+def update_nodes_and_edges_data(nx_graph,nodes_data_source,edges_data_source,edges_in):
+
+	selected = nodes_data_source.selected.indices
+	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
+	edges = []
+
+	for n in selected:
+		node = nodes_data_source.data["index"][n]
+		new_data_nodes[n] = 1
 
 		neighbors = []
 		if edges_in==False:
-			neighbors = G.successors(selected_node)
+			neighbors = nx_graph.successors(node)
 		else:
-			neighbors = G.predecessors(selected_node)
+			neighbors = nx_graph.predecessors(node)
 
-		for n in neighbors:
-			if graph_to_show.nodes[n]["selected"] == 0:
-				graph_to_show.nodes[n]["selected"] = 2
-			if nodes[n]["sheet"]==nodes[selected_node]["sheet"]:
-				if edges_in==False:
-					selected_edges.append((selected_node,n,G[selected_node][n]))
-				else:
-					selected_edges.append((n,selected_node,G[n][selected_node]))
+		for ng in neighbors:
+			if ng in nodes_data_source.data["index"]:
+				p = nodes_data_source.data["index"].index(ng)
+				if new_data_nodes[p] == 0:
+					new_data_nodes[p] = 2
 
-	graph_to_show.add_edges_from(selected_edges)
+	nodes_data_source.data["selected"] = new_data_nodes
 
-	return graph_to_show
+
