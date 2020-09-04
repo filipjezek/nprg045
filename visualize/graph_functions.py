@@ -93,19 +93,33 @@ def get_nodes_layout(G):
 
 def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
 
+	selected_indicies = get_selected()
+
 	for graph_renderer in curdoc().select({"type":GraphRenderer}):
-		update_nodes_and_edges_data(nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
+		update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 	
 
-def update_nodes_and_edges_data(nx_graph,nodes_data_source,edges_data_source,edges_in):
+def get_selected():
+	selected_indicies = []
+	
+	for graph_renderer in curdoc().select({"type":GraphRenderer}):
+		source = graph_renderer.node_renderer.data_source
+		indicies_in_renderer = source.selected.indices
+		for i in indicies_in_renderer:
+			node_index = source.data["index"][i]
+			selected_indicies.append(node_index)
 
-	selected = nodes_data_source.selected.indices
+	return selected_indicies
+
+def update_nodes_and_edges_data(selected,nx_graph,nodes_data_source,edges_data_source,edges_in):
+
 	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
 	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
 
-	for n in selected:
-		node = nodes_data_source.data["index"][n]
-		new_data_nodes[n] = 1
+	for node in selected:
+		if node in nodes_data_source.data["index"]:
+			p = nodes_data_source.data["index"].index(node)
+			new_data_nodes[p] = 1
 
 		neighbors = []
 		if edges_in:
