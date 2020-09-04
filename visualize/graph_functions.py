@@ -101,17 +101,17 @@ def update_nodes_and_edges_data(nx_graph,nodes_data_source,edges_data_source,edg
 
 	selected = nodes_data_source.selected.indices
 	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
-	edges = []
+	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
 
 	for n in selected:
 		node = nodes_data_source.data["index"][n]
 		new_data_nodes[n] = 1
 
 		neighbors = []
-		if edges_in==False:
-			neighbors = nx_graph.successors(node)
-		else:
+		if edges_in:
 			neighbors = nx_graph.predecessors(node)
+		else:
+			neighbors = nx_graph.successors(node)
 
 		for ng in neighbors:
 			if ng in nodes_data_source.data["index"]:
@@ -119,6 +119,20 @@ def update_nodes_and_edges_data(nx_graph,nodes_data_source,edges_data_source,edg
 				if new_data_nodes[p] == 0:
 					new_data_nodes[p] = 2
 
+			if nx_graph.nodes[node]["sheet"] == nx_graph.nodes[ng]["sheet"]:
+				if edges_in:
+					edges['start'].append(ng)
+					edges['end'].append(node)
+					edges['weight'].append(nx_graph.edges[ng,node]["weight"])
+					edges['delay'].append(nx_graph.edges[ng,node]["delay"])
+				else:
+					edges['start'].append(node)
+					edges['end'].append(ng)
+					edges['weight'].append(nx_graph.edges[node,ng]["weight"])
+					edges['delay'].append(nx_graph.edges[node,ng]["delay"])
+	
+
 	nodes_data_source.data["selected"] = new_data_nodes
+	edges_data_source.data = edges
 
 
