@@ -16,7 +16,7 @@ from parameters import ParameterSet
 from bokeh.plotting import figure, curdoc, show
 from bokeh.layouts import gridplot, layout
 from bokeh.models import ToolbarBox, Toolbar, LassoSelectTool, WheelZoomTool,ResetTool, PanTool,HoverTool, Plot
-from bokeh.models import CDSView, ColumnDataSource, GroupFilter
+from bokeh.models import ColumnDataSource, GroupFilter, DataRange1d, Hex
 from bokeh.palettes import Spectral6
 from bokeh.transform import linear_cmap
 
@@ -42,20 +42,44 @@ edges_in=False
 plots=[]
 
 for sheet in datastore.sheets():
+    # create graph renderer
 	sheet_graph_renderer = sheet_graph(neuron_connections_graph,sheet)
-	sheet_graph_renderer.node_renderer.glyph = Circle(fill_color=mapper_nodes,line_color=mapper_nodes)
-	sheet_graph_renderer.node_renderer.nonselection_glyph = Circle(fill_color=mapper_nodes,line_color=mapper_nodes)
+ 
+	# style nodes
+	sheet_graph_renderer.node_renderer.glyph = Hex(fill_color=mapper_nodes,line_color=mapper_nodes)
+	sheet_graph_renderer.node_renderer.nonselection_glyph = Hex(fill_color=mapper_nodes,line_color=None)
+
+	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source
+	
 	nodes_data_source.selected.on_change("indices",
-                                    partial(update_renderers_according_selection,
-                                            nx_graph=neuron_connections_graph,
-                                            edges_in=edges_in))
+									partial(update_renderers_according_selection,
+											nx_graph=neuron_connections_graph,
+											edges_in=edges_in))
 	 
+	# get plot ranges
+	ranges = get_ranges(nodes_data_source.data["coor"])
+	# create plot
 	sheet_graph_plot = figure(title=sheet,
-				  x_range=(-1,1), y_range=(-1,1),
-				  tools="lasso_select,pan,wheel_zoom")
-	sheet_graph_plot.add_tools(HoverTool(tooltips=[("index", "@index"), ("coordinates", "@coor")]))
+							  x_range=ranges[0],
+    						  y_range=ranges[1],
+							  tools="lasso_select,pan,wheel_zoom")
+ 
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
+ 
+	# does not work
+	hover_nodes = HoverTool(
+					tooltips=[("index", "@index"), ("coordinates", "@coor")],
+					renderers=[sheet_graph_renderer.node_renderer]
+					)
+	hover_edges = HoverTool(
+					tooltips=[('weight','@weight'),('delay','@delay')],
+					renderers=[sheet_graph_renderer.edge_renderer]
+					)
+
+
+
+	sheet_graph_plot.add_tools(hover_edges,hover_nodes)
 
 	plots.append(sheet_graph_plot)
 	

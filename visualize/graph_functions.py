@@ -13,7 +13,7 @@ from parameters import ParameterSet
 
 from numpy import arange
 from bokeh.plotting import figure, curdoc, from_networkx, show
-from bokeh.models import (BoxZoomTool, Circle, HoverTool,
+from bokeh.models import (BoxZoomTool, Circle, HoverTool, Range1d,
 						  MultiLine, Plot, Range1d, ResetTool,GraphRenderer)
 import networkx as nx
 from functools import partial
@@ -44,23 +44,26 @@ def add_connection_edges(G, source, target, conn_weights, conn_delays):
 
 def add_sheet_nodes_to_graph(G,datastore,n,sheet):
 	positions = get_neuron_positions_on_sheet(datastore,sheet)
-		
-	node_indices = [i for i in range(len(positions['x']))]
+	
+	number_of_nodes = len(positions['x'])
+	node_indices = [i for i in range(number_of_nodes)]
 	nodes_with_sheet = [(i+n,{"coor":(positions['x'][i],positions['y'][i])})
 						for i
 						in node_indices]
 		
 	G.add_nodes_from(nodes_with_sheet,sheet=sheet)
 
+	return n + number_of_nodes
+
 def create_neuron_connections_graph(datastore):
 	G = nx.DiGraph()
 
 	sheet_nodes_start_number = {}
+	n = 0
 
 	for sheet in datastore.sheets():
-		n = G.number_of_nodes() # maybe do it faster?
 		sheet_nodes_start_number[sheet] = n
-		add_sheet_nodes_to_graph(G,datastore,n,sheet)
+		n = add_sheet_nodes_to_graph(G,datastore,n,sheet)
 
 	connections = datastore.get_analysis_result(identifier='Connections')
 
@@ -111,7 +114,39 @@ def get_selected():
 
 	return selected_indicies
 
+#def update_removed_from_selection(removed,nx_graph,nodes_data_source,edges_data_source,edges_in):
+#	patch = []
+#	for node in removed:
+#		if node in nodes_data_source.data["index"]:
+#			p = nodes_data_source.data["index"].index(node)
+#			patch.append((p,0))
+#
+#		neighbors = []
+#		if edges_in:
+#			neighbors = nx_graph.predecessors(node)
+#		else:
+#			neighbors = nx_graph.successors(node)
+#
+#		for ng in neighbors:
+#			if ng in nodes_data_source.data["index"]:
+#				p = nodes_data_source.data["index"].index(ng)
+#				if new_data_nodes[p] == 0:
+#					new_data_nodes[p] = 2
+#
+#			if nx_graph.nodes[node]["sheet"] == nx_graph.nodes[ng]["sheet"]:
+#				if edges_in:
+#					edges['start'].append(ng)
+#					edges['end'].append(node)
+#					edges['weight'].append(nx_graph.edges[ng,node]["weight"])
+#					edges['delay'].append(nx_graph.edges[ng,node]["delay"])
+#				else:
+#					edges['start'].append(node)
+#					edges['end'].append(ng)
+#					edges['weight'].append(nx_graph.edges[node,ng]["weight"])
+#					edges['delay'].append(nx_graph.edges[node,ng]["delay"])
+
 def update_nodes_and_edges_data(selected,nx_graph,nodes_data_source,edges_data_source,edges_in):
+	#print("updating")
 
 	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
 	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
@@ -149,4 +184,21 @@ def update_nodes_and_edges_data(selected,nx_graph,nodes_data_source,edges_data_s
 	nodes_data_source.data["selected"] = new_data_nodes
 	edges_data_source.data = edges
 
+def get_ranges(coors_list):
+    min_x = 0
+    max_x = 0
+    min_y = 0
+    max_y = 0
+    for coor in coors_list:
+        x = coor[0]
+        y = coor[1]
+        if x<min_x:
+            min_x = x
+        if x>max_x:
+            max_x=x
+        if y<min_y:
+            min_y=y
+        if y>max_y:
+            max_y=y
 
+    return (Range1d(min_x,max_x),Range1d(min_y,max_y))
