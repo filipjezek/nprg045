@@ -77,15 +77,6 @@ def create_neuron_connections_graph(datastore):
 
 	return G
 
-def get_sheet_subgraphs(G,sheets):
-	subgraphs = {}
-	
-	for sheet in sheets:
-		sheet_nodes = [n for n,attr in G.nodes(data=True) if attr["sheet"]==sheet]
-		subgraphs[sheet] = G.subgraph(sheet_nodes)
-  
-	return subgraphs
-
 def create_sheet_graph_renderer(G,sheet):
 	sheet_nodes = [(n,attr) for n,attr in G.nodes(data=True) if attr["sheet"]==sheet]
 	sheet_subgraph = nx.DiGraph()
@@ -102,8 +93,6 @@ def get_nodes_layout(G):
 	return layout
 
 def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
-	print(new)
-
 	selected_indicies = get_selected()
 
 	for graph_renderer in curdoc().select({"type":GraphRenderer}):
@@ -122,50 +111,6 @@ def get_selected():
 
 	return selected_indicies
 
-def change_selection(positions,nodes_data_source,value_to_selected):
-	selected_indicies = []
-	nodes_data = nodes_data_source.data
-
-	patch_data = []
-
-	for p in positions:
-		node_index = nodes_data["index"][p]
-		selected_indicies.append(node_index)
-		patch_data.append((p,value_to_selected))
-
-	print(patch_data)
-	nodes_data_source.patch({'selected': patch_data})
-
-	return selected_indicies
-
-def update_renderers_according_selection2(attr, old, new, nx_graph, this_renderer, edges_in=False):
-	old_set = set(old)
-	new_set = set(new)
-
-	print("---------------------------------------------------")
-	added_set = new_set.difference(old_set)
-	removed_set = old_set.difference(new_set)
-	print("old")
-	print(old_set)
-	print("new")
-	print(new_set)
-
-	print("added")
-	print(added_set)
-	print("removed")
-	print(removed_set)
-
-	# indicies removed from selection
-	removed = change_selection(removed_set,this_renderer.node_renderer.data_source,0)
-	added = change_selection(added_set,this_renderer.node_renderer.data_source,1)
-	print(removed)
-	print(added)
-
-def update_this_renderer():
-	raise NotImplementedError
-
-def selected_return_neighbors_by_sheet():
-	raise NotImplementedError
 
 def update_nodes_and_edges_data(selected,nx_graph,nodes_data_source,edges_data_source,edges_in):
 	#print("updating")

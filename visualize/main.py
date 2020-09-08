@@ -32,8 +32,6 @@ edges_in=False
 
 sheets = datastore.sheets()
 
-sheet_subgraphs = get_sheet_subgraphs(neuron_connections_graph,sheets)
-
 plots=[]
 
 for sheet in sheets:
@@ -48,9 +46,8 @@ for sheet in sheets:
 	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
 	nodes_data_source.selected.on_change("indices",
-									partial(update_renderers_according_selection2,
+									partial(update_renderers_according_selection,
 											nx_graph=neuron_connections_graph,
-											this_renderer=sheet_graph_renderer,
 											edges_in=edges_in))
 	 
 	# get plot ranges
