@@ -72,7 +72,10 @@ for sheet in sheets:
 	sheet_graph_plot.tools.append(hover_nodes)
 	#sheet_graph_plot.tools.append(hover_edges)
 
-	sheet_graph_plot.on_event(SelectionGeometry, partial(update_renderers_after_selection,nx_graph=neuron_connections_graph))
+	sheet_graph_plot.on_event(SelectionGeometry,
+								partial(update_renderers_after_selection,
+											nx_graph=neuron_connections_graph,
+											sheet=sheet))
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)

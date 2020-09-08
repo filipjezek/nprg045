@@ -101,31 +101,23 @@ def get_nodes_layout(G):
 	layout = {n:G.nodes[n]["coor"] for n in G.nodes()}
 	return layout
 
-#def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
-def update_renderers_according_selection(nx_graph, edges_in=False):
-
-	selected_indicies = get_selected()
-
-	for graph_renderer in curdoc().select({"type":GraphRenderer}):
-		update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 	
-def update_renderers_after_selection(event,nx_graph,edges_in=False):
+def update_renderers_after_selection(event,nx_graph,sheet,edges_in=False):
 
 	if event.final:
-		selected_indicies = get_selected()
+		graph_renderer = curdoc().select({"name":sheet})[0]
 
-		for graph_renderer in curdoc().select({"type":GraphRenderer}):
-			update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
+		selected_indicies = get_selected(graph_renderer)
+		update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 
-def get_selected(): # used now - change to update only current plot selection
+def get_selected(graph_renderer):
 	selected_indicies = []
-	
-	for graph_renderer in curdoc().select({"type":GraphRenderer}):
-		source = graph_renderer.node_renderer.data_source
-		indicies_in_renderer = source.selected.indices
-		for i in indicies_in_renderer:
-			node_index = source.data["index"][i]
-			selected_indicies.append(node_index)
+
+	source = graph_renderer.node_renderer.data_source
+	indicies_in_renderer = source.selected.indices
+	for i in indicies_in_renderer:
+		node_index = source.data["index"][i]
+		selected_indicies.append(node_index)
 
 	return selected_indicies
 
