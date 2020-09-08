@@ -31,23 +31,26 @@ neuron_connections_graph = create_neuron_connections_graph(datastore)
 edges_in=False
 
 sheets = datastore.sheets()
+
+sheet_subgraphs = get_sheet_subgraphs(neuron_connections_graph,sheets)
+
 plots=[]
 
 for sheet in sheets:
-    # create graph renderer
-	sheet_graph_renderer = sheet_graph(neuron_connections_graph,sheet)
+	# create graph renderer
+	sheet_graph_renderer = create_sheet_graph_renderer(neuron_connections_graph,sheet)
 	sheet_graph_renderer.name = sheet
  
 	# style nodes
-	sheet_graph_renderer.node_renderer.glyph = Hex(fill_color=mapper_nodes,line_color=mapper_nodes)
+	sheet_graph_renderer.node_renderer.glyph = Hex(fill_color=mapper_nodes,line_color=None)
 	sheet_graph_renderer.node_renderer.nonselection_glyph = Hex(fill_color=mapper_nodes,line_color=None)
 
 	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
 	nodes_data_source.selected.on_change("indices",
-									partial(update_renderers_according_selection,
+									partial(update_renderers_according_selection2,
 											nx_graph=neuron_connections_graph,
-											#this_renderer=sheet_graph_renderer,
+											this_renderer=sheet_graph_renderer,
 											edges_in=edges_in))
 	 
 	# get plot ranges
@@ -62,16 +65,10 @@ for sheet in sheets:
 	# add renderer to the plot
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
  
-	# works only for one of them, not both
+	# hover tool
 	hover_nodes = HoverTool(
-					tooltips=[("index", "@index"), ("coordinates", "@coor")],
-					renderers=[sheet_graph_renderer.node_renderer]
-					)
-	hover_edges = HoverTool(
-					tooltips=[('weight','@weight'),('delay','@delay')],
-					renderers=[sheet_graph_renderer.edge_renderer]
-					)
-	sheet_graph_plot.add_tools(hover_edges,hover_nodes)
+					tooltips=[("index", "@index"), ("coordinates", "@coor")],)
+	sheet_graph_plot.add_tools(hover_nodes)
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)

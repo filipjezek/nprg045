@@ -132,3 +132,12 @@ def test_get_nodes_layout():
     
     assert result == expected
     
+def test_get_node_indicies():
+    nodes_data = {"index": [10,2,7,4,1,8]}
+    positions = [1,3,5]
+    
+    expected = [2,4,8]
+    result = graph_functions.get_node_indicies(positions,nodes_data)
+    
+    assert expected == result
+    
