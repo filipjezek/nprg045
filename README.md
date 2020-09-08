@@ -17,3 +17,6 @@ Run in folder mff_nprg045:
 bokeh serve --show visualize --args path_to_datastore
 ```
 (path_to_datastore example: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student)
+
+Running bokeh server:
+* selecting more disjunct areas in plot is posblie with Shift key
