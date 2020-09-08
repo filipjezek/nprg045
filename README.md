@@ -1,12 +1,19 @@
-# MFF Ročníkový projekt
+# How to run visualization
 
-Příprava:
-vyrobit venv, nainstalovat requirements.txt
+Prepare:
+venv, install requirements.txt
 
-Instalace mozaik pro python3:
+Install mozaik (python3):
+
 ```
 git clone https://github.com/antolikjan/mozaik.git
 cd mozaik
 git checkout python3
 python setup.py install
 ```
+
+Run in folder mff_nprg045:
+```
+bokeh serve --show visualize --args path_to_datastore
+```
+(path_to_datastore example: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student)
