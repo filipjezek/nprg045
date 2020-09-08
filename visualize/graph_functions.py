@@ -92,12 +92,22 @@ def get_nodes_layout(G):
 	layout = {n:G.nodes[n]["coor"] for n in G.nodes()}
 	return layout
 
-def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
+#def update_renderers_according_selection(attr, old, new, nx_graph, edges_in=False):
+def update_renderers_according_selection(nx_graph, edges_in=False):
 	selected_indicies = get_selected()
 
 	for graph_renderer in curdoc().select({"type":GraphRenderer}):
 		update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 	
+
+def print_callback(event,nx_graph,edges_in=False):
+	print("callback")
+	if event.final:
+		print("action")
+		selected_indicies = get_selected()
+
+		for graph_renderer in curdoc().select({"type":GraphRenderer}):
+			update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 
 def get_selected():
 	selected_indicies = []

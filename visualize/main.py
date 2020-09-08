@@ -17,10 +17,11 @@ from bokeh.plotting import figure, curdoc
 from bokeh.layouts import gridplot
 from bokeh.models import Hex
 from bokeh.transform import linear_cmap
+from bokeh.events import SelectionGeometry
 
 from graph_functions import *
 
-mapper_nodes = linear_cmap(field_name='selected', palette=('#a1cdec', '#440154', '#f20808') ,low=0 ,high=2)
+mapper_nodes = linear_cmap(field_name='selected', palette=('#a1cdec', '#ffff00', '#f20808') ,low=0 ,high=2)
 
 path_to_data = sys.argv[1]
 # for me: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student
@@ -34,6 +35,11 @@ sheets = datastore.sheets()
 
 plots=[]
 
+def my_tap_handler(attr,old,new,source):
+    print("tap")
+    index = source.selected.indices
+    print(index)
+
 for sheet in sheets:
 	# create graph renderer
 	sheet_graph_renderer = create_sheet_graph_renderer(neuron_connections_graph,sheet)
@@ -45,10 +51,12 @@ for sheet in sheets:
 
 	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
-	nodes_data_source.selected.on_change("indices",
-									partial(update_renderers_according_selection,
-											nx_graph=neuron_connections_graph,
-											edges_in=edges_in))
+	#nodes_data_source.selected.on_change("indices",
+	#								partial(update_renderers_according_selection,
+	#										nx_graph=neuron_connections_graph,
+	#										edges_in=edges_in))
+
+	nodes_data_source.on_change("selected", partial(my_tap_handler,source=nodes_data_source))
 	 
 	# get plot ranges
 	ranges = get_ranges(nodes_data_source.data["coor"])
@@ -57,15 +65,24 @@ for sheet in sheets:
 	sheet_graph_plot = figure(title=sheet,
 							  x_range=ranges[0],
     						  y_range=ranges[1],
-							  tools="lasso_select,pan,wheel_zoom")
+							  tools="tap,lasso_select,pan,wheel_zoom")
 
 	# add renderer to the plot
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
  
 	# hover tool
 	hover_nodes = HoverTool(
-					tooltips=[("index", "@index"), ("coordinates", "@coor")],)
-	sheet_graph_plot.add_tools(hover_nodes)
+					tooltips=[("index", "@index"), ("coordinates", "@coor")],
+					renderers=[sheet_graph_renderer])
+ 
+	hover_edges = HoverTool(
+					tooltips=[("weight", "@weight"), ("delay", "@delay")],
+					renderers=[sheet_graph_renderer])
+ 
+	sheet_graph_plot.tools.append(hover_nodes)
+	sheet_graph_plot.tools.append(hover_edges)
+
+	sheet_graph_plot.on_event(SelectionGeometry, partial(print_callback,nx_graph=neuron_connections_graph))
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)
