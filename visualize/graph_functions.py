@@ -93,7 +93,7 @@ def create_sheet_graph_renderer(G,sheet):
 	layout = get_nodes_layout(sheet_subgraph)
 	graph_renderer = from_networkx(sheet_subgraph,layout)
 
-	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected')
+	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected_neighbors')
 
 	return graph_renderer
 
@@ -102,89 +102,101 @@ def get_nodes_layout(G):
 	return layout
 
 	
-def update_renderers_after_selection(event,nx_graph,sheet,edges_in=False):
+def update_renderers_after_selection(event,nx_graph,this_sheet,sheets,edges_in=False):
 
 	if event.final:
-		graph_renderer = curdoc().select({"name":sheet})[0]
+		# now update only current sheet plot
+		update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in)
+		
+		#for graph_renderer in curdoc().select({"type":GraphRenderer}):
+		#	update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 
-		selected_indicies = get_selected(graph_renderer)
-		update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 
-def get_selected(graph_renderer):
+def selected_nx_index(graph_renderer,new_data_nodes):
 	selected_indicies = []
 
 	source = graph_renderer.node_renderer.data_source
 	indicies_in_renderer = source.selected.indices
-	for i in indicies_in_renderer:
+
+	for i in indicies_in_renderer:	
 		node_index = source.data["index"][i]
 		selected_indicies.append(node_index)
+		new_data_nodes[i] = 1
 
 	return selected_indicies
 
-def change_selection(positions,nodes_data_source,value_to_selected):
-	selected_indicies = []
-	nodes_data = nodes_data_source.data
+def update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in):
+	graph_renderer = curdoc().select({"name":this_sheet})[0]
 
-	patch_data = []
+	nodes_data_source = graph_renderer.node_renderer.data_source
+	edges_data_source = graph_renderer.edge_renderer.data_source
 
-	for p in positions:
-		node_index = nodes_data["index"][p]
-		selected_indicies.append(node_index)
-		patch_data.append((p,value_to_selected))
+	new_data_nodes = [0] * len(nodes_data_source.data["selected_neighbors"])
 
-	print(patch_data)
-	nodes_data_source.patch({'selected': patch_data})
+	selected_nx_indicies = selected_nx_index(graph_renderer,new_data_nodes)
 
-	return selected_indicies
-
-def update_renderers_according_selection2(attr, old, new, nx_graph, this_renderer, edges_in=False):
-	old_set = set(old)
-	new_set = set(new)
-
-	added_set = new_set.difference(old_set)
-	removed_set = old_set.difference(new_set)
-
-	# indicies removed from selection
-	removed = change_selection(removed_set,this_renderer.node_renderer.data_source,0)
-	added = change_selection(added_set,this_renderer.node_renderer.data_source,1)
-
-def update_nodes_and_edges_data(selected,nx_graph,nodes_data_source,edges_data_source,edges_in):
-
-	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
 	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
+ 
+	neighbors_in_other_sheets = { s:[] for s in sheets }
 
-	for node in selected:
-		if node in nodes_data_source.data["index"]:
-			p = nodes_data_source.data["index"].index(node)
-			new_data_nodes[p] = 1
+	for node in selected_nx_indicies:
 
-		neighbors = []
-		if edges_in:
-			neighbors = nx_graph.predecessors(node)
-		else:
-			neighbors = nx_graph.successors(node)
+		neighbors = get_neighbors(node,nx_graph, edges_in)
 
 		for ng in neighbors:
-			if ng in nodes_data_source.data["index"]:
+
+			if nx_graph.nodes[ng]["sheet"] == this_sheet:
 				p = nodes_data_source.data["index"].index(ng)
 				if new_data_nodes[p] == 0:
 					new_data_nodes[p] = 2
 
-			if nx_graph.nodes[node]["sheet"] == nx_graph.nodes[ng]["sheet"]:
 				if edges_in:
 					append_edge_to_edges_dict(edges,nx_graph,ng,node)
 				else:
 					append_edge_to_edges_dict(edges,nx_graph,node,ng)
-	
+			else:
+				neighbors_in_other_sheets[nx_graph.nodes[ng]["sheet"]].append(ng)
 
-	nodes_data_source.data["selected"] = new_data_nodes
+	nodes_data_source.data["selected_neighbors"] = new_data_nodes
 	edges_data_source.data = edges
- 
+
+	update_neighbors_in_other_sheets(neighbors_in_other_sheets,this_sheet)
+
+def update_neighbors_in_other_sheets(neighbors_dict,active_sheet):
+
+	for graph_renderer in curdoc().select({"type":GraphRenderer}):
+
+		if graph_renderer.name == active_sheet:
+			continue
+
+		nodes_data_source = graph_renderer.node_renderer.data_source
+		new_data_nodes = [0] * len(nodes_data_source.data["selected_neighbors"])
+
+		for node in neighbors_dict[graph_renderer.name]:
+			p = nodes_data_source.data["index"].index(node)
+			if nodes_data_source.data["selected_neighbors"][p] == 0:
+    				new_data_nodes[p] = 2 
+
+		nodes_data_source.data["selected_neighbors"] = new_data_nodes
+
+		edges_data_source = graph_renderer.edge_renderer.data_source
+		edges_data_source.data = {'start':[], 'end':[], 'weight':[],'delay':[]}
+
 def append_edge_to_edges_dict(edges_dict, nx_graph, start, end):
 	edges_dict['start'].append(start)
 	edges_dict['end'].append(end)
 	edges_dict['weight'].append(nx_graph.edges[(start,end)]["weight"])
 	edges_dict['delay'].append(nx_graph.edges[(start,end)]["delay"])
+ 
+def get_neighbors(node,nx_graph, edges_in):
+	neighbors = []
+	if edges_in:
+		neighbors = nx_graph.predecessors(node)
+	else:
+		neighbors = nx_graph.successors(node)
+
+	return neighbors
+    
 
 def get_ranges(coors_list):
 	min_x = 0
@@ -204,3 +216,32 @@ def get_ranges(coors_list):
 			max_y=y
 
 	return (Range1d(min_x,max_x),Range1d(min_y,max_y))
+
+#--------------------------------------------------------------------
+
+def change_selection(positions,nodes_data_source,value_to_selected):
+	selected_indicies = []
+	nodes_data = nodes_data_source.data
+
+	patch_data = []
+
+	for p in positions:
+		node_index = nodes_data["index"][p]
+		selected_indicies.append(node_index)
+		patch_data.append((p,value_to_selected))
+
+	print(patch_data)
+	nodes_data_source.patch({'selected_neighbors': patch_data})
+
+	return selected_indicies
+
+def update_renderers_according_selection2(attr, old, new, nx_graph, this_renderer, edges_in=False):
+	old_set = set(old)
+	new_set = set(new)
+
+	added_set = new_set.difference(old_set)
+	removed_set = old_set.difference(new_set)
+
+	# indicies removed from selection
+	removed = change_selection(removed_set,this_renderer.node_renderer.data_source,0)
+	added = change_selection(added_set,this_renderer.node_renderer.data_source,1)

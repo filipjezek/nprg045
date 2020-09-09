@@ -21,7 +21,10 @@ from bokeh.events import SelectionGeometry
 
 from graph_functions import *
 
-mapper_nodes = linear_cmap(field_name='selected', palette=('#a1cdec', '#ffff00', '#f20808') ,low=0 ,high=2)
+mapper_nodes = linear_cmap(field_name='selected_neighbors',
+                           palette=('#8cbacc', '#f0e60c', '#ff000d'),low=0 ,high=2)
+mapper_nodes_line = linear_cmap(field_name='selected_neighbors',
+                                palette=('#337088', '#d8cf0a', '#990007'),low=0 ,high=2)
 
 path_to_data = sys.argv[1]
 # for me: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student
@@ -31,10 +34,10 @@ neuron_connections_graph = create_neuron_connections_graph(datastore)
 
 edges_in=False
 
+# get sheets from datastore
 sheets = datastore.sheets()
 
 plots=[]
-
 
 for sheet in sheets:
 	# create graph renderer
@@ -42,9 +45,10 @@ for sheet in sheets:
 	sheet_graph_renderer.name = sheet
  
 	# style nodes
-	sheet_graph_renderer.node_renderer.glyph = Hex(fill_color=mapper_nodes,line_color=None)
-	sheet_graph_renderer.node_renderer.nonselection_glyph = Hex(fill_color=mapper_nodes,line_color=None)
-
+	node_style = Hex(size=6,fill_color=mapper_nodes,line_color=mapper_nodes_line)
+	sheet_graph_renderer.node_renderer.glyph = node_style
+	sheet_graph_renderer.node_renderer.nonselection_glyph = node_style
+ 
 	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
 
@@ -64,18 +68,14 @@ for sheet in sheets:
 	hover_nodes = HoverTool(
 					tooltips=[("index", "@index"), ("coordinates", "@coor")],
 					renderers=[sheet_graph_renderer])
- 
-	#hover_edges = HoverTool(
-	#				tooltips=[("weight", "@weight"), ("delay", "@delay")],
-	#				renderers=[sheet_graph_renderer])
- 
 	sheet_graph_plot.tools.append(hover_nodes)
-	#sheet_graph_plot.tools.append(hover_edges)
 
+	# interactivity after selection
 	sheet_graph_plot.on_event(SelectionGeometry,
 								partial(update_renderers_after_selection,
 											nx_graph=neuron_connections_graph,
-											sheet=sheet))
+											this_sheet=sheet,
+											sheets=sheets))
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)
