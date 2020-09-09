@@ -15,7 +15,7 @@ from parameters import ParameterSet
 # bokeh plotting
 from bokeh.plotting import figure, curdoc
 from bokeh.layouts import gridplot
-from bokeh.models import Hex
+from bokeh.models import Hex, RadioButtonGroup
 from bokeh.transform import linear_cmap
 from bokeh.events import SelectionGeometry
 
@@ -26,13 +26,15 @@ mapper_nodes = linear_cmap(field_name='selected_neighbors',
 mapper_nodes_line = linear_cmap(field_name='selected_neighbors',
                                 palette=('#337088', '#d8cf0a', '#990007'),low=0 ,high=2)
 
+
 path_to_data = sys.argv[1]
-# for me: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student
 
 datastore = get_datastore(path_to_data)
 neuron_connections_graph = create_neuron_connections_graph(datastore)
 
-edges_in=False
+radio_button_group = RadioButtonGroup(labels=["outcoming edges", "incoming edges"], active=0)
+radio_button_group.on_click(reset_visualization)
+
 
 # get sheets from datastore
 sheets = datastore.sheets()
@@ -75,7 +77,8 @@ for sheet in sheets:
 								partial(update_renderers_after_selection,
 											nx_graph=neuron_connections_graph,
 											this_sheet=sheet,
-											sheets=sheets))
+											sheets=sheets,
+											edges_in_rbgroup=radio_button_group))
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)
@@ -83,4 +86,5 @@ for sheet in sheets:
 # create grid layout form plots list
 layout = gridplot(plots, ncols=2,plot_width=800, plot_height=800)
 
+curdoc().add_root(radio_button_group)
 curdoc().add_root(layout)

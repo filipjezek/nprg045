@@ -102,14 +102,11 @@ def get_nodes_layout(G):
 	return layout
 
 	
-def update_renderers_after_selection(event,nx_graph,this_sheet,sheets,edges_in=False):
+def update_renderers_after_selection(event,nx_graph,this_sheet,sheets,edges_in_rbgroup):
+	edges_in = edges_in_rbgroup.active
 
 	if event.final:
-		# now update only current sheet plot
 		update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in)
-		
-		#for graph_renderer in curdoc().select({"type":GraphRenderer}):
-		#	update_nodes_and_edges_data(selected_indicies,nx_graph,graph_renderer.node_renderer.data_source,graph_renderer.edge_renderer.data_source,edges_in)
 
 
 def selected_nx_index(graph_renderer,new_data_nodes):
@@ -174,8 +171,7 @@ def update_neighbors_in_other_sheets(neighbors_dict,active_sheet):
 
 		for node in neighbors_dict[graph_renderer.name]:
 			p = nodes_data_source.data["index"].index(node)
-			if nodes_data_source.data["selected_neighbors"][p] == 0:
-    				new_data_nodes[p] = 2 
+			new_data_nodes[p] = 2 
 
 		nodes_data_source.data["selected_neighbors"] = new_data_nodes
 
@@ -217,6 +213,9 @@ def get_ranges(coors_list):
 
 	return (Range1d(min_x,max_x),Range1d(min_y,max_y))
 
+def reset_visualization(source):
+    	raise NotImplementedError
+
 #--------------------------------------------------------------------
 
 def change_selection(positions,nodes_data_source,value_to_selected):
@@ -245,3 +244,5 @@ def update_renderers_according_selection2(attr, old, new, nx_graph, this_rendere
 	# indicies removed from selection
 	removed = change_selection(removed_set,this_renderer.node_renderer.data_source,0)
 	added = change_selection(added_set,this_renderer.node_renderer.data_source,1)
+ 
+ 
