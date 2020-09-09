@@ -93,7 +93,7 @@ def create_sheet_graph_renderer(G,sheet):
 	layout = get_nodes_layout(sheet_subgraph)
 	graph_renderer = from_networkx(sheet_subgraph,layout)
 
-	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected_neighbors')
+	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected')
 
 	return graph_renderer
 
@@ -128,7 +128,7 @@ def update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in):
 	nodes_data_source = graph_renderer.node_renderer.data_source
 	edges_data_source = graph_renderer.edge_renderer.data_source
 
-	new_data_nodes = [0] * len(nodes_data_source.data["selected_neighbors"])
+	new_data_nodes = [0] * len(nodes_data_source.data["selected"])
 
 	selected_nx_indicies = selected_nx_index(graph_renderer,new_data_nodes)
 
@@ -154,7 +154,7 @@ def update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in):
 			else:
 				neighbors_in_other_sheets[nx_graph.nodes[ng]["sheet"]].append(ng)
 
-	nodes_data_source.data["selected_neighbors"] = new_data_nodes
+	nodes_data_source.data["selected"] = new_data_nodes
 	edges_data_source.data = edges
 
 	update_neighbors_in_other_sheets(neighbors_in_other_sheets,this_sheet)
@@ -167,13 +167,13 @@ def update_neighbors_in_other_sheets(neighbors_dict,active_sheet):
 			continue
 
 		nodes_data_source = graph_renderer.node_renderer.data_source
-		new_data_nodes = [0] * len(nodes_data_source.data["selected_neighbors"])
+		new_data_nodes = [0] * len(nodes_data_source.data["selected"])
 
 		for node in neighbors_dict[graph_renderer.name]:
 			p = nodes_data_source.data["index"].index(node)
 			new_data_nodes[p] = 2 
 
-		nodes_data_source.data["selected_neighbors"] = new_data_nodes
+		nodes_data_source.data["selected"] = new_data_nodes
 
 		edges_data_source = graph_renderer.edge_renderer.data_source
 		edges_data_source.data = {'start':[], 'end':[], 'weight':[],'delay':[]}
@@ -214,35 +214,12 @@ def get_ranges(coors_list):
 	return (Range1d(min_x,max_x),Range1d(min_y,max_y))
 
 def reset_visualization(source):
-    	raise NotImplementedError
-
-#--------------------------------------------------------------------
-
-def change_selection(positions,nodes_data_source,value_to_selected):
-	selected_indicies = []
-	nodes_data = nodes_data_source.data
-
-	patch_data = []
-
-	for p in positions:
-		node_index = nodes_data["index"][p]
-		selected_indicies.append(node_index)
-		patch_data.append((p,value_to_selected))
-
-	print(patch_data)
-	nodes_data_source.patch({'selected_neighbors': patch_data})
-
-	return selected_indicies
-
-def update_renderers_according_selection2(attr, old, new, nx_graph, this_renderer, edges_in=False):
-	old_set = set(old)
-	new_set = set(new)
-
-	added_set = new_set.difference(old_set)
-	removed_set = old_set.difference(new_set)
-
-	# indicies removed from selection
-	removed = change_selection(removed_set,this_renderer.node_renderer.data_source,0)
-	added = change_selection(added_set,this_renderer.node_renderer.data_source,1)
+	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
  
- 
+	for graph_renderer in curdoc().select({"type":GraphRenderer}):
+		nodes = [0] * len(graph_renderer.node_renderer.data_source.data["selected"])
+		graph_renderer.node_renderer.data_source.data["selected"] = nodes
+		graph_renderer.edge_renderer.data_source.data = edges
+
+def tap_callback(attr, old, new):
+	textarea.text = "text"
