@@ -41,7 +41,8 @@ reset_button = Button(label="reset")
 reset_button.on_click(reset_visualization)
 
 # area to add text info about connections from/to selected node
-textarea = Div(text="Select one neuron to show info about its connections.", width=600, height=1000)
+textarea = Div(text="", width=500, height=1600)
+textarea.name = "conn_info"
 
 # get sheets from datastore
 sheets = datastore.sheets()

@@ -14,7 +14,7 @@ from parameters import ParameterSet
 from numpy import arange
 from bokeh.plotting import figure, curdoc, from_networkx, show
 from bokeh.models import (BoxZoomTool, Circle, HoverTool, Range1d,
-						  MultiLine, Plot, Range1d, ResetTool,GraphRenderer)
+						  MultiLine, Plot, Range1d, ResetTool,GraphRenderer,Div)
 import networkx as nx
 from functools import partial
 
@@ -132,6 +132,12 @@ def update_nodes_and_edges_data(nx_graph,this_sheet,sheets,edges_in):
 
 	selected_nx_indicies = selected_nx_index(graph_renderer,new_data_nodes)
 
+	textarea = curdoc().select({"name":"conn_info"})[0]
+	if len(selected_nx_indicies)==1:
+		textarea.text = text_info_about_connections(nx_graph,selected_nx_indicies[0],edges_in)
+	else:
+		textarea.text = ""
+
 	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
  
 	neighbors_in_other_sheets = { s:[] for s in sheets }
@@ -221,5 +227,54 @@ def reset_visualization(source):
 		graph_renderer.node_renderer.data_source.data["selected"] = nodes
 		graph_renderer.edge_renderer.data_source.data = edges
 
-def tap_callback(attr, old, new):
-	textarea.text = "text"
+	(curdoc().select({"name":"textarea"})[0]).text = ""
+
+def text_info_about_connections(nx_graph, node_index, edges_in):
+	selected_node = "<h2>Selected node {index}</h2>".format(index=node_index)
+ 
+	selected_node_info = "Sheet: {sheet}<br>Coordinates: ({x:.2f},{y:.2f})".format(
+    	sheet=nx_graph.nodes[node_index]['sheet'],
+    	x=nx_graph.nodes[node_index]['coor'][0],
+    	y=nx_graph.nodes[node_index]['coor'][1]
+	)
+
+	d = ""
+	if edges_in:
+		d = "Incoming"
+	else:
+		d = "Outcoming"
+
+	connections_headline = "<h3>{direction} connections:</h3>".format(direction=d)
+ 
+	connections = ""
+
+	neighbors = get_neighbors(node_index,nx_graph, edges_in)
+ 
+	for n in neighbors:
+		nx_graph.nodes[n]['sheet']
+
+		neighbor_info = "<h4>{node}, {sheet}, coor: ({x:.2f},{y:.2f})</h4>".format(
+			node=int(n),
+			sheet=nx_graph.nodes[n]['sheet'],
+    		x=nx_graph.nodes[n]['coor'][0],
+    		y=nx_graph.nodes[n]['coor'][1]
+			)
+
+		if edges_in:
+			start = n
+			end = node_index
+		else:
+			start = node_index
+			end = n     
+
+		connection_info = "<ul><li>weight: {w}</li><li>delay: {d}</li></ul>".format(
+			w = nx_graph.edges[(start,end)]['weight'],
+			d = nx_graph.edges[(start,end)]['delay']
+		)
+  
+		connections += neighbor_info+connection_info
+
+	text='<div style="width:300px;height:1000px;margin:10px;overflow-y:auto;overflow-x: hidden">' 
+	text+= selected_node + selected_node_info + connections_headline + connections + '</div>'
+
+	return text
