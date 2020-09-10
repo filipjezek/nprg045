@@ -4,7 +4,7 @@ import sys
 # bokeh plotting
 from bokeh.plotting import figure, curdoc
 from bokeh.layouts import gridplot, row, column
-from bokeh.models import Hex, RadioButtonGroup, Button, Div, HoverTool
+from bokeh.models import Hex, RadioButtonGroup, Button, Div, HoverTool, MultiLine
 from bokeh.transform import linear_cmap
 from bokeh.events import SelectionGeometry
 
@@ -15,7 +15,6 @@ mapper_nodes = linear_cmap(field_name='selected',
                            palette=('#8cbacc', '#f0e60c', '#ff000d'),low=0 ,high=2)
 mapper_nodes_line = linear_cmap(field_name='selected',
                                 palette=('#337088', '#d8cf0a', '#990007'),low=0 ,high=2)
-
 
 path_to_data = sys.argv[1]
 
@@ -51,6 +50,9 @@ for sheet in sheets:
 	node_style = Hex(size=6,fill_color=mapper_nodes,line_color=mapper_nodes_line)
 	sheet_graph_renderer.node_renderer.glyph = node_style
 	sheet_graph_renderer.node_renderer.nonselection_glyph = node_style
+
+	# style edges
+	sheet_graph_renderer.edge_renderer.glyph = MultiLine(line_alpha=0.5)
  
 	# add interactivity to nodes selection
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
