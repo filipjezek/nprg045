@@ -7,6 +7,8 @@ from bokeh.models import GraphRenderer,Div,Range1d
 import networkx as nx
 from functools import partial
 
+from .graph import *
+
 def update_renderers_after_selection(event,nx_graph,this_sheet,sheets,edges_in_rbgroup):
 	edges_in = edges_in_rbgroup.active
 
@@ -94,22 +96,14 @@ def append_edge_to_edges_dict(edges_dict, nx_graph, start, end):
 	edges_dict['end'].append(end)
 	edges_dict['weight'].append(nx_graph.edges[(start,end)]["weight"])
 	edges_dict['delay'].append(nx_graph.edges[(start,end)]["delay"])
- 
-def get_neighbors(node,nx_graph, edges_in):
-	neighbors = []
-	if edges_in:
-		neighbors = nx_graph.predecessors(node)
-	else:
-		neighbors = nx_graph.successors(node)
-
-	return neighbors
-	
 
 def get_ranges(coors_list):
-	min_x = 0
-	max_x = 0
-	min_y = 0
-	max_y = 0
+	
+	min_x = -0.1
+	max_x = 0.1
+	min_y = -0.1
+	max_y = 0.1
+ 
 	for coor in coors_list:
 		x = coor[0]
 		y = coor[1]

@@ -92,5 +92,11 @@ def get_nodes_layout(G):
 	layout = {n:G.nodes[n]["coor"] for n in G.nodes()}
 	return layout
 
-	
+def get_neighbors(node,nx_graph,edges_in):
+	neighbors = []
+	if edges_in:
+		neighbors = nx_graph.predecessors(node)
+	else:
+		neighbors = nx_graph.successors(node)
 
+	return neighbors

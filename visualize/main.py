@@ -8,8 +8,8 @@ from bokeh.models import Hex, RadioButtonGroup, Button, Div, HoverTool
 from bokeh.transform import linear_cmap
 from bokeh.events import SelectionGeometry
 
-from graph import *
-from interactivity import *
+from .graph import *
+from .interactivity import *
 
 mapper_nodes = linear_cmap(field_name='selected',
                            palette=('#8cbacc', '#f0e60c', '#ff000d'),low=0 ,high=2)
