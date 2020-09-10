@@ -227,10 +227,10 @@ def reset_visualization(source):
 		graph_renderer.node_renderer.data_source.data["selected"] = nodes
 		graph_renderer.edge_renderer.data_source.data = edges
 
-	(curdoc().select({"name":"textarea"})[0]).text = ""
+	(curdoc().select({"name":"conn_info"})[0]).text = ""
 
 def text_info_about_connections(nx_graph, node_index, edges_in):
-	selected_node = "<h2>Selected node {index}</h2>".format(index=node_index)
+	selected_node = "<h3>Selected node {index}</h3>".format(index=node_index)
  
 	selected_node_info = "Sheet: {sheet}<br>Coordinates: ({x:.2f},{y:.2f})".format(
     	sheet=nx_graph.nodes[node_index]['sheet'],
@@ -244,7 +244,7 @@ def text_info_about_connections(nx_graph, node_index, edges_in):
 	else:
 		d = "Outcoming"
 
-	connections_headline = "<h3>{direction} connections:</h3>".format(direction=d)
+	connections_headline = "<h2>{direction} connections:</h2>".format(direction=d)
  
 	connections = ""
 

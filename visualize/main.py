@@ -14,7 +14,7 @@ from parameters import ParameterSet
 
 # bokeh plotting
 from bokeh.plotting import figure, curdoc
-from bokeh.layouts import gridplot, row
+from bokeh.layouts import gridplot, row, column
 from bokeh.models import Hex, RadioButtonGroup, Button, Div, TapTool, HoverTool
 from bokeh.transform import linear_cmap
 from bokeh.events import SelectionGeometry
@@ -40,9 +40,12 @@ radio_button_group.on_click(reset_visualization)
 reset_button = Button(label="reset")
 reset_button.on_click(reset_visualization)
 
+# helptext to conn info
+text = '<div style="width:200px;margin:10px">Select one node to show info about its connections.</div>'
+helptext = Div(text=text)
 # area to add text info about connections from/to selected node
-textarea = Div(text="", width=500, height=1600)
-textarea.name = "conn_info"
+conn_info = Div(text="")
+conn_info.name = "conn_info"
 
 # get sheets from datastore
 sheets = datastore.sheets()
@@ -94,7 +97,7 @@ for sheet in sheets:
 layout = gridplot(plots, ncols=2,plot_width=800, plot_height=800)
 
 curdoc().add_root(row(reset_button,radio_button_group))
-curdoc().add_root(row(layout,textarea))
+curdoc().add_root(row(layout,column(helptext,conn_info)))
 
 
 
