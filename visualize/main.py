@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
 import sys
 
-# mozaik
-from pyNN.random import RandomDistribution
-from mozaik.tools.distribution_parametrization import MozaikExtendedParameterSet, load_parameters, PyNNDistribution
-from mozaik.storage.datastore import Hdf5DataStore,PickledDataStore
-from mozaik.analysis.data_structures import Connections
-from mozaik.storage import queries
-
-from parameters import UniformDist
-from json import JSONEncoder
-from parameters import ParameterSet
-
 # bokeh plotting
 from bokeh.plotting import figure, curdoc
 from bokeh.layouts import gridplot, row, column
-from bokeh.models import Hex, RadioButtonGroup, Button, Div, TapTool, HoverTool
+from bokeh.models import Hex, RadioButtonGroup, Button, Div, HoverTool
 from bokeh.transform import linear_cmap
 from bokeh.events import SelectionGeometry
 
-from graph_functions import *
+from graph import *
+from interactivity import *
 
 mapper_nodes = linear_cmap(field_name='selected',
                            palette=('#8cbacc', '#f0e60c', '#ff000d'),low=0 ,high=2)
