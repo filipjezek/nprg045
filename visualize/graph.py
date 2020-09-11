@@ -69,7 +69,7 @@ def add_sheet_nodes_to_graph(nx_graph,datastore,n,sheet):
 	
 	number_of_nodes = len(positions['x'])
 	node_indices = [i for i in range(number_of_nodes)]
-	nodes_with_sheet = [(i+n,{"coor":(positions['x'][i],positions['y'][i])})
+	nodes_with_sheet = [(i+n,{'coor':(positions['x'][i],positions['y'][i])})
 						for i
 						in node_indices]
 		
@@ -107,7 +107,7 @@ def create_sheet_graph_renderer(nx_graph,sheet):
 	"""
 	creates bokeh GraphRenderer for given sheet from networkx graph od neurons and connections
 	"""
-	sheet_nodes = [(n,attr) for n,attr in nx_graph.nodes(data=True) if attr["sheet"]==sheet]
+	sheet_nodes = [(n,attr) for n,attr in nx_graph.nodes(data=True) if attr['sheet']==sheet]
 	sheet_subgraph = nx.DiGraph()
 	sheet_subgraph.add_nodes_from(sheet_nodes)
 	layout = get_nodes_layout(sheet_subgraph)
@@ -122,7 +122,7 @@ def get_nodes_layout(nx_graph):
 	"""
 	extract coordinates od nodes from networkx graph with node attribute "coor":(x,y)
 	"""
-	layout = {n:nx_graph.nodes[n]["coor"] for n in nx_graph.nodes()}
+	layout = {n:nx_graph.nodes[n]['coor'] for n in nx_graph.nodes()}
 	return layout
 
 def get_neighbors(node,nx_graph,edges_in):

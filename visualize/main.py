@@ -22,11 +22,11 @@ datastore = get_datastore(path_to_data)
 neuron_connections_graph = create_neuron_connections_graph(datastore)
 
 # buttons to choose if displayed edges are outcoming or incoming
-radio_button_group = RadioButtonGroup(labels=["outcoming edges", "incoming edges"], active=0)
+radio_button_group = RadioButtonGroup(labels=['outcoming connections', 'incoming connections'], active=0)
 radio_button_group.on_click(reset_visualization)
 
 # reset button
-reset_button = Button(label="reset")
+reset_button = Button(label='reset')
 reset_button.on_click(reset_visualization)
 
 # helptext to conn info
@@ -34,7 +34,7 @@ text = '<div style="width:200px;margin:10px">Select one node to show info about 
 helptext = Div(text=text)
 # area to add text info about connections from/to selected node
 conn_info = Div(text="")
-conn_info.name = "conn_info"
+conn_info.name = 'conn_info'
 
 # get sheets from datastore
 sheets = datastore.sheets()
@@ -58,19 +58,20 @@ for sheet in sheets:
 	nodes_data_source = sheet_graph_renderer.node_renderer.data_source	
 
 	# get plot ranges
-	ranges = get_ranges(nodes_data_source.data["coor"])
+	# will not be needed in Bokeh 2.3 https://github.com/bokeh/bokeh/issues/10472
+	ranges = get_ranges(nodes_data_source.data['coor'])
 
 	# create plot
 	sheet_graph_plot = figure(title=sheet,
 							  x_range=ranges[0],
 							  y_range=ranges[1],
-							  tools="lasso_select,pan,wheel_zoom,tap")
+							  tools='lasso_select,pan,wheel_zoom,tap')
 
 	# add renderer to the plot
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
  
 	# hover tool
-	hover_nodes = HoverTool(tooltips=[("index", "@index"), ("coordinates", "@coor")])
+	hover_nodes = HoverTool(tooltips=[('index', '@index'), ('coordinates', '@coor')])
  
 	sheet_graph_plot.tools.append(hover_nodes)
 
@@ -78,9 +79,10 @@ for sheet in sheets:
 	sheet_graph_plot.on_event(SelectionGeometry,
 								partial(update_renderers_after_selection,
 											nx_graph=neuron_connections_graph,
+											this_renderer=sheet_graph_renderer,
 											this_sheet=sheet,
 											sheets=sheets,
-											edges_in_rbgroup=radio_button_group))
+											edges_in_toggle=radio_button_group))
  
 	# add completed plot to plots list
 	plots.append(sheet_graph_plot)
