@@ -30,7 +30,7 @@ reset_button = Button(label='reset')
 reset_button.on_click(reset_visualization)
 
 # helptext to conn info
-text = '<div style="width:200px;margin:10px">Select one node to show info about its connections.</div>'
+text = '<div style="width:300px;margin:10px">Select one node to show info about its connections.</div>'
 helptext = Div(text=text)
 # area to add text info about connections from/to selected node
 conn_info = Div(text="")
