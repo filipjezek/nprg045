@@ -9,6 +9,7 @@ from functools import partial
 
 from .graph import *
 
+
 def update_renderers_after_selection(event,nx_graph,this_renderer,this_sheet,sheets,edges_in_toggle):
 	"""
 	update all graph renderers if selection event is comleted
@@ -23,11 +24,11 @@ def update_renderers_after_selection(event,nx_graph,this_renderer,this_sheet,she
 		update_nodes_and_edges_data(nx_graph,this_renderer,this_sheet,sheets,edges_in)
 
 
-def selected_nx_index(graph_renderer,new_data_nodes):
+def selected_nx_index(graph_renderer,new_selected_nodes):
 	"""
 	return indicies (index attribute, not position) of nodes selected in current graph_renderer
-	and change their state in new_data_nodes list
-	new_data_nodes: list of int, 1 if node is selected, 2 if it is neighbor of selected, 0 otherwise
+	and change their state in new_selected_nodes list
+	new_selected_nodes: list of int, 1 if node is selected, 2 if it is neighbor of selected, 0 otherwise
 	"""
 	selected_indicies = []
 
@@ -37,7 +38,7 @@ def selected_nx_index(graph_renderer,new_data_nodes):
 	for i in indicies_in_renderer:	
 		node_index = source.data['index'][i]
 		selected_indicies.append(node_index)
-		new_data_nodes[i] = 1
+		new_selected_nodes[i] = 1
 
 	return selected_indicies
 
@@ -56,10 +57,12 @@ def update_nodes_and_edges_data(nx_graph,graph_renderer,this_sheet,sheets,edges_
 	edges_data_source = graph_renderer.edge_renderer.data_source
 
 	# reset if nodes are selected
-	new_data_nodes = [0] * len(nodes_data_source.data['selected'])
+	new_selected_nodes = [0] * len(nodes_data_source.data['selected'])
+	new_selected_nodes_w = [0] * len(nodes_data_source.data['weight'])
+	new_selected_nodes_d = [0] * len(nodes_data_source.data['delay'])
 
 	# get indicies of of selected nodes
-	selected_nx_indicies = selected_nx_index(graph_renderer,new_data_nodes)
+	selected_nx_indicies = selected_nx_index(graph_renderer,new_selected_nodes)
 
 	# if selected only one node, display info about connections
 	textarea = curdoc().select({'name':'conn_info'})[0]
@@ -67,6 +70,11 @@ def update_nodes_and_edges_data(nx_graph,graph_renderer,this_sheet,sheets,edges_
 		textarea.text = text_info_about_connections(nx_graph,selected_nx_indicies[0],edges_in)
 	else:
 		textarea.text = ""
+
+	hover_info_connections = False
+
+	if len(selected_nx_indicies)==1:
+		hover_info_connections = True
 
 	# prepare empty edges data
 	edges = {'start':[], 'end':[], 'weight':[],'delay':[]}
@@ -83,8 +91,15 @@ def update_nodes_and_edges_data(nx_graph,graph_renderer,this_sheet,sheets,edges_
 			# for neighbor in this sheet change their 'selected' value and add edge
 			if nx_graph.nodes[ng]['sheet'] == this_sheet:
 				p = nodes_data_source.data['index'].index(ng)
-				if new_data_nodes[p] == 0:
-					new_data_nodes[p] = 2
+				if new_selected_nodes[p] == 0:
+					new_selected_nodes[p] = 2
+					if hover_info_connections:
+						if edges_in:
+							new_selected_nodes_w[p] = nx_graph.edges[(ng,node)]['weight']
+							new_selected_nodes_d[p] = nx_graph.edges[(ng,node)]['delay']
+						else:
+							new_selected_nodes_w[p] = nx_graph.edges[(node,ng)]['weight']
+							new_selected_nodes_d[p] = nx_graph.edges[(node,ng)]['delay']
 
 				if edges_in:
 					append_edge_to_edges_dict(edges,nx_graph,ng,node)
@@ -96,13 +111,16 @@ def update_nodes_and_edges_data(nx_graph,graph_renderer,this_sheet,sheets,edges_
 				neighbors_in_other_sheets[nx_graph.nodes[ng]['sheet']].append(ng)
 
 	# update data
-	nodes_data_source.data['selected'] = new_data_nodes
+	nodes_data_source.data['selected'] = new_selected_nodes
+	nodes_data_source.data['weight'] = new_selected_nodes_w
+	nodes_data_source.data['delay'] = new_selected_nodes_d
+
 	edges_data_source.data = edges
 
 	# update data ('selected' value) in other sheets
-	update_neighbors_in_other_sheets(neighbors_in_other_sheets,this_sheet)
+	update_neighbors_in_other_sheets(neighbors_in_other_sheets,this_sheet,edges_in,hover_info_connections,selected_nx_indicies,nx_graph)
 
-def update_neighbors_in_other_sheets(neighbors_dict,active_sheet):
+def update_neighbors_in_other_sheets(neighbors_dict,active_sheet,edges_in,hover_info_connections,selected_indicies,nx_graph):
 	"""
 	foreach sheet (graph renderer) update 'selected' nodes info
 	"""
@@ -113,13 +131,25 @@ def update_neighbors_in_other_sheets(neighbors_dict,active_sheet):
 			continue # action source sheet is updated yet
 
 		nodes_data_source = graph_renderer.node_renderer.data_source
-		new_data_nodes = [0] * len(nodes_data_source.data['selected'])
+		new_selected_nodes = [0] * len(nodes_data_source.data['selected'])
+		new_selected_nodes_w = [0] * len(nodes_data_source.data['weight'])
+		new_selected_nodes_d = [0] * len(nodes_data_source.data['delay'])
 
-		for node in neighbors_dict[graph_renderer.name]:
-			p = nodes_data_source.data['index'].index(node)
-			new_data_nodes[p] = 2 
+		for ng in neighbors_dict[graph_renderer.name]:
+			p = nodes_data_source.data['index'].index(ng)
+			new_selected_nodes[p] = 2 
+			if hover_info_connections:
+				node = selected_indicies[0]
+				if edges_in:
+					new_selected_nodes_w[p] = nx_graph.edges[(ng,node)]['weight']
+					new_selected_nodes_d[p] = nx_graph.edges[(ng,node)]['delay']
+				else:
+					new_selected_nodes_w[p] = nx_graph.edges[(node,ng)]['weight']
+					new_selected_nodes_d[p] = nx_graph.edges[(node,ng)]['delay']
 
-		nodes_data_source.data['selected'] = new_data_nodes
+		nodes_data_source.data['selected'] = new_selected_nodes
+		nodes_data_source.data['weight'] = new_selected_nodes_w
+		nodes_data_source.data['delay'] = new_selected_nodes_d
 
 		# reset edges data
 		edges_data_source = graph_renderer.edge_renderer.data_source
@@ -164,7 +194,11 @@ def reset_visualization(source):
 	for graph_renderer in curdoc().select({'type':GraphRenderer}):
 		# reset edges 'selected' value
 		nodes = [0] * len(graph_renderer.node_renderer.data_source.data['selected'])
+		nodes_w = [0] * len(graph_renderer.node_renderer.data_source.data['weight'])
+		nodes_d = [0] * len(graph_renderer.node_renderer.data_source.data['delay'])
 		graph_renderer.node_renderer.data_source.data['selected'] = nodes
+		graph_renderer.node_renderer.data_source.data['weight'] = nodes_w
+		graph_renderer.node_renderer.data_source.data['delay'] = nodes_d
 		# empty edges
 		graph_renderer.edge_renderer.data_source.data = {'start':[], 'end':[], 'weight':[],'delay':[]}
 

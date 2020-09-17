@@ -114,6 +114,10 @@ def create_sheet_graph_renderer(nx_graph,sheet):
 	graph_renderer = from_networkx(sheet_subgraph,layout)
 
 	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'selected')
+
+	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'weight')
+	graph_renderer.node_renderer.data_source.add([0] * len(sheet_nodes), 'delay')
+
 	graph_renderer.edge_renderer.data_source.data = {'start':[], 'end':[], 'weight':[],'delay':[]}
 
 	return graph_renderer

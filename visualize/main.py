@@ -65,13 +65,14 @@ for sheet in sheets:
 	sheet_graph_plot = figure(title=sheet,
 							  x_range=ranges[0],
 							  y_range=ranges[1],
+							  sizing_mode='scale_width',
 							  tools='lasso_select,pan,wheel_zoom,tap')
 
 	# add renderer to the plot
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
  
 	# hover tool
-	hover_nodes = HoverTool(tooltips=[('index', '@index'), ('coordinates', '@coor')])
+	hover_nodes = HoverTool(tooltips=[('index', '@index'), ('coordinates', '@coor'), ('connection weight', '@weight'), ('connection delay', '@delay')])
  
 	sheet_graph_plot.tools.append(hover_nodes)
 
@@ -88,7 +89,7 @@ for sheet in sheets:
 	plots.append(sheet_graph_plot)
 
 # create grid layout form plots list
-layout = gridplot(plots, ncols=2,plot_width=800, plot_height=800)
+layout = gridplot(plots, ncols=2, sizing_mode='scale_width')
 
 curdoc().add_root(row(reset_button,radio_button_group))
 curdoc().add_root(row(layout,column(helptext,conn_info)))
