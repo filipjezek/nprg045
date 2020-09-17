@@ -20,3 +20,7 @@ bokeh serve --show visualize --args path_to_datastore
 
 Running bokeh server:
 * selecting more disjunct areas in plot is posblie with Shift key
+
+### Bug
+
+There is some bug in Bokeh 2.2.1, so there is KeyError: 'id' error after run the application (related issue: https://github.com/bokeh/bokeh/issues/10503)
