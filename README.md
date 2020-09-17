@@ -23,4 +23,4 @@ Running bokeh server:
 
 ### Bug
 
-There is some bug in Bokeh 2.2.1, so there is KeyError: 'id' error after run the application (related issue: https://github.com/bokeh/bokeh/issues/10503)
+There is some bug in Bokeh 2.2.1, so there is KeyError: 'id' error after run the application (related issue: https://github.com/bokeh/bokeh/issues/10453)
