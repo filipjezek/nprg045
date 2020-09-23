@@ -41,6 +41,8 @@ sheets = datastore.sheets()
 
 plots=[]
 
+HOVER = HoverTool(tooltips=[('index', '@index'), ('coordinates', '@coor'), ('connection weight', '@weight'), ('connection delay', '@delay')])
+
 for sheet in sheets:
 	# create graph renderer
 	sheet_graph_renderer = create_sheet_graph_renderer(neuron_connections_graph,sheet)
@@ -72,7 +74,7 @@ for sheet in sheets:
 	sheet_graph_plot.renderers.append(sheet_graph_renderer)
  
 	# hover tool
-	hover_nodes = HoverTool(tooltips=[('index', '@index'), ('coordinates', '@coor'), ('connection weight', '@weight'), ('connection delay', '@delay')])
+	hover_nodes = HOVER
  
 	sheet_graph_plot.tools.append(hover_nodes)
 
