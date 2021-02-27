@@ -1,0 +1,16 @@
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 21661, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'SSExcAnalog.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Inh_L4', 'neuron': 23224, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'SSInhAnalog.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22714, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc2.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 21661, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc3.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 21788, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc4.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 21866, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc5.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22142, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc6.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22164, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc7.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22211, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc8.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22255, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc9.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Exc_L4', 'neuron': 22438, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Exc10.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'V1_Inh_L4', 'neuron': 23535, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'Inh.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'X_ON', 'neuron': 68, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'LGN0On.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'X_OFF', 'neuron': 4425, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'LGN0Off.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'X_ON', 'neuron': 570, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'LGN1On.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
+{'parameters': {'sheet_name': 'X_OFF', 'neuron': 4920, 'sheet_activity': {}, 'spontaneous': True}, 'file_name': 'LGN1Off.png', 'class_name': "<class 'mozaik.visualization.plotting.OverviewPlot'>"}
