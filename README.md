@@ -1,9 +1,14 @@
-# How to run visualization
+# Visualization tool for mozaik
 
-Prepare:
-venv, install requirements.txt
+Example session:
+![example](example.png)
 
-Install mozaik (python3):
+- [documentation](dokumentace.pdf) (in czech)
+
+## How to run visualization
+
+- install requirements.txt
+- install mozaik (python3):
 
 ```
 git clone https://github.com/antolikjan/mozaik.git
@@ -12,14 +17,14 @@ git checkout python3
 python setup.py install
 ```
 
-Run in folder mff_nprg045:
+- run in folder mff_nprg045:
 ```
 bokeh serve --show visualize --args path_to_datastore
 ```
-(path_to_datastore example: /home/katterrina/matfyz/rocnikac/vzorove_mozaik/FeedForwardInhibition_student)
+(path_to_datastore example: /example_data/FeedForwardInhibition_student)
 
 Running bokeh server:
-* selecting more disjunct areas in plot is posblie with Shift key
+- selecting more disjunct areas in plot is posblie with Shift key
 
 ### Bug
 
