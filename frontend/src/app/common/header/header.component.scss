@@ -1,0 +1,14 @@
+header {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  background-color: var(--primary);
+  color: var(--primary-text);
+  box-shadow: 0 0 4px #00000078;
+  padding: 0 20px;
+
+  a {
+    text-decoration: none;
+    font-size: 1.1em;
+  }
+}

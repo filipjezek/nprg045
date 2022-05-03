@@ -1,0 +1,35 @@
+:root {
+  --primary: #ad1457;
+  --primary-light: #e35183;
+  --primary-dark: #78002e;
+  --primary-text: white;
+  --primary-dark-text: white;
+  --primary-light-text: black;
+
+  --secondary: #616161;
+  --secondary-light: #8e8e8e;
+  --secondary-dark: #373737;
+  --secondary-text: white;
+  --secondary-dark-text: white;
+  --secondary-light-text: black;
+
+  --background: #f5f5f6;
+  --background-text: black;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--background-text);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+a {
+  color: inherit;
+}
