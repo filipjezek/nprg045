@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  align-items: stretch;
+}
+
+input {
+  display: none;
+}
+label {
+  border: 1px solid #ccc;
+  background-color: white;
+  color: black;
+  padding: 5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  font-size: 0.8em;
+
+  &:first-of-type {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  &:last-of-type {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+  &.selected {
+    border: 2px solid lightblue;
+    padding: 4px;
+  }
+}

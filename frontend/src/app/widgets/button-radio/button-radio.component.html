@@ -1,0 +1,16 @@
+<label
+  vidretrKeyboardClick
+  tabindex="0"
+  *ngFor="let opt of options"
+  [class.selected]="opt.value == value"
+>
+  <input
+    type="radio"
+    [name]="name"
+    [value]="opt.value"
+    [id]="name + '-' + opt.value"
+    [formControl]="control"
+    (change)="onTouched(); onChange(opt.value)"
+  />
+  {{ opt.label }}
+</label>
