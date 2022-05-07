@@ -2,3 +2,4 @@ __pycache__
 *.pyc
 *.egg-info
 .vscode
+backend/static/frontend_dist/*
