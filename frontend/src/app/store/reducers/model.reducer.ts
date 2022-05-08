@@ -1,29 +1,33 @@
 import { createReducer, on } from '@ngrx/store';
-import { modelListLoaded, modelLoaded } from '../actions/model.actions';
+import { modelLoaded } from '../actions/model.actions';
 import * as fromRoot from './index';
 
 export const modelFeatureKey = 'model';
 
-export interface ModelInfo {
-  label: string;
-  id: number;
+// one large network containing all nodes and connections.
+// connections and nodes can be viewed differently based on sheet parameter
+export interface ModelNetwork {
+  nodes: NetworkNode[];
 }
 
-export interface Model extends ModelInfo {
-  layers: Layer[];
+export interface NetworkNode {
+  id: number; // this is for convenience
+  sheets: {
+    [key: string]: {
+      x: number;
+      y: number;
+      connections: {
+        sheet: string;
+        node: NetworkNode;
+        weight: number;
+        delay: number;
+      }[];
+    };
+  };
 }
-
-export interface Layer {
-  label: string;
-  nodes: Neuron[];
-}
-
-export interface Neuron {}
 
 export interface ModelState {
-  totalResults: number;
-  availableModels: ModelInfo[];
-  currentModel?: Model;
+  currentModel?: ModelNetwork;
 }
 
 export interface State extends fromRoot.State {
@@ -31,18 +35,11 @@ export interface State extends fromRoot.State {
 }
 
 export const initialState: ModelState = {
-  totalResults: 1,
-  availableModels: [],
   currentModel: null,
 };
 
 export const reducer = createReducer(
   initialState,
-  on(modelListLoaded, (state, { models, totalResults }) => ({
-    ...state,
-    availableModels: [...models],
-    totalResults,
-  })),
   on(modelLoaded, (state, { model }) => ({
     ...state,
     currentModel: { ...model },

@@ -4,13 +4,7 @@ import { switchMap, catchError, map, mapTo } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
-import {
-  apiError,
-  loadModel,
-  loadModelList,
-  modelListLoaded,
-  modelLoaded,
-} from '../actions/model.actions';
+import { apiError, loadModel, modelLoaded } from '../actions/model.actions';
 import { ToastService } from 'src/app/widgets/services/toast.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -23,23 +17,10 @@ import { ModelService } from 'src/app/model-page/model.service';
 
 @Injectable()
 export class ModelEffects {
-  loadModelList$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(loadModelList),
-      switchMap(({ take, skip }) => this.modelS.loadModels(take, skip)),
-      map(({ models, totalResults }) =>
-        modelListLoaded({ models, totalResults })
-      ),
-      catchError((error) => {
-        this.toastS.add(new Toast(`Failed to load data`));
-        return of(apiError({ error }));
-      })
-    )
-  );
-  loadFullModel$ = createEffect(() =>
+  loadModel$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadModel),
-      switchMap(({ id }) => this.modelS.loadModel(id)),
+      switchMap(() => this.modelS.loadModel()),
       map(({ model }) => modelLoaded({ model })),
       catchError((err: HttpErrorResponse) => {
         if (err.status < 500 && err.status >= 400) {
@@ -53,14 +34,11 @@ export class ModelEffects {
   );
 
   loadingOverlayInc$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(loadModel, loadModelList),
-      mapTo(loadingOverlayIncrement())
-    )
+    this.actions$.pipe(ofType(loadModel), mapTo(loadingOverlayIncrement()))
   );
   loadingOverlayDec$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(modelListLoaded, modelLoaded, apiError),
+      ofType(modelLoaded, apiError),
       mapTo(loadingOverlayDecrement())
     )
   );

@@ -1,20 +1,85 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Model, ModelInfo } from '../store/reducers/model.reducer';
+import { map, Observable } from 'rxjs';
+import { HttpService } from '../services/http.service';
+import { ModelNetwork } from '../store/reducers/model.reducer';
+
+export interface Model {
+  sheets: Sheet[];
+  neurons: Neuron[];
+  connections: Connections[];
+}
+
+export interface Connections {
+  edges: Edge[];
+  src: string; // sheet
+  target: string; // sheet
+}
+
+export interface Edge {
+  srcIndex: number;
+  tgtIndex: number;
+  weight: number;
+  delay: number;
+}
+export interface Sheet {
+  label: string;
+  neuronPositions: {
+    ids: number[];
+    x: number[];
+    y: number[];
+  };
+}
+
+export interface Neuron {
+  id: number;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModelService {
-  constructor() {}
+  constructor(private http: HttpService) {}
 
-  public loadModels(
-    take: number,
-    skip: number
-  ): Observable<{ models: ModelInfo[]; totalResults: number }> {
-    return of({ models: [], totalResults: 0 });
+  public loadModel(): Observable<{ model: ModelNetwork }> {
+    return this.http
+      .get<Model>('model')
+      .pipe(map((m) => ({ model: this.parseNetwork(m) })));
   }
-  public loadModel(id: number): Observable<{ model: Model }> {
-    return of({ model: null });
+
+  private parseNetwork(model: Model): ModelNetwork {
+    const network: ModelNetwork = {
+      nodes: [],
+    };
+    for (const { id } of model.neurons) {
+      network.nodes[id] = { id, sheets: {} };
+    }
+    const sheetMap = new Map<string, Sheet>();
+    for (const sheet of model.sheets) {
+      sheetMap.set(sheet.label, sheet);
+      sheet.neuronPositions.ids.forEach((id, i) => {
+        network.nodes[id].sheets[sheet.label] = {
+          x: sheet.neuronPositions.x[i],
+          y: sheet.neuronPositions.y[i],
+          connections: [],
+        };
+      });
+    }
+    for (const { src, target, edges } of model.connections) {
+      for (const edge of edges) {
+        const srcNode =
+          network.nodes[sheetMap.get(src).neuronPositions.ids[edge.srcIndex]];
+        const tgtNode =
+          network.nodes[
+            sheetMap.get(target).neuronPositions.ids[edge.tgtIndex]
+          ];
+        srcNode.sheets[src].connections.push({
+          sheet: target,
+          node: tgtNode,
+          delay: edge.delay,
+          weight: edge.weight,
+        });
+      }
+    }
+    return network;
   }
 }
