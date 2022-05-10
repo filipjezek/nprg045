@@ -1,1 +1,9 @@
 <h1>Model</h1>
+
+<div class="graphs">
+  <mozaik-network-graph
+    *ngFor="let sheet of (model$ | async)?.sheetNodes | keyvalue"
+    [sheetName]="sheet.key"
+    [nodes]="sheet.value"
+  ></mozaik-network-graph>
+</div>

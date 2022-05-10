@@ -49,21 +49,27 @@ export class ModelService {
   private parseNetwork(model: Model): ModelNetwork {
     const network: ModelNetwork = {
       nodes: [],
+      sheetNodes: {},
     };
     for (const { id } of model.neurons) {
       network.nodes[id] = { id, sheets: {} };
     }
+
     const sheetMap = new Map<string, Sheet>();
     for (const sheet of model.sheets) {
       sheetMap.set(sheet.label, sheet);
+      network.sheetNodes[sheet.label] = [];
+
       sheet.neuronPositions.ids.forEach((id, i) => {
         network.nodes[id].sheets[sheet.label] = {
           x: sheet.neuronPositions.x[i],
           y: sheet.neuronPositions.y[i],
           connections: [],
         };
+        network.sheetNodes[sheet.label].push(network.nodes[id]);
       });
     }
+
     for (const { src, target, edges } of model.connections) {
       for (const edge of edges) {
         const srcNode =
@@ -74,7 +80,7 @@ export class ModelService {
           ];
         srcNode.sheets[src].connections.push({
           sheet: target,
-          node: tgtNode,
+          node: tgtNode.id,
           delay: edge.delay,
           weight: edge.weight,
         });

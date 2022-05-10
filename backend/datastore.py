@@ -10,9 +10,9 @@ from .parameters import params
 # it should be space-efficient representation of the network data
 
 class Positions(TypedDict):
-  ids: np.ndarray
-  x: np.ndarray
-  y: np.ndarray
+  ids: List[int]
+  x: List[int]
+  y: List[int]
 
 class Sheet(TypedDict):
   label: str
@@ -50,7 +50,7 @@ def __get_datastore(path_to_datastore: str) -> JsonSerializableDataStore:
   sheets = __get_serializable_sheets(datastore)
   serializable: JsonSerializableDataStore = {
     'sheets': sheets,
-    'neurons': __get_serializable_neurons(serializable['sheets']),
+    'neurons': __get_serializable_neurons(sheets),
     'connections': __get_serializable_connections(datastore)
   }
 
@@ -62,9 +62,9 @@ def __get_serializable_sheets(datastore: DataStore) -> List[Sheet]:
     {
       'label': s,
       'neuronPositions': {
-        'ids': datastore.get_sheet_ids(s, np.arange(0, len(all_positions[s][0]))),
-        'x': all_positions[s][0],
-        'y': all_positions[s][1]
+        'ids': datastore.get_sheet_ids(s, np.arange(0, len(all_positions[s][0]))).tolist(),
+        'x': all_positions[s][0].tolist(),
+        'y': all_positions[s][1].tolist()
       }
     } for s in all_positions
   ]
@@ -73,7 +73,7 @@ def __get_serializable_sheets(datastore: DataStore) -> List[Sheet]:
 def __get_serializable_neurons(sheets: List[Sheet]) -> List[Neuron]:
   return list(
     map(
-      lambda id: {'id': id},
+      lambda id: {'id': int(id)},
       np.unique(np.concatenate([s['neuronPositions']['ids'] for s in sheets]))
     )
   )

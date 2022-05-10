@@ -21,6 +21,9 @@
     "@ngrx/effects": "^13.2.0",
     "@ngrx/store": "^13.2.0",
     "@ngrx/store-devtools": "^13.2.0",
+    "@types/d3": "^7.4.0",
+    "d3": "^7.4.4",
+    "d3-lasso": "^0.0.5",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

@@ -1,4 +1,12 @@
 :host {
   display: block;
   padding: 0 10px;
+
+  .graphs {
+    display: grid;
+    margin: auto;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 20px;
+    justify-content: space-evenly;
+  }
 }

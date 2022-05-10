@@ -1,0 +1,23 @@
+:host {
+  display: block;
+
+  .svg-container {
+    max-width: 500px;
+    margin: auto;
+
+    ::ng-deep {
+      svg {
+        width: 100%;
+        border: 1px solid black;
+
+        .node {
+          stroke-opacity: 0.7;
+          stroke: steelblue;
+        }
+        .domain {
+          display: none;
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { EffectsModule } from '@ngrx/effects';
@@ -20,8 +21,6 @@ import { reducers, metaReducers } from './store/reducers';
       runtimeChecks: {
         strictStateImmutability: true,
         strictActionImmutability: true,
-        strictStateSerializability: true,
-        strictActionSerializability: true,
         strictActionWithinNgZone: true,
         strictActionTypeUniqueness: true,
       },
@@ -31,6 +30,7 @@ import { reducers, metaReducers } from './store/reducers';
       maxAge: 25,
       logOnly: environment.production,
     }),
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

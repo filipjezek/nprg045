@@ -7,9 +7,13 @@ export const modelFeatureKey = 'model';
 // one large network containing all nodes and connections.
 // connections and nodes can be viewed differently based on sheet parameter
 export interface ModelNetwork {
-  nodes: NetworkNode[];
-}
+  nodes: NetworkNode[]; // indexed by id
 
+  // duplicate reference for convenience
+  sheetNodes: {
+    [key: string]: NetworkNode[];
+  };
+}
 export interface NetworkNode {
   id: number; // this is for convenience
   sheets: {
@@ -18,7 +22,7 @@ export interface NetworkNode {
       y: number;
       connections: {
         sheet: string;
-        node: NetworkNode;
+        node: number; // id - ngrx devtools crash otherwise bc they can't handle circular refs
         weight: number;
         delay: number;
       }[];
