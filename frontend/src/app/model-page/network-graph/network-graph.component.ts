@@ -1,14 +1,14 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
   Input,
   NgZone,
-  OnInit,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { NetworkNode } from 'src/app/store/reducers/model.reducer';
@@ -21,17 +21,33 @@ export interface Directional<T> {
   right: T;
 }
 
+export enum EdgeDirection {
+  incoming = 'incoming',
+  outgoing = 'outgoing',
+  all = 'all',
+}
+
 @Component({
   selector: 'mozaik-network-graph',
   templateUrl: './network-graph.component.html',
   styleUrls: ['./network-graph.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NetworkGraphComponent implements AfterViewInit {
+export class NetworkGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
   @Input() nodes: NetworkNode[];
   @Input() sheetName: string;
+  @Input() allNodes: NetworkNode[];
+  @Input() get selectedNodes(): NetworkNode[] {
+    return this._selectedNodes;
+  }
+  set selectedNodes(nodes: NetworkNode[]) {
+    if (this._selectedNodes === nodes) return;
+    this._selectedNodes = nodes;
+  }
+  private _selectedNodes: NetworkNode[] = [];
+  @Input() edgeDir: EdgeDirection;
   @Output() select = new EventEmitter<NetworkNode[]>();
 
   private scales: {
@@ -51,22 +67,24 @@ export class NetworkGraphComponent implements AfterViewInit {
     right: { axis: null, g: null },
   };
   private circles: d3.Selection<SVGGElement, any, any, any>;
+  private edges: d3.Selection<SVGGElement, any, any, any>;
   private grid: d3.Selection<SVGGElement, any, any, any>;
+  private svg: d3.Selection<SVGGElement, any, any, any>;
 
   private readonly width = 410;
   private readonly height = 410;
   private readonly margin = {
     left: 60,
     right: 60,
-    top: 20,
-    bottom: 20,
+    top: 50,
+    bottom: 50,
   };
 
   constructor(private zone: NgZone) {}
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
-      const svg = d3
+      this.svg = d3
         .select(this.container.nativeElement)
         .append('svg')
         .attr(
@@ -81,19 +99,43 @@ export class NetworkGraphComponent implements AfterViewInit {
         .attr('width', this.width)
         .attr('height', this.height)
         .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
-      this.grid = svg
+
+      const defs = this.svg.append('defs');
+      for (const classes of ['incoming', 'outgoing', 'incoming outgoing']) {
+        defs
+          .append('marker')
+          .attr('id', 'arrowhead-' + classes.replace(' ', '-'))
+          .classed(classes + ' arrowhead', true)
+          .attr('viewBox', '-0 -5 10 10')
+          .attr('refX', 10)
+          .attr('refY', 0)
+          .attr('orient', 'auto')
+          .attr('markerWidth', 6)
+          .attr('markerHeight', 6)
+          .attr('xoverflow', 'visible')
+          .append('svg:path')
+          .attr('d', 'M 0,-5 L 10 ,0 L 0,5');
+      }
+      this.grid = this.svg
         .append('g')
         .attr('stroke', 'currentColor')
         .attr('stroke-opacity', 0.1);
-      this.circles = svg
-        .append('g')
-        .attr('fill', 'none')
-        .attr('stroke-linecap', 'round');
+      this.circles = this.svg.append('g');
+      this.edges = this.circles.append('g');
+      this.circles.attr('fill', 'none').attr('stroke-linecap', 'round');
 
-      this.initAxes(svg);
+      this.initAxes();
       this.redraw();
       this.initZoom();
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['edgeDir'] || changes['selectedNodes']) {
+      if (this.svg) {
+        this.updateSelection();
+      }
+    }
   }
 
   private redraw() {
@@ -102,16 +144,11 @@ export class NetworkGraphComponent implements AfterViewInit {
       .data(this.nodes)
       .join('path')
       .classed('node', true)
-      .attr(
-        'd',
-        (n) =>
-          `M${this.scales.x(n.sheets[this.sheetName].x)},${this.scales.y(
-            n.sheets[this.sheetName].y
-          )}h0`
-      );
+      .attr('d', (n) => `M${this.displayX(n)},${this.displayY(n)}h0`)
+      .attr('data-id', (n) => n.id);
   }
 
-  private initAxes(svg: d3.Selection<any, any, any, any>) {
+  private initAxes() {
     this.scales.x = d3
       .scaleLinear()
       .domain(d3.extent(this.nodes, (node) => node.sheets[this.sheetName].x))
@@ -123,12 +160,12 @@ export class NetworkGraphComponent implements AfterViewInit {
       .nice()
       .range([0, this.height]);
 
-    this.axes.bottom.g = svg
+    this.axes.bottom.g = this.svg
       .append('g')
       .attr('transform', `translate(0, ${this.height})`);
-    this.axes.top.g = svg.append('g');
-    this.axes.left.g = svg.append('g');
-    this.axes.right.g = svg
+    this.axes.top.g = this.svg.append('g');
+    this.axes.left.g = this.svg.append('g');
+    this.axes.right.g = this.svg
       .append('g')
       .attr('transform', `translate(${this.width}, 0)`);
   }
@@ -202,6 +239,7 @@ export class NetworkGraphComponent implements AfterViewInit {
         this.circles
           .attr('transform', e.transform.toString())
           .attr('stroke-width', 7 / e.transform.k);
+        this.edges.attr('stroke-width', 2 / e.transform.k);
         this.redrawGrid(zx, zy);
       });
 
@@ -209,5 +247,118 @@ export class NetworkGraphComponent implements AfterViewInit {
       .select<Element>('svg')
       .call(zoom)
       .call(zoom.transform, d3.zoomIdentity);
+  }
+
+  private updateEdges() {
+    interface Edge {
+      weight: number;
+      delay: number;
+      from: number;
+      to: number;
+    }
+    let inLinks: Edge[] = [];
+    let outLinks: Edge[] = [];
+    const set = new Set(this.selectedNodes.map((n) => n.id));
+    if (
+      this.edgeDir === EdgeDirection.outgoing ||
+      this.edgeDir === EdgeDirection.all
+    ) {
+      outLinks = this.selectedNodes.flatMap(
+        (n) =>
+          n.sheets[this.sheetName]?.connections
+            .filter((conn) => conn.sheet === this.sheetName)
+            .map((conn) => ({
+              weight: conn.weight,
+              delay: conn.delay,
+              from: n.id,
+              to: conn.node,
+            })) || []
+      );
+    }
+    if (
+      this.edgeDir === EdgeDirection.incoming ||
+      this.edgeDir === EdgeDirection.all
+    ) {
+      inLinks = this.allNodes.flatMap(
+        (n) =>
+          n.sheets[this.sheetName]?.connections
+            .filter(
+              (conn) => conn.sheet === this.sheetName && set.has(conn.node)
+            )
+            .map((conn) => ({
+              weight: conn.weight,
+              delay: conn.delay,
+              from: n.id,
+              to: conn.node,
+            })) || []
+      );
+    }
+
+    inLinks.forEach((conn) =>
+      this.circles.select(`[data-id="${conn.from}"]`).classed('neighbor', true)
+    );
+    outLinks.forEach((conn) =>
+      this.circles.select(`[data-id="${conn.to}"]`).classed('neighbor', true)
+    );
+
+    this.edges
+      .selectAll('.link')
+      .data([...inLinks, ...outLinks])
+      .join(
+        (enter) => enter.append('line').classed('link', true),
+        (update) => update,
+        (exit) => exit.remove()
+      )
+      .classed('incoming', (conn) => set.has(conn.to))
+      .classed('outgoing', (conn) => set.has(conn.from))
+      .attr(
+        'marker-end',
+        (conn) =>
+          `url(#arrowhead${set.has(conn.to) ? '-incoming' : ''}${
+            set.has(conn.from) ? '-outgoing' : ''
+          })`
+      )
+      .attr('x1', (conn) => this.displayX(this.allNodes[conn.from]))
+      .attr('y1', (conn) => this.displayY(this.allNodes[conn.from]))
+      .attr('x2', (conn) => this.displayX(this.allNodes[conn.to]))
+      .attr('y2', (conn) => this.displayY(this.allNodes[conn.to]));
+  }
+
+  private updateSelection() {
+    this.circles
+      .selectAll('.selected, .neighbor')
+      .classed('selected neighbor', false);
+    this.updateEdges();
+    this.selectedNodes.forEach((n) =>
+      this.circles.select(`[data-id="${n.id}"]`).classed('selected', true)
+    );
+  }
+
+  handleClick(e: MouseEvent) {
+    const tgt: HTMLElement = e.target as HTMLElement;
+    if (tgt.matches('.node')) {
+      const id = +tgt.dataset['id'];
+      if (tgt.classList.contains('selected')) {
+        if (e.shiftKey) {
+          this.selectedNodes = this.selectedNodes.filter((n) => n.id !== id);
+        } else {
+          this.selectedNodes = [];
+        }
+      } else {
+        if (e.shiftKey) {
+          this.selectedNodes = [...this.selectedNodes, this.allNodes[id]];
+        } else {
+          this.selectedNodes = [this.allNodes[id]];
+        }
+      }
+    }
+    this.select.emit(this.selectedNodes);
+  }
+
+  private displayX(node: NetworkNode) {
+    return this.scales.x(node.sheets[this.sheetName].x);
+  }
+  private displayY(node: NetworkNode) {
+    return this.scales.y(node.sheets[this.sheetName].y);
   }
 }

@@ -7,15 +7,10 @@ const routes: Routes = [
   { path: '', pathMatch: 'full', component: ModelPageComponent },
 ];
 
-export enum EdgeDirection {
-  incoming,
-  outcoming,
-}
-
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
 export class ModelPageRoutingModule {
-  constructor(private fb: FormBuilder) {}
+  constructor() {}
 }

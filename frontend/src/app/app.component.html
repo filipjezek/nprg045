@@ -2,3 +2,7 @@
 <main>
   <router-outlet></router-outlet>
 </main>
+<mozaik-loading-overlay
+  @fade
+  *ngIf="showLoadingOverlay$ | async"
+></mozaik-loading-overlay>

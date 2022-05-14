@@ -3,3 +3,10 @@ main {
   min-height: calc(100vh - 50px);
   overflow: hidden;
 }
+mozaik-header {
+  position: relative;
+  z-index: 10;
+}
+mozaik-loading-overlay {
+  z-index: 9;
+}

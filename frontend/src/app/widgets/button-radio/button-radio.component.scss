@@ -10,13 +10,14 @@ label {
   border: 1px solid #ccc;
   background-color: white;
   color: black;
-  padding: 5px;
+  padding: 10px;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  font-size: 0.8em;
+  font-size: 0.9em;
+  transition: 0.1s;
+  cursor: pointer;
 
   &:first-of-type {
     border-top-left-radius: 3px;
@@ -26,8 +27,13 @@ label {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
   }
+  &:not(:first-of-type) {
+    border-left-width: 0;
+  }
   &.selected {
-    border: 2px solid lightblue;
-    padding: 4px;
+    background-color: #dcdcdc;
+  }
+  &:hover {
+    background-color: #cbcbcb;
   }
 }

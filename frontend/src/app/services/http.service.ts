@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError, of } from 'rxjs';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpParams,
-} from '@angular/common/http';
-import { retry, concatMap, delay, catchError } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { retry, delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -15,15 +11,12 @@ export class HttpService {
 
   private retryPipeline = retry({
     count: 5,
-    delay: (err) =>
-      err.pipe(
-        concatMap((e: HttpErrorResponse, i) => {
-          if (![503, 504, 0, 429, 425].includes(e.status)) {
-            return throwError(() => e);
-          }
-          return of(e).pipe(delay(i * 500));
-        })
-      ),
+    delay: (e, i) => {
+      if (![503, 504, 0, 429, 425].includes(e.status)) {
+        return throwError(() => e);
+      }
+      return of(e).pipe(delay(i * 500));
+    },
   });
 
   constructor(private http: HttpClient) {}
@@ -33,12 +26,7 @@ export class HttpService {
       .get<T>(this.apiUrl + url, {
         params: params,
       })
-      .pipe(
-        catchError((err) => {
-          return throwError(() => err);
-        }),
-        this.retryPipeline as any
-      );
+      .pipe(this.retryPipeline as any);
   }
 
   post<T>(url: string, body: any): Observable<T> {
