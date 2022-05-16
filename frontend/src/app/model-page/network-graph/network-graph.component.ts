@@ -5,7 +5,6 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  NgZone,
   OnChanges,
   Output,
   SimpleChanges,
@@ -13,6 +12,12 @@ import {
 } from '@angular/core';
 import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 import * as d3 from 'd3';
+import * as d3Lasso from 'd3-lasso';
+import { GlobalEventService } from 'src/app/services/global-event.service';
+import { takeUntil } from 'rxjs';
+import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+
+type anySelection = d3.Selection<any, any, any, any>;
 
 export interface Directional<T> {
   top: T;
@@ -33,7 +38,10 @@ export enum EdgeDirection {
   styleUrls: ['./network-graph.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NetworkGraphComponent implements AfterViewInit, OnChanges {
+export class NetworkGraphComponent
+  extends UnsubscribingComponent
+  implements AfterViewInit, OnChanges
+{
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
   @Input() nodes: NetworkNode[];
@@ -43,7 +51,11 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
     return this._selectedNodes;
   }
   set selectedNodes(nodes: NetworkNode[]) {
-    if (this._selectedNodes === nodes) return;
+    if (
+      this._selectedNodes === nodes ||
+      (!nodes.length && !this._selectedNodes.length)
+    )
+      return;
     this._selectedNodes = nodes;
   }
   private _selectedNodes: NetworkNode[] = [];
@@ -58,7 +70,7 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
     y: null,
   };
   private axes: Directional<{
-    g: d3.Selection<SVGGElement, any, any, any>;
+    g: anySelection;
     axis: d3.Axis<number>;
   }> = {
     top: { axis: null, g: null },
@@ -66,10 +78,10 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
     left: { axis: null, g: null },
     right: { axis: null, g: null },
   };
-  private circles: d3.Selection<SVGGElement, any, any, any>;
-  private edges: d3.Selection<SVGGElement, any, any, any>;
-  private grid: d3.Selection<SVGGElement, any, any, any>;
-  private svg: d3.Selection<SVGGElement, any, any, any>;
+  private circles: anySelection;
+  private edges: anySelection;
+  private grid: anySelection;
+  private svg: anySelection;
 
   private readonly width = 410;
   private readonly height = 410;
@@ -80,54 +92,22 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
     bottom: 50,
   };
 
-  constructor(private zone: NgZone) {}
+  constructor(private gEventS: GlobalEventService) {
+    super();
+  }
 
   ngAfterViewInit(): void {
-    this.zone.runOutsideAngular(() => {
-      this.svg = d3
-        .select(this.container.nativeElement)
-        .append('svg')
-        .attr(
-          'viewBox',
-          `0 0 ${this.width + this.margin.left + this.margin.right} ${
-            this.height + this.margin.top + this.margin.bottom
-          }`
-        )
-        .attr('width', '100%')
-        .append('g')
-        .classed('content', true)
-        .attr('width', this.width)
-        .attr('height', this.height)
-        .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+    this.initSvg();
+    this.initAxes();
+    this.redraw();
+    this.initZoom();
+    this.initLasso();
 
-      const defs = this.svg.append('defs');
-      for (const classes of ['incoming', 'outgoing', 'incoming outgoing']) {
-        defs
-          .append('marker')
-          .attr('id', 'arrowhead-' + classes.replace(' ', '-'))
-          .classed(classes + ' arrowhead', true)
-          .attr('viewBox', '-0 -5 10 10')
-          .attr('refX', 10)
-          .attr('refY', 0)
-          .attr('orient', 'auto')
-          .attr('markerWidth', 6)
-          .attr('markerHeight', 6)
-          .attr('xoverflow', 'visible')
-          .append('svg:path')
-          .attr('d', 'M 0,-5 L 10 ,0 L 0,5');
-      }
-      this.grid = this.svg
-        .append('g')
-        .attr('stroke', 'currentColor')
-        .attr('stroke-opacity', 0.1);
-      this.circles = this.svg.append('g');
-      this.edges = this.circles.append('g');
-      this.circles.attr('fill', 'none').attr('stroke-linecap', 'round');
-
-      this.initAxes();
-      this.redraw();
-      this.initZoom();
-    });
+    this.gEventS.escapePressed
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(() => {
+        this.select.emit([]);
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -136,6 +116,48 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
         this.updateSelection();
       }
     }
+  }
+
+  private initSvg() {
+    this.svg = d3
+      .select(this.container.nativeElement)
+      .append('svg')
+      .attr(
+        'viewBox',
+        `0 0 ${this.width + this.margin.left + this.margin.right} ${
+          this.height + this.margin.top + this.margin.bottom
+        }`
+      )
+      .attr('width', '100%')
+      .append('g')
+      .classed('content', true)
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+    const defs = this.svg.append('defs');
+    for (const classes of ['incoming', 'outgoing', 'incoming outgoing']) {
+      defs
+        .append('marker')
+        .attr('id', 'arrowhead-' + classes.replace(' ', '-'))
+        .classed(classes + ' arrowhead', true)
+        .attr('viewBox', '-0 -5 10 10')
+        .attr('refX', 10)
+        .attr('refY', 0)
+        .attr('orient', 'auto')
+        .attr('markerWidth', 6)
+        .attr('markerHeight', 6)
+        .attr('xoverflow', 'visible')
+        .append('svg:path')
+        .attr('d', 'M 0,-5 L 10 ,0 L 0,5');
+    }
+    this.grid = this.svg
+      .append('g')
+      .attr('stroke', 'currentColor')
+      .attr('stroke-opacity', 0.1);
+    this.circles = this.svg.append('g');
+    this.edges = this.circles.append('g');
+    this.circles.attr('fill', 'none').attr('stroke-linecap', 'round');
   }
 
   private redraw() {
@@ -226,6 +248,13 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
   private initZoom() {
     const zoom = d3
       .zoom()
+      .filter(
+        (event: MouseEvent) =>
+          (!event.ctrlKey || event.type === 'wheel') &&
+          !event.button &&
+          !event.altKey &&
+          !event.shiftKey
+      )
       .scaleExtent([0.5, 32])
       .on('zoom', (e: d3.D3ZoomEvent<Element, any>) => {
         const zx = e.transform
@@ -360,5 +389,38 @@ export class NetworkGraphComponent implements AfterViewInit, OnChanges {
   }
   private displayY(node: NetworkNode) {
     return this.scales.y(node.sheets[this.sheetName].y);
+  }
+
+  private initLasso() {
+    const lasso = d3Lasso
+      .lasso()
+      .closePathSelect(true)
+      .closePathDistance(1000)
+      .hoverSelect(false)
+      .items(this.circles.selectAll('.node') as any)
+      .targetArea(
+        d3.select(this.container.nativeElement).select<Element>('svg')
+      )
+      .on('start', () => {
+        console.log('lasso start');
+        lasso.items().classed('not-possible', true).classed('selected', false);
+      })
+      .on('draw', () => {
+        lasso
+          .possibleItems()
+          .classed('not-possible', false)
+          .classed('possible', true);
+        lasso
+          .notPossibleItems()
+          .classed('not-possible', true)
+          .classed('possible', false);
+      })
+      .on('end', () => {
+        lasso.items().classed('not-possible possible', false);
+        this.select.emit([
+          ...new Set([...this.selectedNodes, ...lasso.selectedItems().data()]),
+        ]);
+      });
+    d3.select(this.container.nativeElement).select<Element>('svg').call(lasso);
   }
 }
