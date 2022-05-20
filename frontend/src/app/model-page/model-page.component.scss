@@ -1,6 +1,6 @@
 :host {
   display: block;
-  padding: 0 10px;
+  padding: 0 10px 20px;
 
   .graphs {
     display: grid;
@@ -8,5 +8,9 @@
     grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
     gap: 20px;
     justify-content: space-evenly;
+  }
+
+  mozaik-button-radio {
+    margin-top: 8px;
   }
 }

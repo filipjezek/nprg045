@@ -32,6 +32,13 @@ export enum EdgeDirection {
   all = 'all',
 }
 
+interface Edge {
+  weight: number;
+  delay: number;
+  from: number;
+  to: number;
+}
+
 @Component({
   selector: 'mozaik-network-graph',
   templateUrl: './network-graph.component.html',
@@ -91,6 +98,11 @@ export class NetworkGraphComponent
     top: 50,
     bottom: 50,
   };
+
+  hoveredEdge: Edge;
+  hoveredNode: NetworkNode;
+  hoverTimeout: any;
+  tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
 
   constructor(private gEventS: GlobalEventService) {
     super();
@@ -279,12 +291,6 @@ export class NetworkGraphComponent
   }
 
   private updateEdges() {
-    interface Edge {
-      weight: number;
-      delay: number;
-      from: number;
-      to: number;
-    }
     let inLinks: Edge[] = [];
     let outLinks: Edge[] = [];
     const set = new Set(this.selectedNodes.map((n) => n.id));
@@ -382,6 +388,62 @@ export class NetworkGraphComponent
       }
     }
     this.select.emit(this.selectedNodes);
+  }
+
+  handleMouseEnter(e: MouseEvent) {
+    const tgt = e.target as HTMLElement;
+    if (tgt.matches('.node')) {
+      this.hoveredNode = d3.select(tgt).datum() as any;
+
+      const bboxNode = tgt.getBoundingClientRect();
+      const bboxCont = this.container.nativeElement.getBoundingClientRect();
+      const tempPos: Partial<Directional<string>> = {};
+
+      if (bboxNode.left - bboxCont.left < 100) {
+        tempPos.left = bboxNode.left - bboxCont.left + 10 + 'px';
+      } else {
+        tempPos.right =
+          bboxCont.width - bboxNode.left + bboxCont.left + 10 + 'px';
+      }
+      if (bboxNode.top - bboxCont.top < 100) {
+        tempPos.top = bboxNode.top - bboxCont.top + 10 + 'px';
+      } else {
+        tempPos.bottom =
+          bboxCont.height - bboxNode.top + bboxCont.top + 10 + 'px';
+      }
+
+      this.tooltipPos = {
+        ...tempPos,
+      };
+    } else if (tgt.matches('.link')) {
+      this.hoveredEdge = d3.select(tgt).datum() as any;
+
+      const bboxCont = this.container.nativeElement.getBoundingClientRect();
+      const tempPos: Partial<Directional<string>> = {};
+
+      if (e.clientX - bboxCont.left < 100) {
+        tempPos.left = e.clientX - bboxCont.left + 10 + 'px';
+      } else {
+        tempPos.right = bboxCont.width - e.clientX + bboxCont.left + 10 + 'px';
+      }
+      if (e.clientY - bboxCont.top < 100) {
+        tempPos.top = e.clientY - bboxCont.top + 10 + 'px';
+      } else {
+        tempPos.bottom = bboxCont.height - e.clientY + bboxCont.top + 10 + 'px';
+      }
+
+      this.tooltipPos = {
+        ...tempPos,
+      };
+    }
+  }
+  handleMouseLeave(e: MouseEvent) {
+    const tgt = e.target as HTMLElement;
+    if (tgt.matches('.node')) {
+      this.hoveredNode = null;
+    } else if (tgt.matches('.link')) {
+      this.hoveredEdge = null;
+    }
   }
 
   private displayX(node: NetworkNode) {

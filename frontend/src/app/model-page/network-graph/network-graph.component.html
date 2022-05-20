@@ -1,3 +1,39 @@
-<div #container class="container" (click)="handleClick($event)">
+<div
+  #container
+  class="container"
+  (click)="handleClick($event)"
+  (mouseover)="handleMouseEnter($event)"
+  (mouseout)="handleMouseLeave($event)"
+>
   <h2>{{ sheetName }}</h2>
+  <mozaik-tooltip #nodeTooltip *ngIf="hoveredNode" [ngStyle]="tooltipPos">
+    <h1>Neuron #{{ hoveredNode.id }}</h1>
+    <table>
+      <tbody>
+        <tr>
+          <td>X</td>
+          <td>{{ hoveredNode.sheets[sheetName].x | number: "1.0-4" }}</td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td>{{ hoveredNode.sheets[sheetName].y | number: "1.0-4" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </mozaik-tooltip>
+  <mozaik-tooltip #edgeTooltip *ngIf="hoveredEdge" [ngStyle]="tooltipPos">
+    <h1>Edge #{{ hoveredEdge.from }} -> #{{ hoveredEdge.to }}</h1>
+    <table>
+      <tbody>
+        <tr>
+          <td>Weight</td>
+          <td>{{ hoveredEdge.weight | number: "1.0-4" }}</td>
+        </tr>
+        <tr>
+          <td>Delay</td>
+          <td>{{ hoveredEdge.delay | number: "1.0-4" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </mozaik-tooltip>
 </div>

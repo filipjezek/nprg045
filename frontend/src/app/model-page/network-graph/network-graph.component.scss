@@ -4,6 +4,7 @@
   .container {
     max-width: 500px;
     margin: auto;
+    position: relative;
 
     h2 {
       font-size: 1.2em;
@@ -84,5 +85,35 @@
         }
       }
     }
+
+    mozaik-tooltip {
+      position: absolute;
+      font-size: 0.7em;
+      min-width: 100px;
+      animation: fade 0.1s ease-out 1s backwards;
+
+      h1 {
+        font-size: 1.1em;
+        margin: 3px 0;
+      }
+
+      table {
+        color: #333;
+        width: 100%;
+
+        td:last-child {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

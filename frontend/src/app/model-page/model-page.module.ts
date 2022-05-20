@@ -10,9 +10,10 @@ import { EffectsModule } from '@ngrx/effects';
 import { ModelEffects } from '../store/effects/model.effects';
 import * as fromModel from '../store/reducers/model.reducer';
 import { NetworkGraphComponent } from './network-graph/network-graph.component';
+import { TooltipComponent } from './tooltip/tooltip.component';
 
 @NgModule({
-  declarations: [ModelPageComponent, NetworkGraphComponent],
+  declarations: [ModelPageComponent, NetworkGraphComponent, TooltipComponent],
   imports: [
     CommonModule,
     ModelPageRoutingModule,
