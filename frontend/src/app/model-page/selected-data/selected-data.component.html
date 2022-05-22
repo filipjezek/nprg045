@@ -1,0 +1,63 @@
+<div class="node" *ngFor="let node of nodeData">
+  <h1>Neuron #{{ node.node.id }}</h1>
+  <section class="positions">
+    <h2>Positions</h2>
+    <table>
+      <tbody>
+        <tr *ngFor="let sheet of node.node.sheets | keyvalue">
+          <td>{{ sheet.key }}</td>
+          <td>
+            [{{ sheet.value.x | number: "1.0-4" }},
+            {{ sheet.value.y | number: "1.0-4" }}]
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="outgoing">
+    <h2>Outgoing</h2>
+    <ng-container *ngFor="let sheet of node.node.sheets | keyvalue">
+      <section class="sheet" *ngIf="sheet.value.connections.length">
+        <h3>{{ sheet.key }}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>To</th>
+              <th>Weight</th>
+              <th>Delay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tgt of sheet.value.connections">
+              <td>#{{ tgt.node }}</td>
+              <td>{{ tgt.weight | number: "1.0-4" }}</td>
+              <td>{{ tgt.delay | number: "1.0-4" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </ng-container>
+  </section>
+  <section class="incoming">
+    <h2>Incoming</h2>
+    <section class="sheet" *ngFor="let sheet of node.in | keyvalue">
+      <h3>{{ sheet.key }}</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>From</th>
+            <th>Weight</th>
+            <th>Delay</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tgt of sheet.value">
+            <td>#{{ tgt.from }}</td>
+            <td>{{ tgt.weight | number: "1.0-4" }}</td>
+            <td>{{ tgt.delay | number: "1.0-4" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </section>
+</div>

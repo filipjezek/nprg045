@@ -10,7 +10,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { NetworkNode } from 'src/app/store/reducers/model.reducer';
+import {
+  Connection,
+  getIncomingConnections,
+  getOutgoingConnections,
+  NetworkNode,
+} from 'src/app/store/reducers/model.reducer';
 import * as d3 from 'd3';
 import * as d3Lasso from 'd3-lasso';
 import { GlobalEventService } from 'src/app/services/global-event.service';
@@ -30,13 +35,6 @@ export enum EdgeDirection {
   incoming = 'incoming',
   outgoing = 'outgoing',
   all = 'all',
-}
-
-interface Edge {
-  weight: number;
-  delay: number;
-  from: number;
-  to: number;
 }
 
 @Component({
@@ -99,9 +97,8 @@ export class NetworkGraphComponent
     bottom: 50,
   };
 
-  hoveredEdge: Edge;
+  hoveredEdge: Connection;
   hoveredNode: NetworkNode;
-  hoverTimeout: any;
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
 
   constructor(private gEventS: GlobalEventService) {
@@ -291,42 +288,20 @@ export class NetworkGraphComponent
   }
 
   private updateEdges() {
-    let inLinks: Edge[] = [];
-    let outLinks: Edge[] = [];
+    let inLinks: Connection[] = [];
+    let outLinks: Connection[] = [];
     const set = new Set(this.selectedNodes.map((n) => n.id));
     if (
       this.edgeDir === EdgeDirection.outgoing ||
       this.edgeDir === EdgeDirection.all
     ) {
-      outLinks = this.selectedNodes.flatMap(
-        (n) =>
-          n.sheets[this.sheetName]?.connections
-            .filter((conn) => conn.sheet === this.sheetName)
-            .map((conn) => ({
-              weight: conn.weight,
-              delay: conn.delay,
-              from: n.id,
-              to: conn.node,
-            })) || []
-      );
+      outLinks = getOutgoingConnections(this.selectedNodes, this.sheetName);
     }
     if (
       this.edgeDir === EdgeDirection.incoming ||
       this.edgeDir === EdgeDirection.all
     ) {
-      inLinks = this.allNodes.flatMap(
-        (n) =>
-          n.sheets[this.sheetName]?.connections
-            .filter(
-              (conn) => conn.sheet === this.sheetName && set.has(conn.node)
-            )
-            .map((conn) => ({
-              weight: conn.weight,
-              delay: conn.delay,
-              from: n.id,
-              to: conn.node,
-            })) || []
-      );
+      inLinks = getIncomingConnections(set, this.sheetName, this.allNodes);
     }
 
     inLinks.forEach((conn) =>

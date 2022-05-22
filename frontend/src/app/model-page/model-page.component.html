@@ -1,20 +1,30 @@
 <h1>Model</h1>
 
-<p class="label">
-  Displayed edges
-  <mozaik-button-radio
-    [options]="edges"
-    [formControl]="edgeControl"
-  ></mozaik-button-radio>
-</p>
-<div class="graphs">
-  <mozaik-network-graph
-    *ngFor="let sheet of (model$ | async)?.sheetNodes | keyvalue"
-    [sheetName]="sheet.key"
-    [nodes]="sheet.value"
-    [edgeDir]="edgeControl.value"
-    [allNodes]="(model$ | async)?.nodes"
-    (select)="selectedNodes = $event"
-    [selectedNodes]="selectedNodes"
-  ></mozaik-network-graph>
+<div class="columns">
+  <div class="col">
+    <p class="label">
+      Displayed edges
+      <mozaik-button-radio
+        [options]="edges"
+        [formControl]="edgeControl"
+      ></mozaik-button-radio>
+    </p>
+    <div class="graphs">
+      <mozaik-network-graph
+        *ngFor="let sheet of (model$ | async)?.sheetNodes | keyvalue"
+        [sheetName]="sheet.key"
+        [nodes]="sheet.value"
+        [edgeDir]="edgeControl.value"
+        [allNodes]="(model$ | async)?.nodes"
+        (select)="selectedNodes = $event"
+        [selectedNodes]="selectedNodes"
+      ></mozaik-network-graph>
+    </div>
+  </div>
+  <div class="col">
+    <mozaik-selected-data
+      [allNodes]="(model$ | async)?.nodes"
+      [selectedNodes]="selectedNodes"
+    ></mozaik-selected-data>
+  </div>
 </div>
