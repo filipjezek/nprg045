@@ -7,25 +7,28 @@ Example session:
 
 ## How to run visualization
 
-- install requirements.txt
-- install mozaik (python3):
+- install mozaik ([](https://github.com/antolikjan/mozaik)):
+- install node.js
+- run in folder mff_nprg045 (flask server):
 
+```bash
+pip install -e .
+export FLASK_APP=backend
+flask run
 ```
-git clone https://github.com/antolikjan/mozaik.git
-cd mozaik
-git checkout python3
-python setup.py install
+
+- run in folder mff_nprg045/frontend (angular development server):
+
+```bash
+npm i -g @angular/cli
+npm i
+ng serve
 ```
 
-- run in folder mff_nprg045:
-```
-bokeh serve --show visualize --args path_to_datastore
-```
-(path_to_datastore example: /example_data/FeedForwardInhibition_student)
+## Usage
 
-Running bokeh server:
-- selecting more disjunct areas in plot is posblie with Shift key
-
-### Bug
-
-There is some bug in Bokeh 2.2.1, so there is KeyError: 'id' error after run the application (related issue: https://github.com/bokeh/bokeh/issues/10453)
+- [](http://localhost:4200/model)
+- click any neuron to reveal all connections
+- selecting more is possible with `shift` key
+- lasso is also available when dragging with `shift` key
+- hover on any node or connection to display tooltip with more info
