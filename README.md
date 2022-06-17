@@ -3,31 +3,49 @@
 Example session:
 ![example](example.png)
 
-- [documentation](dokumentace.pdf) (in czech)
+- [documentation](dokumentace.pdf) (in czech, outdated)
 
 ## How to run visualization
 
-- install mozaik ([](https://github.com/antolikjan/mozaik)):
-- install node.js
-- run in folder mff_nprg045 (flask server):
+- install mozaik (<https://github.com/antolikjan/mozaik>):
+- install [node.js](https://nodejs.org/en/)
+
+### Dependencies
 
 ```bash
 pip install -e .
-export FLASK_APP=backend
-flask run
+npm i -g @angular/cli
+cd frontend
+npm i
 ```
 
-- run in folder mff_nprg045/frontend (angular development server):
+### Production build & run
 
 ```bash
-npm i -g @angular/cli
-npm i
+cd frontend
+npm run build
+cd ..
+./run.sh
+```
+
+- open <http://localhost:5000>
+
+### Angular development server
+
+_Angular dev server is only intended for development_
+
+```bash
+cd frontend
 ng serve
 ```
 
+- frontend will not be served by flask but by angular
+- url defaults to <http://localhost:4200>
+- flask server needs to be running too to provide backend api
+
 ## Usage
 
-- [](http://localhost:4200/model)
+- open the app in browser
 - click any neuron to reveal all connections
 - selecting more is possible with `shift` key
 - lasso is also available when dragging with `shift` key

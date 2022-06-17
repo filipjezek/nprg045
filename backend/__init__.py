@@ -2,9 +2,7 @@ from .app import app
 from .server_api import api
 from werkzeug.exceptions import NotFound
 import flask
-from .datastore import curr_datastore
 
-print(app.static_folder)
 app.register_blueprint(api, url_prefix='/api/')
 
 
