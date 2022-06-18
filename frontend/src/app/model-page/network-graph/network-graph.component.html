@@ -6,7 +6,11 @@
   (mouseout)="handleMouseLeave($event)"
 >
   <h2>{{ sheetName }}</h2>
-  <mozaik-tooltip #nodeTooltip *ngIf="hoveredNode" [ngStyle]="tooltipPos">
+  <mozaik-tooltip
+    #nodeTooltip
+    *ngIf="hoveredNode && hoveredNode.sheets[sheetName]"
+    [ngStyle]="tooltipPos"
+  >
     <h1>Neuron #{{ hoveredNode.id }}</h1>
     <table>
       <tbody>

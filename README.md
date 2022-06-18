@@ -50,3 +50,4 @@ ng serve
 - selecting more is possible with `shift` key
 - lasso is also available when dragging with `shift` key
 - hover on any node or connection to display tooltip with more info
+- hovering and selection also works in the info sidebar

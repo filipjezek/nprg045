@@ -20,6 +20,7 @@ export class ModelPageComponent implements OnInit {
   ];
   edgeControl = new FormControl(EdgeDirection.outgoing);
   selectedNodes: NetworkNode[] = [];
+  hoveredNode: NetworkNode;
 
   constructor(private store: Store<State>) {}
 

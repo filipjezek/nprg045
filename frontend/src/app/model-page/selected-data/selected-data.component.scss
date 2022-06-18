@@ -22,4 +22,13 @@
       }
     }
   }
+
+  .node-anchor {
+    border-radius: 3px;
+    cursor: pointer;
+
+    &.hovered {
+      background-color: #a3ffa3;
+    }
+  }
 }

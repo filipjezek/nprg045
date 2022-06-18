@@ -1,5 +1,13 @@
 <div class="node" *ngFor="let node of nodeData">
-  <h1>Neuron #{{ node.node.id }}</h1>
+  <h1
+    class="node-anchor"
+    [class.hovered]="hoveredNode?.id === node.node.id"
+    (mouseenter)="hoverNode(node.node)"
+    (mouseleave)="hoverNode(null)"
+    (click)="handleSelect($event, node.node)"
+  >
+    Neuron #{{ node.node.id }}
+  </h1>
   <section class="positions">
     <h2>Positions</h2>
     <table>
@@ -29,7 +37,16 @@
           </thead>
           <tbody>
             <tr *ngFor="let tgt of sheet.value.connections">
-              <td>#{{ tgt.node }}</td>
+              <td>
+                <span
+                  class="node-anchor"
+                  [class.hovered]="hoveredNode?.id === tgt.node"
+                  (mouseenter)="hoverNode(allNodes[tgt.node])"
+                  (mouseleave)="hoverNode(null)"
+                  (click)="handleSelect($event, allNodes[tgt.node])"
+                  >#{{ tgt.node }}</span
+                >
+              </td>
               <td>{{ tgt.weight | number: "1.0-4" }}</td>
               <td>{{ tgt.delay | number: "1.0-4" }}</td>
             </tr>
@@ -52,7 +69,16 @@
         </thead>
         <tbody>
           <tr *ngFor="let tgt of sheet.value">
-            <td>#{{ tgt.from }}</td>
+            <td>
+              <span
+                class="node-anchor"
+                [class.hovered]="hoveredNode?.id === tgt.from"
+                (mouseenter)="hoverNode(allNodes[tgt.from])"
+                (mouseleave)="hoverNode(null)"
+                (click)="handleSelect($event, allNodes[tgt.from])"
+                >#{{ tgt.from }}</span
+              >
+            </td>
             <td>{{ tgt.weight | number: "1.0-4" }}</td>
             <td>{{ tgt.delay | number: "1.0-4" }}</td>
           </tr>

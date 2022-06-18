@@ -18,6 +18,8 @@
         [allNodes]="(model$ | async)?.nodes"
         (select)="selectedNodes = $event"
         [selectedNodes]="selectedNodes"
+        [hoveredNode]="hoveredNode"
+        (hoveredNodeChange)="hoveredNode = $event"
       ></mozaik-network-graph>
     </div>
   </div>
@@ -25,6 +27,9 @@
     <mozaik-selected-data
       [allNodes]="(model$ | async)?.nodes"
       [selectedNodes]="selectedNodes"
+      [hoveredNode]="hoveredNode"
+      (hoveredNodeChange)="hoveredNode = $event"
+      (select)="selectedNodes = $event"
     ></mozaik-selected-data>
   </div>
 </div>

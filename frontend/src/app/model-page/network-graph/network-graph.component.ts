@@ -98,7 +98,8 @@ export class NetworkGraphComponent
   };
 
   hoveredEdge: Connection;
-  hoveredNode: NetworkNode;
+  @Input() hoveredNode: NetworkNode;
+  @Output() hoveredNodeChange = new EventEmitter<NetworkNode>();
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
 
   constructor(private gEventS: GlobalEventService) {
@@ -123,6 +124,21 @@ export class NetworkGraphComponent
     if (changes['edgeDir'] || changes['selectedNodes']) {
       if (this.svg) {
         this.updateSelection();
+      }
+    }
+    if (changes['hoveredNode'] && this.svg) {
+      if (changes['hoveredNode'].previousValue) {
+        this.circles.select('.hovered').classed('hovered', false);
+      }
+      if (this.hoveredNode && this.hoveredNode.sheets[this.sheetName]) {
+        const tgt = this.circles
+          .select(`[data-id="${this.hoveredNode.id}"]`)
+          .classed('hovered', true);
+        console.log(tgt, tgt.node());
+        const bboxNode = (tgt.node() as HTMLElement).getBoundingClientRect();
+        this.tooltipPos = {
+          ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
+        };
       }
     }
   }
@@ -369,46 +385,11 @@ export class NetworkGraphComponent
     const tgt = e.target as HTMLElement;
     if (tgt.matches('.node')) {
       this.hoveredNode = d3.select(tgt).datum() as any;
-
-      const bboxNode = tgt.getBoundingClientRect();
-      const bboxCont = this.container.nativeElement.getBoundingClientRect();
-      const tempPos: Partial<Directional<string>> = {};
-
-      if (bboxNode.left - bboxCont.left < 100) {
-        tempPos.left = bboxNode.left - bboxCont.left + 10 + 'px';
-      } else {
-        tempPos.right =
-          bboxCont.width - bboxNode.left + bboxCont.left + 10 + 'px';
-      }
-      if (bboxNode.top - bboxCont.top < 100) {
-        tempPos.top = bboxNode.top - bboxCont.top + 10 + 'px';
-      } else {
-        tempPos.bottom =
-          bboxCont.height - bboxNode.top + bboxCont.top + 10 + 'px';
-      }
-
-      this.tooltipPos = {
-        ...tempPos,
-      };
+      this.hoveredNodeChange.emit(this.hoveredNode);
     } else if (tgt.matches('.link')) {
       this.hoveredEdge = d3.select(tgt).datum() as any;
-
-      const bboxCont = this.container.nativeElement.getBoundingClientRect();
-      const tempPos: Partial<Directional<string>> = {};
-
-      if (e.clientX - bboxCont.left < 100) {
-        tempPos.left = e.clientX - bboxCont.left + 10 + 'px';
-      } else {
-        tempPos.right = bboxCont.width - e.clientX + bboxCont.left + 10 + 'px';
-      }
-      if (e.clientY - bboxCont.top < 100) {
-        tempPos.top = e.clientY - bboxCont.top + 10 + 'px';
-      } else {
-        tempPos.bottom = bboxCont.height - e.clientY + bboxCont.top + 10 + 'px';
-      }
-
       this.tooltipPos = {
-        ...tempPos,
+        ...this.recalcTooltipPos(e.clientX, e.clientY),
       };
     }
   }
@@ -416,6 +397,7 @@ export class NetworkGraphComponent
     const tgt = e.target as HTMLElement;
     if (tgt.matches('.node')) {
       this.hoveredNode = null;
+      this.hoveredNodeChange.emit(null);
     } else if (tgt.matches('.link')) {
       this.hoveredEdge = null;
     }
@@ -459,5 +441,23 @@ export class NetworkGraphComponent
         ]);
       });
     d3.select(this.container.nativeElement).select<Element>('svg').call(lasso);
+  }
+
+  private recalcTooltipPos(x: number, y: number) {
+    const bboxCont = this.container.nativeElement.getBoundingClientRect();
+    const pos: Partial<Directional<string>> = {};
+
+    if (x - bboxCont.left < 100) {
+      pos.left = x - bboxCont.left + 10 + 'px';
+    } else {
+      pos.right = bboxCont.width - x + bboxCont.left + 10 + 'px';
+    }
+    if (y - bboxCont.top < 100) {
+      pos.top = y - bboxCont.top + 10 + 'px';
+    } else {
+      pos.bottom = bboxCont.height - y + bboxCont.top + 10 + 'px';
+    }
+
+    return pos;
   }
 }
