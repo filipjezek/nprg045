@@ -4,3 +4,4 @@ __pycache__
 .vscode
 backend/static/frontend_dist/*
 .angular
+package-lock.json
