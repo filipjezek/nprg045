@@ -2,12 +2,13 @@ from typing import  List, Tuple, TypedDict
 from mozaik.storage.datastore import PickledDataStore, DataStore
 from parameters import ParameterSet
 import numpy as np
+from functools import lru_cache
 from .parameters import params
 
 # these type definitons should correspond to those
 # in /frontend/src/app/model-page/model.service.ts
 #
-# it should be space-efficient representation of the network data
+# it should be a space-efficient representation of the network data
 
 class Positions(TypedDict):
   ids: List[int]
@@ -38,7 +39,10 @@ class JsonSerializableDataStore(TypedDict):
   connections: List[Connections]
 
 
-def __get_datastore(path_to_datastore: str) -> JsonSerializableDataStore:
+# faster webpage refresh
+# the webpage will have at most two datastores loaded (in comparison mode)
+@lru_cache(2)
+def get_datastore(path_to_datastore: str) -> JsonSerializableDataStore:
   """
   path_to_datastore: absolute path to mozaik datastore
   """
@@ -99,7 +103,3 @@ def __get_serializable_connections(datastore: DataStore) -> List[Connections]:
       } for (s,t,w), (_,_,d) in zip(conn.weights, conn.delays)
     ] 
   } for conn in connections]
-
-# only one datastore should be accessed during the app lifetime so we will cache it
-# (at least for now)
-curr_datastore: JsonSerializableDataStore = __get_datastore(params['datastore_path'])
