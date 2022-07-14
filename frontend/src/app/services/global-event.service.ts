@@ -13,9 +13,16 @@ export class GlobalEventService {
   public spacePressed: Observable<KeyboardEvent>;
   public escapePressed: Observable<KeyboardEvent>;
   public mouseReleased: Observable<MouseEvent>;
+  public overlayClicked: Observable<MouseEvent>;
 
   constructor(@Inject(DOCUMENT) private doc: Document) {
     this.documentClicked = fromEvent<MouseEvent>(this.doc, 'click').pipe(
+      share()
+    );
+    this.overlayClicked = this.documentClicked.pipe(
+      filter(
+        (e) => (e.target as HTMLElement).closest('mozaik-overlay') !== null
+      ),
       share()
     );
 

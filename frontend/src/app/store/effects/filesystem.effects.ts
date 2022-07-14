@@ -4,27 +4,30 @@ import { switchMap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
-import { apiError, loadModel, modelLoaded } from '../actions/model.actions';
 import { ToastService } from 'src/app/widgets/services/toast.service';
-import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   loadingOverlayDecrement,
   loadingOverlayIncrement,
 } from '../actions/ui.actions';
 import { Toast } from 'src/app/widgets/services/toast';
-import { ModelService } from 'src/app/model-page/model.service';
+import { FilesystemService } from 'src/app/services/filesystem.service';
+import {
+  apiError,
+  filesystemLoaded,
+  loadFilesystem,
+} from '../actions/filesystem.actions';
 
 @Injectable()
-export class ModelEffects {
+export class FilesystemEffects {
   loadModel$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadModel),
-      switchMap(({ path }) =>
-        this.modelS.loadModel(path).pipe(
-          map(({ model }) => modelLoaded({ model })),
+      ofType(loadFilesystem),
+      switchMap(() =>
+        this.fsService.loadFilesystem().pipe(
+          map((fs) => filesystemLoaded({ fs })),
           catchError((err: HttpErrorResponse) => {
-            this.toastS.add(new Toast('Failed to load data'));
+            this.toastS.add(new Toast('Failed to load filesystem'));
             return of(apiError({ error: err }));
           })
         )
@@ -34,13 +37,13 @@ export class ModelEffects {
 
   loadingOverlayInc$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadModel),
+      ofType(loadFilesystem),
       map(() => loadingOverlayIncrement())
     )
   );
   loadingOverlayDec$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(modelLoaded, apiError),
+      ofType(filesystemLoaded, apiError),
       map(() => loadingOverlayDecrement())
     )
   );
@@ -49,7 +52,6 @@ export class ModelEffects {
     private actions$: Actions,
     private store: Store<State>,
     private toastS: ToastService,
-    private modelS: ModelService,
-    private router: Router
+    private fsService: FilesystemService
   ) {}
 }

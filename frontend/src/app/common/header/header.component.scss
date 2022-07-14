@@ -4,11 +4,25 @@ header {
   height: 50px;
   background-color: var(--primary);
   color: var(--primary-text);
+  padding: 0 10px;
   box-shadow: 0 0 4px #00000078;
-  padding: 0 20px;
+  justify-content: space-between;
 
   a {
     text-decoration: none;
     font-size: 1.1em;
+    padding: 0 10px;
+  }
+
+  button {
+    color: white;
+    background-color: transparent;
+    border: none;
+    font-size: 1em;
+    padding: 10px;
+
+    &:not(:disabled) {
+      cursor: pointer;
+    }
   }
 }

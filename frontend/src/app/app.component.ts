@@ -1,8 +1,9 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { auditTime } from 'rxjs';
 import { fade } from './animations';
+import { loadFilesystem } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
 
 @Component({
@@ -16,7 +17,7 @@ import { State } from './store/reducers';
         useAnimation(fade, {
           params: {
             start: '0',
-            end: '1',
+            end: '*',
             time: '0.1s',
           },
         })
@@ -25,7 +26,7 @@ import { State } from './store/reducers';
         ':leave',
         useAnimation(fade, {
           params: {
-            start: '1',
+            start: '*',
             end: '0',
             time: '0.1s',
           },
@@ -34,10 +35,15 @@ import { State } from './store/reducers';
     ]),
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   showLoadingOverlay$ = this.store
     .select((x) => x.ui.loadingOverlay > 0)
     .pipe(auditTime(50));
+  overlay$ = this.store.select((x) => x.ui.overlay);
 
   constructor(private store: Store<State>) {}
+
+  ngOnInit(): void {
+    this.store.dispatch(loadFilesystem());
+  }
 }

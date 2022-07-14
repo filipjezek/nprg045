@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  width: 350px;
+  max-width: 100%;
+  overflow-y: auto;
+  height: calc(100vh - 50px);
+  position: fixed;
+  top: 50px;
+  left: 0;
+  background-color: var(--background);
+  color: var(--background-text);
+  z-index: -2;
+  box-shadow: 0 0 3px #00000078;
+}

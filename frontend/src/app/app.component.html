@@ -6,3 +6,9 @@
   @fade
   *ngIf="showLoadingOverlay$ | async"
 ></mozaik-loading-overlay>
+<mozaik-overlay
+  @fade
+  *ngIf="(overlay$ | async).open"
+  [style.opacity]="(overlay$ | async).opacity"
+  [style.zIndex]="(overlay$ | async).zIndex"
+></mozaik-overlay>

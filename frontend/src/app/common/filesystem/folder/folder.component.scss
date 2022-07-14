@@ -1,0 +1,33 @@
+header {
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  transition: 0.1s;
+  cursor: pointer;
+
+  .name {
+    overflow-wrap: break-word;
+    min-width: 0;
+  }
+  &:hover {
+    background-color: #ddd;
+  }
+  &.open {
+    .folder-marker {
+      transform: rotate(90deg);
+    }
+  }
+  .folder-marker {
+    text-align: center;
+    display: inline-block;
+    width: 20px;
+    transition: transform 0.1s;
+    flex-shrink: 0;
+  }
+}
+
+.content {
+  margin-left: 6px;
+  border-left: 1px solid #dbdbdb;
+}

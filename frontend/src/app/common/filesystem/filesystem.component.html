@@ -1,0 +1,14 @@
+<ng-container *ngIf="files; else empty">
+  <ng-container *ngIf="files.content.length; else singleDatastore">
+    <mozaik-folder [info]="files" [open]="true"></mozaik-folder>
+  </ng-container>
+  <ng-template #singleDatastore>
+    <mozaik-datastore
+      [selected]="current == files.name"
+      [name]="files.name"
+    ></mozaik-datastore>
+  </ng-template>
+</ng-container>
+<ng-template #empty>
+  <p>No datastore found</p>
+</ng-template>

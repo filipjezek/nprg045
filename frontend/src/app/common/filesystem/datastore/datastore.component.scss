@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  transition: 0.1s;
+  cursor: pointer;
+
+  .name {
+    overflow-wrap: break-word;
+    min-width: 0;
+  }
+  .db-marker {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--secondary-light);
+  }
+
+  &.selected {
+    color: var(--primary-dark);
+  }
+  &:hover {
+    background-color: #ddd;
+  }
+}

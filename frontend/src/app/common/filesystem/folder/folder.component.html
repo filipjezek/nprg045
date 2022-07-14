@@ -1,0 +1,34 @@
+<header [class.open]="open" (click)="open = !open">
+  <fa-icon [icon]="faChevronRight" class="folder-marker"></fa-icon>
+  <span class="name">{{ info.name }}</span>
+</header>
+<div class="content" @folder *ngIf="open">
+  <mozaik-datastore
+    (click)="selectDatastore((context && context + '/') + info.name)"
+    *ngIf="info.datastore"
+    [selected]="(current$ | async) == (context && context + '/') + info.name"
+    name="."
+  ></mozaik-datastore>
+  <ng-container *ngFor="let item of info.content">
+    <ng-container *ngIf="item.content.length; else datastore">
+      <mozaik-folder
+        [info]="item"
+        [context]="(context && context + '/') + info.name"
+      ></mozaik-folder>
+    </ng-container>
+    <ng-template #datastore>
+      <mozaik-datastore
+        (click)="
+          selectDatastore(
+            (context && context + '/') + info.name + '/' + item.name
+          )
+        "
+        [selected]="
+          (current$ | async) ==
+          (context && context + '/') + info.name + '/' + item.name
+        "
+        [name]="item.name"
+      ></mozaik-datastore>
+    </ng-template>
+  </ng-container>
+</div>

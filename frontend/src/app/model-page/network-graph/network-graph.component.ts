@@ -134,7 +134,6 @@ export class NetworkGraphComponent
         const tgt = this.circles
           .select(`[data-id="${this.hoveredNode.id}"]`)
           .classed('hovered', true);
-        console.log(tgt, tgt.node());
         const bboxNode = (tgt.node() as HTMLElement).getBoundingClientRect();
         this.tooltipPos = {
           ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
@@ -421,7 +420,6 @@ export class NetworkGraphComponent
         d3.select(this.container.nativeElement).select<Element>('svg')
       )
       .on('start', () => {
-        console.log('lasso start');
         lasso.items().classed('not-possible', true).classed('selected', false);
       })
       .on('draw', () => {

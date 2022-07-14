@@ -1,3 +1,4 @@
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { HttpService } from '../services/http.service';
@@ -40,9 +41,9 @@ export interface Neuron {
 export class ModelService {
   constructor(private http: HttpService) {}
 
-  public loadModel(): Observable<{ model: ModelNetwork }> {
+  public loadModel(path: string): Observable<{ model: ModelNetwork }> {
     return this.http
-      .get<Model>('model')
+      .get<Model>('model', new HttpParams().append('path', path))
       .pipe(map((m) => ({ model: this.parseNetwork(m) })));
   }
 

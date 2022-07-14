@@ -1,1 +1,12 @@
-<header><a routerLink="/model">Mozaik visualization</a></header>
+<header>
+  <button (click)="toggleSideMenu()" [disabled]="!(currDatastore$ | async)">
+    <fa-icon [icon]="faFolderTree"></fa-icon>
+  </button>
+  <a routerLink="/">Mozaik visualization</a>
+</header>
+<mozaik-filesystem
+  @menu
+  *ngIf="filesystemOpen"
+  [files]="filesystem$ | async"
+  [current]="currDatastore$ | async"
+></mozaik-filesystem>
