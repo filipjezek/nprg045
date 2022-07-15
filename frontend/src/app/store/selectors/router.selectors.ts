@@ -16,5 +16,7 @@ export const selectUrlAfterDatastore = createSelector(selectUrl, (url) => {
   if (!url.startsWith('/datastore/')) {
     return [];
   }
-  return url.slice(url.indexOf('/', '/datastore/'.length) + 1).split('/');
+  const slash2 = url.indexOf('/', '/datastore/'.length) + 1;
+  if (slash2 === 0) return [];
+  return url.slice(slash2).split('/');
 });

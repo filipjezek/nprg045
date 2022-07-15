@@ -1,1 +1,9 @@
-<p>features works!</p>
+<h1>{{ datastore$ | async }}</h1>
+<nav>
+  <a
+    *ngFor="let link of links"
+    [routerLink]="['datastore', datastore$ | async].concat(link.value)"
+    routerLinkActive="selected"
+    >{{ link.label }}</a
+  >
+</nav>
