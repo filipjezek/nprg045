@@ -20,9 +20,21 @@ import { FeaturesComponent } from './common/features/features.component';
 import { OverlayComponent } from './common/overlay/overlay.component';
 import { FolderComponent } from './common/filesystem/folder/folder.component';
 import { DatastoreComponent } from './common/filesystem/datastore/datastore.component';
+import { NotFoundComponent } from './common/not-found/not-found.component';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, LoadingOverlayComponent, FilesystemComponent, FeaturesComponent, OverlayComponent, FolderComponent, DatastoreComponent],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    LoadingOverlayComponent,
+    FilesystemComponent,
+    FeaturesComponent,
+    OverlayComponent,
+    FolderComponent,
+    DatastoreComponent,
+    NotFoundComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -54,6 +66,7 @@ import { DatastoreComponent } from './common/filesystem/datastore/datastore.comp
     HttpClientModule,
     FontAwesomeModule,
     BrowserAnimationsModule,
+    StoreRouterConnectingModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

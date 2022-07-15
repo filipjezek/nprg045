@@ -1,9 +1,11 @@
-:host {
+a {
   display: flex;
   align-items: center;
   padding: 5px;
   transition: 0.1s;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 
   .name {
     overflow-wrap: break-word;

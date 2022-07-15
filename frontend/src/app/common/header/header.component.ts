@@ -1,6 +1,11 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  NavigationStart,
+  Router,
+} from '@angular/router';
 import { faFolderTree } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import {
@@ -17,6 +22,7 @@ import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
 import { closeOverlay, openOverlay } from 'src/app/store/actions/ui.actions';
 import { State } from 'src/app/store/reducers';
+import { selectRouteParam } from 'src/app/store/selectors/router.selectors';
 
 @Component({
   selector: 'mozaik-header',
@@ -25,11 +31,11 @@ import { State } from 'src/app/store/reducers';
   animations: [
     trigger('menu', [
       transition(':enter', [
-        style({ left: '-275px' }),
+        style({ transform: 'translateX(-100%)' }),
         animate('0.25s ease-out'),
       ]),
       transition(':leave', [
-        animate('0.15s ease-in', style({ left: '-275px' })),
+        animate('0.15s ease-in', style({ transform: 'translateX(-100%)' })),
       ]),
     ]),
   ],
@@ -38,12 +44,13 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
   faFolderTree = faFolderTree;
   filesystemOpen = false;
   filesystem$ = this.store.select((x) => x.fs.datastores);
-  currDatastore$ = this.store.select((x) => x.fs.selectedDatastore);
+  datastore$ = this.store.select(selectRouteParam('path'));
 
   constructor(
     private store: Store<State>,
     private gEventS: GlobalEventService,
-    private router: Router
+    protected router: Router,
+    protected route: ActivatedRoute
   ) {
     super();
   }
@@ -52,13 +59,13 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
     zip(
       this.filesystem$.pipe(filter((x) => !!x)),
       this.router.events.pipe(
-        filter((e) => e instanceof NavigationStart),
+        filter((e) => e instanceof NavigationEnd),
         delay(0)
       )
     )
       .pipe(
         take(1),
-        switchMap(() => this.currDatastore$),
+        switchMap(() => this.datastore$),
         takeUntil(this.onDestroy$)
       )
       .subscribe((curr) => {
@@ -66,14 +73,13 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
           this.toggleSideMenu();
         }
       });
-
     merge(
       this.gEventS.escapePressed,
       this.gEventS.overlayClicked,
       this.router.events.pipe(filter((e) => e instanceof NavigationStart))
     )
       .pipe(
-        withLatestFrom(this.currDatastore$),
+        withLatestFrom(this.datastore$),
         filter(([e, curr]) => curr && this.filesystemOpen),
         takeUntil(this.onDestroy$)
       )

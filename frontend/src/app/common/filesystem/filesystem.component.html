@@ -4,8 +4,8 @@
   </ng-container>
   <ng-template #singleDatastore>
     <mozaik-datastore
-      [selected]="current == files.name"
       [name]="files.name"
+      [link]="['datastore', files.name].concat(urlRest$ | async)"
     ></mozaik-datastore>
   </ng-template>
 </ng-container>

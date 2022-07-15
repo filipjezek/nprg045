@@ -1,5 +1,5 @@
 <header>
-  <button (click)="toggleSideMenu()" [disabled]="!(currDatastore$ | async)">
+  <button (click)="toggleSideMenu()" [disabled]="!(datastore$ | async)">
     <fa-icon [icon]="faFolderTree"></fa-icon>
   </button>
   <a routerLink="/">Mozaik visualization</a>
@@ -8,5 +8,4 @@
   @menu
   *ngIf="filesystemOpen"
   [files]="filesystem$ | async"
-  [current]="currDatastore$ | async"
 ></mozaik-filesystem>

@@ -8,9 +8,9 @@ import {
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import { dialogClose, dialogOpen } from 'src/app/animations';
-import { selectDatastore } from 'src/app/store/actions/filesystem.actions';
 import { State } from 'src/app/store/reducers';
 import { FolderInfo } from 'src/app/store/reducers/filesystem.reducer';
+import { selectUrlAfterDatastore } from 'src/app/store/selectors/router.selectors';
 
 @Component({
   selector: 'mozaik-folder',
@@ -29,14 +29,10 @@ export class FolderComponent implements OnInit {
   @Input() open = false;
   @Input() context = '';
 
-  current$ = this.store.select((x) => x.fs.selectedDatastore);
   faChevronRight = faChevronRight;
+  urlRest$ = this.store.select(selectUrlAfterDatastore);
 
   constructor(private store: Store<State>) {}
 
   ngOnInit(): void {}
-
-  selectDatastore(path: string) {
-    this.store.dispatch(selectDatastore({ path }));
-  }
 }

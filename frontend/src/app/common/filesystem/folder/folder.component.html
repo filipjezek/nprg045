@@ -4,9 +4,12 @@
 </header>
 <div class="content" @folder *ngIf="open">
   <mozaik-datastore
-    (click)="selectDatastore((context && context + '/') + info.name)"
+    [link]="
+      ['datastore', (context && context + '/') + info.name].concat(
+        urlRest$ | async
+      )
+    "
     *ngIf="info.datastore"
-    [selected]="(current$ | async) == (context && context + '/') + info.name"
     name="."
   ></mozaik-datastore>
   <ng-container *ngFor="let item of info.content">
@@ -18,14 +21,11 @@
     </ng-container>
     <ng-template #datastore>
       <mozaik-datastore
-        (click)="
-          selectDatastore(
+        [link]="
+          [
+            'datastore',
             (context && context + '/') + info.name + '/' + item.name
-          )
-        "
-        [selected]="
-          (current$ | async) ==
-          (context && context + '/') + info.name + '/' + item.name
+          ].concat(urlRest$ | async)
         "
         [name]="item.name"
       ></mozaik-datastore>

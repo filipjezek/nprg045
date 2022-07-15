@@ -7,7 +7,3 @@ export const filesystemLoaded = createAction(
   props<{ fs: FolderInfo }>()
 );
 export const apiError = createAction('[fs API] error', props<{ error: any }>());
-export const selectDatastore = createAction(
-  '[filesystem] select datastore',
-  props<{ path: string }>()
-);

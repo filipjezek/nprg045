@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs';
 import { UnsubscribingComponent } from '../mixins/unsubscribing.mixin';
 import { loadModel } from '../store/actions/model.actions';
 import { NetworkNode, State } from '../store/reducers/model.reducer';
+import { selectRouteParam } from '../store/selectors/router.selectors';
 import { RadioOption } from '../widgets/button-radio/button-radio.component';
 import { EdgeDirection } from './network-graph/network-graph.component';
 
@@ -26,7 +28,7 @@ export class ModelPageComponent
   edgeControl = new FormControl(EdgeDirection.outgoing);
   selectedNodes: NetworkNode[] = [];
   hoveredNode: NetworkNode;
-  datastore$ = this.store.select((x) => x.fs.selectedDatastore);
+  datastore$ = this.store.select(selectRouteParam('path'));
 
   constructor(private store: Store<State>) {
     super();

@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'mozaik-overlay',
   templateUrl: './overlay.component.html',
-  styleUrls: ['./overlay.component.scss']
+  styleUrls: ['./overlay.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverlayComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

@@ -1,13 +1,21 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { NotFoundComponent } from './common/not-found/not-found.component';
 
 const routes: Routes = [
   {
-    path: 'model',
-    loadChildren: () =>
-      import('./model-page/model-page.module').then((m) => m.ModelPageModule),
+    path: 'datastore/:path',
+    children: [
+      {
+        path: 'model',
+        loadChildren: () =>
+          import('./model-page/model-page.module').then(
+            (m) => m.ModelPageModule
+          ),
+      },
+    ],
   },
-  { path: '', redirectTo: 'model', pathMatch: 'full' },
+  { path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({
