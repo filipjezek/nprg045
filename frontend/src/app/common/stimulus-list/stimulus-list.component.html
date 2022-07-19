@@ -1,0 +1,21 @@
+<h2 *ngIf="stimuli.length">Stimuli</h2>
+<nav>
+  <a
+    routerLink="."
+    [routerLinkActiveOptions]="{
+      matrixParams: 'ignored',
+      queryParams: 'subset',
+      fragment: 'ignored',
+      paths: 'subset'
+    }"
+    [queryParams]="{ stimulus: i }"
+    routerLinkActive="selected"
+    *ngFor="let s of stimuli; let i = index"
+    >{{ i }}
+    <button
+      (click)="$event.stopPropagation(); $event.preventDefault(); showHelp(i)"
+    >
+      <fa-icon [icon]="faCircleQuestion"></fa-icon>
+    </button>
+  </a>
+</nav>

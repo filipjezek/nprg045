@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { AdsLoaded, specificAdsLoaded } from '../actions/ads.actions';
+import { AdsLoaded, loadAds, specificAdsLoaded } from '../actions/ads.actions';
 
 export const adsFeatureKey = 'ads';
 
@@ -47,6 +47,7 @@ export const initialState: State = {
 
 export const reducer = createReducer(
   initialState,
+  on(loadAds, (state) => ({ ...state, allAds: [] })),
   on(AdsLoaded, (state, { ads }) => ({
     ...state,
     allAds: ads,

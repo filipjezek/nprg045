@@ -18,6 +18,9 @@ export class FeaturesComponent implements OnInit {
   datastore$ = this.store.select(selectRouteParam('path'));
   staticLinks: Labelled<string[]>[] = [{ label: 'Model', value: ['model'] }];
   ads$ = this.store.select((x) => x.ads.allAds);
+  stimuli$ = this.store.select((x) =>
+    Array.from(new Set(x.ads.selectedAds.map((a) => a.stimulus)))
+  );
 
   constructor(private store: Store<State>) {}
 

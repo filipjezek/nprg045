@@ -25,7 +25,7 @@ def get_model():
 def get_filesystem():
     return flask.jsonify(find_datastores(params['root_path']))
 
-@api.route('ads_list')
+@api.route('analysis_ds_list')
 def get_ads():
     try:
         path = get_path()
@@ -33,20 +33,19 @@ def get_ads():
         return flask.Response(status=400)
     return flask.jsonify(get_ads_list(str(path)))
 
-@api.route('ads')
+@api.route('analysis_ds')
 def get_specific_ads():
     try:
         args = flask.request.args
         path = get_path()
         alg = args['algorithm']
-        identifier = args['identifier']
+        identifier = AdsIdentifier(args['identifier'])
         tags = args.getlist('tags')
-        assert identifier in AdsIdentifier
     except:
         return flask.Response(status=400)
     match identifier:
-        case AdsIdentifier.perNeuronValue:
-            return flask.jsonify(get_per_neuron_value(path, alg, tags))
+        case AdsIdentifier.PerNeuronValue:
+            return flask.jsonify(get_per_neuron_value(str(path), alg, tags))
         case _:
             return flask.Response(status=400)
     

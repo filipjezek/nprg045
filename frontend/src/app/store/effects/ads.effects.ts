@@ -7,6 +7,9 @@ import {
   withLatestFrom,
   distinctUntilKeyChanged,
   filter,
+  distinctUntilChanged,
+  tap,
+  delayWhen,
 } from 'rxjs/operators';
 import { merge, of } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -27,23 +30,36 @@ import {
   specificAdsLoaded,
 } from '../actions/ads.actions';
 import { selectRouteParam } from '../selectors/router.selectors';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AdsEffects {
-  datastoreChanged$ = this.store.select(selectRouteParam('path')).pipe(
-    filter((x) => !!x),
-    map((path) => ({ path }))
+  datastoreChanged$ = createEffect(() =>
+    this.store.select(selectRouteParam('path')).pipe(
+      filter((x) => !!x),
+      distinctUntilChanged(),
+      map((path) => loadAds({ path }))
+    )
+  );
+  adsSelected$ = createEffect(() =>
+    this.store.select(selectRouteParam('adsIndex')).pipe(
+      filter((x) => !!x),
+      distinctUntilChanged(),
+      withLatestFrom(this.store.select(selectRouteParam('path'))),
+      map(([index, path]) => loadSpecificAds({ index: +index, path }))
+    )
   );
 
   loadingOverlayInc$ = createEffect(() =>
-    merge(
-      this.datastoreChanged$,
-      this.actions$.pipe(ofType(loadAds, loadSpecificAds))
-    ).pipe(map(() => loadingOverlayIncrement()))
+    this.actions$.pipe(
+      ofType(loadAds, loadSpecificAds),
+      map(() => loadingOverlayIncrement())
+    )
   );
 
   loadAds$ = createEffect(() =>
-    merge(this.actions$.pipe(ofType(loadAds)), this.datastoreChanged$).pipe(
+    this.actions$.pipe(
+      ofType(loadAds),
       distinctUntilKeyChanged('path'),
       switchMap(({ path }) =>
         this.adsS.loadAds(path).pipe(
@@ -61,6 +77,11 @@ export class AdsEffects {
       ofType(loadSpecificAds),
       switchMap(({ path, index }) =>
         of(path).pipe(
+          delayWhen(() =>
+            this.store
+              .select((x) => x.ads.allAds)
+              .pipe(filter((ads) => ads.length > index))
+          ),
           withLatestFrom(this.store.select((x) => x.ads.allAds[index]))
         )
       ),
@@ -68,6 +89,11 @@ export class AdsEffects {
         this.adsS
           .loadSpecificAds(path, thumb.identifier, thumb.algorithm, thumb.tags)
           .pipe(
+            tap((ads) => {
+              if (ads.find((a) => a.stimulus)) {
+                this.router.navigate([], { queryParams: { stimulus: 0 } });
+              }
+            }),
             map((ads) => specificAdsLoaded({ ads })),
             catchError((err: HttpErrorResponse) => {
               this.toastS.add(new Toast('Failed to load data structures'));
@@ -89,6 +115,7 @@ export class AdsEffects {
     private actions$: Actions,
     private store: Store<State>,
     private toastS: ToastService,
-    private adsS: AdsService
+    private adsS: AdsService,
+    private router: Router
   ) {}
 }

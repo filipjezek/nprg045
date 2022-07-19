@@ -34,7 +34,6 @@ export class ModelPageComponent
   }
 
   ngOnInit(): void {
-    console.log('init');
     this.datastore$
       .pipe(
         filter((x) => !!x),

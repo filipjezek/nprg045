@@ -12,7 +12,7 @@ export class AdsService {
 
   public loadAds(path: string): Observable<AdsThumb[]> {
     return this.http.get<AdsThumb[]>(
-      'ads_list',
+      'analysis_ds_list',
       new HttpParams().append('path', path)
     );
   }
@@ -28,6 +28,6 @@ export class AdsService {
       .append('identifier', identifier)
       .append('algorithm', alg)
       .appendAll({ tags });
-    return this.http.get<Ads[]>('ads', params);
+    return this.http.get<Ads[]>('analysis_ds', params);
   }
 }

@@ -46,21 +46,21 @@ def get_ads_list(path_to_datastore: str) -> List[__AdsThumbnail]:
 def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[__SerializablePerNeuronValue]:
     datastore = load_datastore(path_to_datastore)
     ads = datastore.get_analysis_result(
-        identifier=AdsIdentifier.PerNeuronValue,
+        identifier=AdsIdentifier.PerNeuronValue.value,
         analysis_algorithm=alg,
         **kwargs
     )
     return [{
-        'identifier': AdsIdentifier.PerNeuronValue,
+        'identifier': AdsIdentifier.PerNeuronValue.value,
         'algorithm': alg,
         'tags': tags,
         'neuron': a.neuron,
-        'sheet': a.sheet,
-        'stimulus': a.stimulus,
+        'sheet': a.sheet_name,
+        'stimulus': a.stimulus_id,
         'ids': a.ids,
         'period': a.period,
         'unit': str(a.value_units),
         'valueName': a.value_name,
-        'values': a.values
+        'values': a.values.tolist()
     } for a in ads]
     

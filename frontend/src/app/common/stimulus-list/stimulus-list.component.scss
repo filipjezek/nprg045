@@ -1,0 +1,30 @@
+a {
+  display: inline-block;
+  background: white;
+  text-decoration: none;
+  box-shadow: 0 0 3px #00000078;
+  padding: 5px;
+  border-radius: 2px;
+  margin: 3px;
+  transition: 0.1s;
+
+  &.selected {
+    background-color: var(--secondary);
+    color: var(--secondary-text);
+  }
+  &:not(.selected):hover {
+    background-color: #dbdbdb;
+  }
+
+  button {
+    background-color: transparent;
+    border: none;
+    color: var(--primary-light);
+    cursor: pointer;
+    transition: 0.1s;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+}
