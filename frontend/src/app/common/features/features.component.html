@@ -1,9 +1,15 @@
 <h1>{{ datastore$ | async }}</h1>
 <nav>
   <a
-    *ngFor="let link of links"
+    *ngFor="let link of staticLinks"
     [routerLink]="['datastore', datastore$ | async].concat(link.value)"
     routerLinkActive="selected"
     >{{ link.label }}</a
   >
+  <mozaik-ads
+    *ngFor="let ads of ads$ | async; index as i"
+    [data]="ads"
+    [index]="i"
+    [datastore]="datastore$ | async"
+  ></mozaik-ads>
 </nav>

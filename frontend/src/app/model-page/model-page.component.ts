@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs';
 import { UnsubscribingComponent } from '../mixins/unsubscribing.mixin';
@@ -35,6 +34,7 @@ export class ModelPageComponent
   }
 
   ngOnInit(): void {
+    console.log('init');
     this.datastore$
       .pipe(
         filter((x) => !!x),

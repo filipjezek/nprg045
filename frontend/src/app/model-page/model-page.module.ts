@@ -14,7 +14,12 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 import { SelectedDataComponent } from './selected-data/selected-data.component';
 
 @NgModule({
-  declarations: [ModelPageComponent, NetworkGraphComponent, TooltipComponent, SelectedDataComponent],
+  declarations: [
+    ModelPageComponent,
+    NetworkGraphComponent,
+    TooltipComponent,
+    SelectedDataComponent,
+  ],
   imports: [
     CommonModule,
     ModelPageRoutingModule,
@@ -23,5 +28,6 @@ import { SelectedDataComponent } from './selected-data/selected-data.component';
     StoreModule.forFeature(fromModel.modelFeatureKey, fromModel.reducer),
     EffectsModule.forFeature([ModelEffects]),
   ],
+  providers: [],
 })
 export class ModelPageModule {}

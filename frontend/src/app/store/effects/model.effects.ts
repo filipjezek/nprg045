@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, delay } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
@@ -17,6 +17,13 @@ import { ModelService } from 'src/app/model-page/model.service';
 
 @Injectable()
 export class ModelEffects {
+  loadingOverlayInc$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadModel),
+      map(() => loadingOverlayIncrement())
+    )
+  );
+
   loadModel$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadModel),
@@ -32,12 +39,6 @@ export class ModelEffects {
     )
   );
 
-  loadingOverlayInc$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(loadModel),
-      map(() => loadingOverlayIncrement())
-    )
-  );
   loadingOverlayDec$ = createEffect(() =>
     this.actions$.pipe(
       ofType(modelLoaded, apiError),

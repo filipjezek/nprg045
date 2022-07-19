@@ -1,11 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
-import {
-  ActivatedRoute,
-  NavigationEnd,
-  NavigationStart,
-  Router,
-} from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { faFolderTree } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import {
@@ -76,7 +71,7 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
     merge(
       this.gEventS.escapePressed,
       this.gEventS.overlayClicked,
-      this.router.events.pipe(filter((e) => e instanceof NavigationStart))
+      this.router.events.pipe(filter((e) => e instanceof NavigationEnd))
     )
       .pipe(
         withLatestFrom(this.datastore$),

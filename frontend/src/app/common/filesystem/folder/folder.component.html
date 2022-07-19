@@ -4,11 +4,7 @@
 </header>
 <div class="content" @folder *ngIf="open">
   <mozaik-datastore
-    [link]="
-      ['datastore', (context && context + '/') + info.name].concat(
-        urlRest$ | async
-      )
-    "
+    [link]="['datastore', (context && context + '/') + info.name, 'model']"
     *ngIf="info.datastore"
     name="."
   ></mozaik-datastore>
@@ -21,12 +17,11 @@
     </ng-container>
     <ng-template #datastore>
       <mozaik-datastore
-        [link]="
-          [
-            'datastore',
-            (context && context + '/') + info.name + '/' + item.name
-          ].concat(urlRest$ | async)
-        "
+        [link]="[
+          'datastore',
+          (context && context + '/') + info.name + '/' + item.name,
+          'model'
+        ]"
         [name]="item.name"
       ></mozaik-datastore>
     </ng-template>

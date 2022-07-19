@@ -22,6 +22,11 @@ import { FolderComponent } from './common/filesystem/folder/folder.component';
 import { DatastoreComponent } from './common/filesystem/datastore/datastore.component';
 import { NotFoundComponent } from './common/not-found/not-found.component';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { AdsComponent } from './common/features/ads/ads.component';
+import { WidgetsModule } from './widgets/widgets.module';
+import { AdsEffects } from './store/effects/ads.effects';
+import { RouteReuseStrategy } from '@angular/router';
+import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
 
 @NgModule({
   declarations: [
@@ -34,6 +39,7 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
     FolderComponent,
     DatastoreComponent,
     NotFoundComponent,
+    AdsComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +53,7 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
         strictActionTypeUniqueness: true,
       },
     }),
-    EffectsModule.forRoot([FilesystemEffects]),
+    EffectsModule.forRoot([FilesystemEffects, AdsEffects]),
     // for performance reasons many safe checks are disabled (store model is huge and freezing it
     // takes a long time), also some objects will not be displayed in devtools
     StoreDevtoolsModule.instrument({
@@ -67,8 +73,11 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
     FontAwesomeModule,
     BrowserAnimationsModule,
     StoreRouterConnectingModule.forRoot(),
+    WidgetsModule,
   ],
-  providers: [],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: MozaikRouteReuseStrategy },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -20,7 +20,7 @@ import {
 
 @Injectable()
 export class FilesystemEffects {
-  loadModel$ = createEffect(() =>
+  loadFilesystem$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadFilesystem),
       switchMap(() =>

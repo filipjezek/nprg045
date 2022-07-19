@@ -8,6 +8,10 @@ h1 {
 }
 
 nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
   a {
     padding: 8px 14px;
     display: inline-block;

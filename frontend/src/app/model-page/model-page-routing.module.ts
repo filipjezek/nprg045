@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { ModelPageComponent } from './model-page.component';
 
 const routes: Routes = [
+  { path: 'pnv/:index', component: ModelPageComponent },
   { path: '', pathMatch: 'full', component: ModelPageComponent },
 ];
 

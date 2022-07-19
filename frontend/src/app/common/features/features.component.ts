@@ -16,7 +16,8 @@ export interface Labelled<T> {
 })
 export class FeaturesComponent implements OnInit {
   datastore$ = this.store.select(selectRouteParam('path'));
-  links: Labelled<string[]>[] = [{ label: 'Model', value: ['model'] }];
+  staticLinks: Labelled<string[]>[] = [{ label: 'Model', value: ['model'] }];
+  ads$ = this.store.select((x) => x.ads.allAds);
 
   constructor(private store: Store<State>) {}
 
