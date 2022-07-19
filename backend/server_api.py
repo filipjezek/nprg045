@@ -1,4 +1,5 @@
 import flask
+from numpy import int64
 from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value
 from .filesystem import find_datastores
 from .model import get_model as get_datastore_model
@@ -45,7 +46,21 @@ def get_specific_ads():
         return flask.Response(status=400)
     match identifier:
         case AdsIdentifier.PerNeuronValue:
-            return flask.jsonify(get_per_neuron_value(str(path), alg, tags))
+            a = get_per_neuron_value(str(path), alg, tags)
+            for i in a:
+                try:
+                    flask.jsonify(i)
+                except:
+                    for x in i['ids']:
+                        if type(x) == int64:
+                            print('culprit is id')
+                    for x in i['values']:
+                        if type(x) == int64:
+                            print('culprit is value')
+                    if type(i['period']) == int64:
+                        print('culprit is period')
+                    print(i)
+            return flask.jsonify(a)
         case _:
             return flask.Response(status=400)
     

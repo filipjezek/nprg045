@@ -19,7 +19,11 @@ export class FeaturesComponent implements OnInit {
   staticLinks: Labelled<string[]>[] = [{ label: 'Model', value: ['model'] }];
   ads$ = this.store.select((x) => x.ads.allAds);
   stimuli$ = this.store.select((x) =>
-    Array.from(new Set(x.ads.selectedAds.map((a) => a.stimulus)))
+    Array.from(
+      new Set(
+        x.ads.selectedAds.map((a) => a.stimulus).filter((x) => x !== null)
+      )
+    )
   );
 
   constructor(private store: Store<State>) {}

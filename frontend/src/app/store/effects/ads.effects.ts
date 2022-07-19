@@ -90,7 +90,7 @@ export class AdsEffects {
           .loadSpecificAds(path, thumb.identifier, thumb.algorithm, thumb.tags)
           .pipe(
             tap((ads) => {
-              if (ads.find((a) => a.stimulus)) {
+              if (ads.find((a) => a.stimulus !== null)) {
                 this.router.navigate([], { queryParams: { stimulus: 0 } });
               }
             }),

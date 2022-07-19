@@ -2,6 +2,8 @@ from enum import Enum
 from typing import List, TypedDict
 import json
 from .model import load_datastore
+import numpy as np
+import math
 
 class AdsIdentifier(Enum):
     SingleValue = 'SingleValue'
@@ -54,13 +56,13 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kw
         'identifier': AdsIdentifier.PerNeuronValue.value,
         'algorithm': alg,
         'tags': tags,
-        'neuron': a.neuron,
+        'neuron': int(a.neuron) if a.neuron else None,
         'sheet': a.sheet_name,
         'stimulus': a.stimulus_id,
-        'ids': a.ids,
-        'period': a.period,
+        'ids': [int(id) for id in a.ids],
+        'period': float(a.period) if a.period else None,
         'unit': str(a.value_units),
         'valueName': a.value_name,
-        'values': a.values.tolist()
+        'values': [None if math.isnan(i) else i for i in a.values.tolist()]
     } for a in ads]
     
