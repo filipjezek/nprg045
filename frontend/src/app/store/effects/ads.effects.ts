@@ -94,7 +94,10 @@ export class AdsEffects {
                 this.router.navigate([], { queryParams: { stimulus: 0 } });
               }
             }),
-            map((ads) => specificAdsLoaded({ ads })),
+            map((ads) => {
+              ads.sort((a, b) => a.stimulus.localeCompare(b.stimulus));
+              return specificAdsLoaded({ ads });
+            }),
             catchError((err: HttpErrorResponse) => {
               this.toastS.add(new Toast('Failed to load data structures'));
               return of(apiError({ error: err }));

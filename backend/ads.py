@@ -43,7 +43,7 @@ def get_ads_list(path_to_datastore: str) -> List[__AdsThumbnail]:
         }) for ads in datastore.analysis_results
         if ads.identifier != AdsIdentifier.Connections.value
     )
-    return [json.loads(s) for s in duplicateless]
+    return [json.loads(s) for s in sorted(duplicateless)]
 
 def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[__SerializablePerNeuronValue]:
     datastore = load_datastore(path_to_datastore)
