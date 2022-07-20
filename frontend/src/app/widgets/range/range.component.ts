@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import {
-  FormControl,
   ControlValueAccessor,
+  FormControl,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 
@@ -27,7 +27,7 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
   set value(v: number) {
     this.control.setValue(v);
   }
-  control = new FormControl();
+  control = new FormControl<number>(undefined);
   disabled = false;
   private onTouchedCb: () => void;
   private onChangeCb: (val: number) => void;

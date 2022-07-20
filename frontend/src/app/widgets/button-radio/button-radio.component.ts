@@ -1,8 +1,8 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import {
   ControlValueAccessor,
-  FormControl,
   NG_VALUE_ACCESSOR,
+  FormControl,
 } from '@angular/forms';
 
 export interface RadioOption {
@@ -26,7 +26,7 @@ export class ButtonRadioComponent implements OnInit, ControlValueAccessor {
   @Input() options: RadioOption[] = [];
   @Input() name = 'button-radio';
 
-  control = new FormControl();
+  control = new FormControl<string>(undefined);
   private disabled = false;
   private onTouchedCb: () => void;
   private onChangeCb: (val: string) => void;
