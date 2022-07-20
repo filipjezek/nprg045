@@ -1,0 +1,25 @@
+<div class="spread">
+  <span class="min">{{ min }}</span>
+  <input
+    type="range"
+    [formControl]="control"
+    (input)="onChange(value)"
+    (blur)="(onTouched)"
+    [min]="min"
+    [max]="max"
+    [step]="step"
+  />
+  <span class="max">{{ max }}</span>
+</div>
+<div class="center">
+  value:
+  <input
+    type="number"
+    #textRepr
+    [min]="min"
+    [max]="max"
+    [step]="step"
+    [value]="value"
+    (input)="writeValue(+textRepr.value); onChange(value)"
+  />
+</div>
