@@ -1,15 +1,15 @@
 <div class="spread">
-  <span class="min">{{ min }}</span>
+  <span class="min" [title]="min">{{ min | scientific }}</span>
   <input
     type="range"
     [formControl]="control"
     (input)="onChange(value)"
-    (blur)="(onTouched)"
+    (blur)="onTouched()"
     [min]="min"
     [max]="max"
     [step]="step"
   />
-  <span class="max">{{ max }}</span>
+  <span class="max" [title]="max">{{ max | scientific }}</span>
 </div>
 <div class="center">
   value:

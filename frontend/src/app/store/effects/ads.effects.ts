@@ -90,15 +90,23 @@ export class AdsEffects {
           .loadSpecificAds(path, thumb.identifier, thumb.algorithm, thumb.tags)
           .pipe(
             tap((ads) => {
-              if (ads.find((a) => a.stimulus !== null)) {
+              const stimuli = new Set(
+                ads.filter((x) => !!x).map((x) => x.stimulus)
+              );
+              const qParam =
+                this.router.routerState.snapshot.root.queryParams['stimulus'];
+              if (
+                (!qParam || stimuli.size <= +qParam) &&
+                ads.find((a) => a.stimulus !== null)
+              ) {
                 this.router.navigate([], { queryParams: { stimulus: 0 } });
               }
             }),
             map((ads) => {
-              ads.sort((a, b) => a.stimulus.localeCompare(b.stimulus));
               return specificAdsLoaded({ ads });
             }),
             catchError((err: HttpErrorResponse) => {
+              console.log(err);
               this.toastS.add(new Toast('Failed to load data structures'));
               return of(apiError({ error: err }));
             })

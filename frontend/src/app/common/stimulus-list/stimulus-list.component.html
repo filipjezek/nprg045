@@ -1,7 +1,8 @@
 <h2 *ngIf="stimuli.length">Stimuli</h2>
 <nav>
   <a
-    routerLink="."
+    [routerLink]="['.']"
+    [relativeTo]="route$ | async"
     [routerLinkActiveOptions]="{
       matrixParams: 'ignored',
       queryParams: 'subset',

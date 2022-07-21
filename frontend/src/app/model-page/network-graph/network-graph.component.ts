@@ -37,6 +37,13 @@ export enum EdgeDirection {
   all = 'all',
 }
 
+export interface PNVData {
+  from: number;
+  to: number;
+  values: number[];
+  period: number;
+}
+
 @Component({
   selector: 'mozaik-network-graph',
   templateUrl: './network-graph.component.html',
@@ -65,6 +72,7 @@ export class NetworkGraphComponent
   }
   private _selectedNodes: NetworkNode[] = [];
   @Input() edgeDir: EdgeDirection;
+  @Input() pnv: PNVData;
   @Output() select = new EventEmitter<NetworkNode[]>();
 
   private scales: {

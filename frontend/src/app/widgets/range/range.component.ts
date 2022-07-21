@@ -18,7 +18,7 @@ import {
   ],
 })
 export class RangeComponent implements OnInit, ControlValueAccessor {
-  @Input() step: number | 'any';
+  @Input() step: number | 'any' = 'any';
   @Input() min: number;
   @Input() max: number;
   @Input() get value(): number {
@@ -27,7 +27,7 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
   set value(v: number) {
     this.control.setValue(v);
   }
-  control = new FormControl<number>(undefined);
+  control = new FormControl<number>(null);
   disabled = false;
   private onTouchedCb: () => void;
   private onChangeCb: (val: number) => void;

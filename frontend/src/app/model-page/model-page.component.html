@@ -1,18 +1,40 @@
 <div class="columns">
   <div class="col">
-    <p class="label">
-      Displayed edges
-      <mozaik-button-radio
-        [options]="edges"
-        [formControl]="edgeControl"
-      ></mozaik-button-radio>
-    </p>
+    <form [formGroup]="optionsForm">
+      <p class="label">
+        Displayed edges
+        <mozaik-button-radio
+          [options]="edges"
+          formControlName="edges"
+        ></mozaik-button-radio>
+      </p>
+      <p class="label pnv" formGroupName="pnv" *ngIf="pnvDetail$ | async">
+        Filter PerNeuronValue
+        <label
+          ><span class="text">From</span>
+          <mozaik-range
+            formControlName="from"
+            [min]="(pnvRange$ | async)?.from"
+            [max]="(pnvRange$ | async)?.to"
+          ></mozaik-range>
+        </label>
+        <label
+          ><span class="text">To</span>
+          <mozaik-range
+            formControlName="to"
+            [min]="(pnvRange$ | async)?.from"
+            [max]="(pnvRange$ | async)?.to"
+          ></mozaik-range>
+        </label>
+      </p>
+    </form>
     <div class="graphs">
       <mozaik-network-graph
         *ngFor="let sheet of (model$ | async)?.sheetNodes | keyvalue"
         [sheetName]="sheet.key"
+        [pnv]="pnvData$ | async"
         [nodes]="sheet.value"
-        [edgeDir]="edgeControl.value"
+        [edgeDir]="optionsForm.value.edges"
         [allNodes]="(model$ | async)?.nodes"
         (select)="selectedNodes = $event"
         [selectedNodes]="selectedNodes"

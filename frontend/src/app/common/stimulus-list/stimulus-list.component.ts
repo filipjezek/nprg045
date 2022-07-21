@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import { State } from 'src/app/store/reducers';
+import { selectCurrentRoute } from 'src/app/store/selectors/router.selectors';
 
 @Component({
   selector: 'mozaik-stimulus-list',
@@ -11,7 +12,7 @@ import { State } from 'src/app/store/reducers';
 export class StimulusListComponent implements OnInit {
   @Input() stimuli: string[];
   faCircleQuestion = faCircleQuestion;
-  url$ = this.store.select((x) => x.router.state.url);
+  route$ = this.store.select(selectCurrentRoute);
 
   constructor(private store: Store<State>) {}
 

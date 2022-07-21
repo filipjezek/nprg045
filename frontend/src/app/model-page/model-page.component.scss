@@ -33,8 +33,33 @@
     gap: 20px;
     justify-content: space-evenly;
   }
+}
 
-  mozaik-button-radio {
-    margin-top: 8px;
+form {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  p.label {
+    min-width: 0;
+    margin: 4px;
+  }
+
+  .pnv label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 5px;
+
+    .text {
+      font-size: 0.8em;
+      margin-top: 2px;
+    }
+
+    mozaik-range {
+      margin-left: 5px;
+    }
   }
 }
