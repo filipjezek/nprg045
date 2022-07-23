@@ -31,7 +31,7 @@ export interface PerNeuronValue extends Ads {
   values: number[];
   ids: number[];
   unit: string;
-  value_name: string;
+  valueName: string;
   period: number;
 }
 

@@ -1,4 +1,4 @@
-<h2 *ngIf="stimuli.length">Stimuli</h2>
+<h2 *ngIf="data.length">{{ header }}</h2>
 <nav>
   <a
     [routerLink]="['.']"
@@ -9,11 +9,13 @@
       fragment: 'ignored',
       paths: 'subset'
     }"
-    [queryParams]="{ stimulus: i }"
+    [queryParams]="(labelTransform ? labelTransform(d, i) : d) | wrap: param"
+    queryParamsHandling="merge"
     routerLinkActive="selected"
-    *ngFor="let s of stimuli; let i = index"
-    >{{ i }}
+    *ngFor="let d of data; let i = index"
+    >{{ labelTransform ? labelTransform(d, i) : d }}
     <button
+      *ngIf="labelTransform"
       (click)="$event.stopPropagation(); $event.preventDefault(); showHelp(i)"
     >
       <fa-icon [icon]="faCircleQuestion"></fa-icon>

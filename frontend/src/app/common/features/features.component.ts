@@ -29,6 +29,8 @@ export class FeaturesComponent implements OnInit {
     )
     .pipe(tap((stimuli) => stimuli.sort()));
 
+  mapIndex = (val: string, i: number) => i;
+
   constructor(private store: Store<State>) {}
 
   ngOnInit(): void {}

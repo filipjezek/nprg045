@@ -1,3 +1,8 @@
+<mozaik-category-list
+  [data]="pnvValueNames$ | async"
+  header="Values"
+  param="valueName"
+></mozaik-category-list>
 <div class="columns">
   <div class="col">
     <form [formGroup]="optionsForm">
@@ -8,31 +13,39 @@
           formControlName="edges"
         ></mozaik-button-radio>
       </p>
-      <p class="label pnv" formGroupName="pnv" *ngIf="pnvDetail$ | async">
+      <p class="label pnv" formGroupName="pnv" *ngIf="pnvData$ | async">
         Filter PerNeuronValue
         <label
           ><span class="text">From</span>
           <mozaik-range
             formControlName="from"
-            [min]="(pnvRange$ | async)?.from"
-            [max]="(pnvRange$ | async)?.to"
+            [min]="(pnvRange$ | async)?.min"
+            [max]="(pnvRange$ | async)?.max"
           ></mozaik-range>
         </label>
         <label
           ><span class="text">To</span>
           <mozaik-range
             formControlName="to"
-            [min]="(pnvRange$ | async)?.from"
-            [max]="(pnvRange$ | async)?.to"
+            [min]="(pnvRange$ | async)?.min"
+            [max]="(pnvRange$ | async)?.max"
           ></mozaik-range>
         </label>
       </p>
     </form>
+    <mozaik-scale
+      *ngIf="pnvData$ | async"
+      [extent]="pnvRange$ | async"
+      [periodic]="!!(displayedPnv$ | async)[0]?.period"
+      [unit]="(displayedPnv$ | async)[0]?.unit"
+    ></mozaik-scale>
     <div class="graphs">
       <mozaik-network-graph
         *ngFor="let sheet of (model$ | async)?.sheetNodes | keyvalue"
         [sheetName]="sheet.key"
-        [pnv]="pnvData$ | async"
+        [pnv]="(pnvData$ | async)?.[sheet.key]"
+        [pnvExtent]="pnvRange$ | async"
+        [pnvFilter]="pnvFilter$ | async"
         [nodes]="sheet.value"
         [edgeDir]="optionsForm.value.edges"
         [allNodes]="(model$ | async)?.nodes"

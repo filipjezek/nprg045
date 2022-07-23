@@ -61,7 +61,7 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kw
         'stimulus': a.stimulus_id,
         'ids': [int(id) for id in a.ids],
         'period': float(a.period) if a.period else None,
-        'unit': str(a.value_units),
+        'unit': '' if a.value_units is None else a.value_units.dimensionality.unicode,
         'valueName': a.value_name,
         'values': [None if math.isnan(i) else i for i in a.values.tolist()]
     } for a in ads]

@@ -12,6 +12,7 @@ import * as fromModel from '../store/reducers/model.reducer';
 import { NetworkGraphComponent } from './network-graph/network-graph.component';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { SelectedDataComponent } from './selected-data/selected-data.component';
+import { ScaleComponent } from './scale/scale.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { SelectedDataComponent } from './selected-data/selected-data.component';
     NetworkGraphComponent,
     TooltipComponent,
     SelectedDataComponent,
+    ScaleComponent,
   ],
   imports: [
     CommonModule,

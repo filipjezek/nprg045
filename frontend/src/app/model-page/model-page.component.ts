@@ -3,25 +3,28 @@ import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
   combineLatest,
+  debounceTime,
   distinctUntilChanged,
   distinctUntilKeyChanged,
   filter,
   map,
   Observable,
   of,
-  share,
+  pluck,
   shareReplay,
   startWith,
   switchMap,
   takeUntil,
   tap,
-  withLatestFrom,
 } from 'rxjs';
 import { UnsubscribingComponent } from '../mixins/unsubscribing.mixin';
 import { loadModel } from '../store/actions/model.actions';
 import { AdsIdentifier, PerNeuronValue } from '../store/reducers/ads.reducer';
 import { NetworkNode, State } from '../store/reducers/model.reducer';
-import { selectStimulus } from '../store/selectors/ads.selectors';
+import {
+  selectAvailableValueNames,
+  selectStimulus,
+} from '../store/selectors/ads.selectors';
 import {
   selectQueryParam,
   selectRouteData,
@@ -60,85 +63,86 @@ export class ModelPageComponent
 
   datastore$ = this.store.select(selectRouteParam('path'));
   model$ = this.store.select((x) => x.model.currentModel);
-  pnvData$: Observable<PNVData> = this.store.select(selectRouteData).pipe(
+  displayedPnv$ = this.store.select(selectRouteData).pipe(
     map((data) => data['ads'] as AdsIdentifier),
     switchMap((identifier) =>
       identifier !== AdsIdentifier.PerNeuronValue
         ? of(null)
         : combineLatest([
-            this.optionsForm.valueChanges.pipe(
-              startWith(this.optionsForm.value)
-            ),
-            combineLatest([
-              this.store.select((x) => x.ads.selectedAds as PerNeuronValue[]),
-              this.store.select(selectStimulus),
-            ]).pipe(
-              map(([ads, stimulus]) => {
-                const merged: number[] = [];
-                for (const a of ads) {
-                  a.ids.forEach((id, i) => {
-                    if (a.stimulus === null || a.stimulus === stimulus) {
-                      merged[id] = a.values[i];
-                    }
-                  });
-                }
-                return {
-                  values: merged,
-                  period: ads.find(
-                    (a) => a.stimulus === null || a.stimulus === stimulus
-                  )?.period,
-                };
-              })
-            ),
+            this.store.select((x) => x.ads.selectedAds as PerNeuronValue[]),
+            this.store.select(selectStimulus),
+            this.store.select(selectQueryParam('valueName')),
           ]).pipe(
-            map(([form, pnv]) => ({
-              ...pnv,
-              from: form.pnv.from,
-              to: form.pnv.to,
-            }))
+            map(([ads, stimulus, valueName]) =>
+              ads.filter(
+                (a) =>
+                  (a.stimulus === null || a.stimulus === stimulus) &&
+                  a.valueName === valueName
+              )
+            )
           )
     )
   );
-  pnvDetail$: Observable<PerNeuronValue> = this.store
-    .select(selectRouteData)
-    .pipe(
-      map((data) => data['ads'] as AdsIdentifier),
-      switchMap((identifier) =>
-        identifier !== AdsIdentifier.PerNeuronValue
-          ? of(null)
-          : combineLatest([
-              this.store.select((x) => x.ads.selectedAds as PerNeuronValue[]),
-              this.store.select(selectStimulus),
-            ]).pipe(
-              map(([ads, stimulus]) =>
-                ads.find((a) => a.stimulus === null || a.stimulus === stimulus)
-              )
-            )
-      )
-    );
-  pnvRange$ = this.pnvData$.pipe(
-    filter((x) => !!x),
-    map(({ values, period }) => {
-      if (period === null || period === undefined) {
-        return {
-          from: Math.min(...values.filter((x) => typeof x === 'number')),
-          to: Math.max(...values.filter((x) => typeof x === 'number')),
+  pnvData$: Observable<Record<string, PNVData>> = combineLatest([
+    this.displayedPnv$,
+    this.model$,
+  ]).pipe(
+    map(([ads, model]) => {
+      if (!ads || !model) return null;
+      const separated: Record<string, PNVData> = {};
+      for (const sheet in model.sheetNodes) {
+        const sheetRelated = ads.filter((a) => a.sheet === sheet || !a.sheet);
+        const values = new Map<number, number>();
+        sheetRelated.forEach((a) =>
+          a.ids.forEach((id, i) => values.set(id, a.values[i]))
+        );
+        separated[sheet] = {
+          values,
+          period: sheetRelated[0]?.period,
+          unit:
+            sheetRelated[0]?.unit === 'dimensionless'
+              ? ''
+              : sheetRelated[0]?.unit,
         };
       }
-      return { from: 0, to: period };
+      return separated;
     }),
-    distinctUntilKeyChanged('from'),
-    distinctUntilKeyChanged('to'),
+    shareReplay(1)
+  );
+  pnvRange$ = this.displayedPnv$.pipe(
+    filter((x) => !!x),
+    map((pnvs) => {
+      const period = pnvs[0]?.period;
+      if (period === null || period === undefined) {
+        return {
+          min: Math.min(...pnvs.flatMap((a) => a.values)),
+          max: Math.max(...pnvs.flatMap((a) => a.values)),
+        };
+      }
+      return { min: 0, max: period };
+    }),
+    distinctUntilKeyChanged('min'),
+    distinctUntilKeyChanged('max'),
     tap((range) => {
       const fromCtrl = this.optionsForm.get(['pnv', 'from']);
       const toCtrl = this.optionsForm.get(['pnv', 'to']);
       setTimeout(() => {
-        fromCtrl.setValue(range.from);
-        toCtrl.setValue(range.to);
+        fromCtrl.setValue(range.min);
+        toCtrl.setValue(range.max);
       });
     }),
     shareReplay(1)
   );
+  pnvFilter$ = this.optionsForm.valueChanges.pipe(
+    debounceTime(100),
+    startWith(this.optionsForm.value),
+    map((form) => form.pnv as { from: number; to: number }),
+    distinctUntilChanged(
+      (prev, curr) => prev?.from === curr?.from && prev?.to === curr?.to
+    )
+  );
+
+  pnvValueNames$ = this.store.select(selectAvailableValueNames);
 
   constructor(private store: Store<State>, private fb: FormBuilder) {
     super();

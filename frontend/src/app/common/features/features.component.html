@@ -13,4 +13,9 @@
     [datastore]="datastore$ | async"
   ></mozaik-ads>
 </nav>
-<mozaik-stimulus-list [stimuli]="stimuli$ | async"></mozaik-stimulus-list>
+<mozaik-category-list
+  [data]="stimuli$ | async"
+  [labelTransform]="mapIndex"
+  header="Stimuli"
+  param="stimulus"
+></mozaik-category-list>

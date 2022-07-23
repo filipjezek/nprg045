@@ -27,7 +27,6 @@ import { WidgetsModule } from './widgets/widgets.module';
 import { AdsEffects } from './store/effects/ads.effects';
 import { RouteReuseStrategy } from '@angular/router';
 import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
-import { StimulusListComponent } from './common/stimulus-list/stimulus-list.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +40,6 @@ import { StimulusListComponent } from './common/stimulus-list/stimulus-list.comp
     DatastoreComponent,
     NotFoundComponent,
     AdsComponent,
-    StimulusListComponent,
   ],
   imports: [
     BrowserModule,

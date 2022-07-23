@@ -5,7 +5,13 @@
   (mouseover)="handleMouseEnter($event)"
   (mouseout)="handleMouseLeave($event)"
 >
-  <h2>{{ sheetName }}</h2>
+  <h2>
+    {{ sheetName }}
+    <span class="count"
+      >(<span class="filtered" *ngIf="pnv">{{ filteredPnv }} / </span
+      >{{ nodes.length }} nodes)</span
+    >
+  </h2>
   <mozaik-tooltip
     #nodeTooltip
     *ngIf="hoveredNode && hoveredNode.sheets[sheetName]"
@@ -16,11 +22,18 @@
       <tbody>
         <tr>
           <td>X</td>
-          <td>{{ hoveredNode.sheets[sheetName].x | number: "1.0-4" }}</td>
+          <td>{{ hoveredNode.sheets[sheetName].x | number: "1.0-4" }} μm</td>
         </tr>
         <tr>
           <td>Y</td>
-          <td>{{ hoveredNode.sheets[sheetName].y | number: "1.0-4" }}</td>
+          <td>{{ hoveredNode.sheets[sheetName].y | number: "1.0-4" }} μm</td>
+        </tr>
+        <tr *ngIf="pnv">
+          <td>Z</td>
+          <td>
+            {{ pnv.values.get(hoveredNode.id) | number: "1.0-4" }}
+            {{ pnv.unit }}
+          </td>
         </tr>
       </tbody>
     </table>

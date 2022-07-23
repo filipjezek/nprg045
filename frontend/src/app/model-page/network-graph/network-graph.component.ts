@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -38,10 +39,9 @@ export enum EdgeDirection {
 }
 
 export interface PNVData {
-  from: number;
-  to: number;
-  values: number[];
+  values: Map<number, number>;
   period: number;
+  unit: string;
 }
 
 @Component({
@@ -52,7 +52,7 @@ export interface PNVData {
 })
 export class NetworkGraphComponent
   extends UnsubscribingComponent
-  implements AfterViewInit, OnChanges
+  implements AfterViewInit, OnChanges, OnInit
 {
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
@@ -72,15 +72,21 @@ export class NetworkGraphComponent
   }
   private _selectedNodes: NetworkNode[] = [];
   @Input() edgeDir: EdgeDirection;
-  @Input() pnv: PNVData;
+  @Input() pnv: PNVData = null;
+  @Input() pnvExtent: { min: number; max: number };
+  @Input() pnvFilter: { from: number; to: number };
   @Output() select = new EventEmitter<NetworkNode[]>();
 
   private scales: {
     x: d3.ScaleLinear<any, any>;
     y: d3.ScaleLinear<any, any>;
+    z: d3.ScaleSequential<any, any>;
+    zPeriodic: d3.ScaleSequential<any, any>;
   } = {
     x: null,
     y: null,
+    z: null,
+    zPeriodic: null,
   };
   private axes: Directional<{
     g: anySelection;
@@ -109,9 +115,14 @@ export class NetworkGraphComponent
   @Input() hoveredNode: NetworkNode;
   @Output() hoveredNodeChange = new EventEmitter<NetworkNode>();
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
+  filteredPnv = 0;
 
   constructor(private gEventS: GlobalEventService) {
     super();
+  }
+
+  ngOnInit(): void {
+    this.filteredPnv = this.pnv?.values.size;
   }
 
   ngAfterViewInit(): void {
@@ -147,6 +158,19 @@ export class NetworkGraphComponent
           ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
         };
       }
+    }
+    if (changes['pnv'] && this.svg) {
+      const ch = changes['pnv'];
+      if (ch.currentValue?.values !== ch.previousValue?.values) {
+        if (ch.currentValue) {
+          this.recalcZScales();
+          this.filteredPnv = ch.currentValue.values.size;
+        }
+        this.redraw();
+      }
+    }
+    if (changes['pnvFilter'] && this.svg && this.pnv) {
+      this.filterPnv();
     }
   }
 
@@ -190,16 +214,48 @@ export class NetworkGraphComponent
     this.circles = this.svg.append('g');
     this.edges = this.circles.append('g');
     this.circles.attr('fill', 'none').attr('stroke-linecap', 'round');
+
+    this.svg
+      .append('text')
+      .text('[μm]')
+      .style('font-size', '0.7em')
+      .style(
+        'transform',
+        `translate(${20 - this.margin.left}px, ${30 - this.margin.top}px)`
+      );
   }
 
   private redraw() {
-    this.circles
-      .selectAll('path')
-      .data(this.nodes)
-      .join('path')
+    let circleProcess: anySelection = this.circles.selectAll('path');
+    if (this.pnv) {
+      circleProcess = circleProcess
+        .data(this.nodes.filter((n) => this.pnv.values.has(n.id)))
+        .join('path')
+        .classed('pnv', true)
+        .style('stroke', (n) =>
+          this.pnv.period
+            ? this.scales.zPeriodic(this.pnv.values.get(n.id) % this.pnv.period)
+            : this.scales.z(this.pnv.values.get(n.id))
+        );
+    } else {
+      circleProcess = circleProcess.data(this.nodes).join('path');
+    }
+    circleProcess
       .classed('node', true)
       .attr('d', (n) => `M${this.displayX(n)},${this.displayY(n)}h0`)
       .attr('data-id', (n) => n.id);
+  }
+
+  private filterPnv() {
+    this.filteredPnv = 0;
+    this.circles
+      .selectAll<d3.BaseType, NetworkNode>('.node')
+      .classed('hidden', (n: NetworkNode) => {
+        const val = this.pnv.values.get(n.id);
+        const res = val < this.pnvFilter.from || val > this.pnvFilter.to;
+        if (!res) ++this.filteredPnv;
+        return res;
+      });
   }
 
   private initAxes() {
@@ -213,6 +269,9 @@ export class NetworkGraphComponent
       .domain(d3.extent(this.nodes, (node) => node.sheets[this.sheetName].y))
       .nice()
       .range([0, this.height]);
+    if (this.pnv) {
+      this.recalcZScales();
+    }
 
     this.axes.bottom.g = this.svg
       .append('g')
@@ -222,6 +281,17 @@ export class NetworkGraphComponent
     this.axes.right.g = this.svg
       .append('g')
       .attr('transform', `translate(${this.width}, 0)`);
+  }
+
+  private recalcZScales() {
+    this.scales.z = d3
+      .scaleSequential(d3.interpolateWarm)
+      .domain([this.pnvExtent.min, this.pnvExtent.max]);
+    if (this.pnv.period) {
+      this.scales.zPeriodic = d3
+        .scaleSequential(d3.interpolateRainbow)
+        .domain([0, this.pnv.period]);
+    }
   }
 
   private redrawAxes(

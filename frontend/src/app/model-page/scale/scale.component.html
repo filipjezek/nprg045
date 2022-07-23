@@ -1,0 +1,9 @@
+<div class="tooltip" *ngIf="hoveredValue !== null" [ngStyle]="tooltipPos">
+  {{ hoveredValue | number: "1.0-4" }}
+</div>
+<div
+  class="container"
+  #container
+  (mousemove)="handleMouseMove($event)"
+  (mouseout)="handleMouseLeave($event)"
+></div>

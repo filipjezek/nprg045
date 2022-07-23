@@ -11,7 +11,7 @@ import {
   tap,
   delayWhen,
 } from 'rxjs/operators';
-import { merge, of } from 'rxjs';
+import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
 import { ToastService } from 'src/app/widgets/services/toast.service';
@@ -31,6 +31,8 @@ import {
 } from '../actions/ads.actions';
 import { selectRouteParam } from '../selectors/router.selectors';
 import { Router } from '@angular/router';
+import { Ads, AdsIdentifier, PerNeuronValue } from '../reducers/ads.reducer';
+import { getSortedStimuli, getValueNames } from '../selectors/ads.selectors';
 
 @Injectable()
 export class AdsEffects {
@@ -89,19 +91,7 @@ export class AdsEffects {
         this.adsS
           .loadSpecificAds(path, thumb.identifier, thumb.algorithm, thumb.tags)
           .pipe(
-            tap((ads) => {
-              const stimuli = new Set(
-                ads.filter((x) => !!x).map((x) => x.stimulus)
-              );
-              const qParam =
-                this.router.routerState.snapshot.root.queryParams['stimulus'];
-              if (
-                (!qParam || stimuli.size <= +qParam) &&
-                ads.find((a) => a.stimulus !== null)
-              ) {
-                this.router.navigate([], { queryParams: { stimulus: 0 } });
-              }
-            }),
+            tap((ads) => this.prepareQueryParams(ads)),
             map((ads) => {
               return specificAdsLoaded({ ads });
             }),
@@ -129,4 +119,36 @@ export class AdsEffects {
     private adsS: AdsService,
     private router: Router
   ) {}
+
+  private prepareQueryParams(ads: Ads[]) {
+    if (!ads.length) return;
+    const qParams = this.router.routerState.snapshot.root.queryParams;
+    const newParams: Record<string, string | number> = {};
+    const stimuli = getSortedStimuli(ads);
+    if (
+      (!qParams['stimulus'] || stimuli.length <= +qParams['stimulus']) &&
+      ads.find((a) => a.stimulus !== null)
+    ) {
+      newParams['stimulus'] = 0;
+    }
+    const stimulus =
+      stimuli[
+        'stimulus' in newParams ? +newParams['stimulus'] : +qParams['stimulus']
+      ] || null;
+
+    if (ads[0].identifier === AdsIdentifier.PerNeuronValue) {
+      const valueNames = getValueNames(ads as PerNeuronValue[], stimulus);
+      if (!qParams['valueName'] || !valueNames.has(qParams['valueName'])) {
+        let min: string = undefined;
+        valueNames.forEach((val) => {
+          if (min === undefined || val < min) min = val;
+        });
+        newParams['valueName'] = min;
+      }
+    }
+    this.router.navigate([], {
+      queryParams: newParams,
+      queryParamsHandling: 'merge',
+    });
+  }
 }

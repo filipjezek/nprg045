@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  position: relative;
+  padding: 1px 0;
+  width: 320px;
+  margin: auto;
+
+  .container {
+    width: 320px;
+    margin: auto;
+    margin-top: 8px;
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 2px;
+    background-color: var(--secondary-dark);
+    color: var(--secondary-dark-text);
+    padding: 3px 5px;
+    border-radius: 2px;
+    font-size: 0.8em;
+  }
+}
