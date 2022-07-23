@@ -46,8 +46,11 @@ ng serve
 ## Usage
 
 - open the app in browser
+- select datastore to examine
 - click any neuron to reveal all connections
-- selecting more is possible with `shift` key
-- lasso is also available when dragging with `shift` key
-- hover on any node or connection to display tooltip with more info
-- hovering and selection also works in the info sidebar
+  - selecting more is possible with `shift` key
+  - lasso is also available when dragging with `shift` key
+  - hover on any node or connection to display tooltip with more info
+  - hovering and selection also works in the info sidebar
+- click any analysis data structure in the top listing to load it
+  - currently supports only PerNeuronValue
