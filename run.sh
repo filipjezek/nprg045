@@ -14,10 +14,12 @@ usage() {
     echo "      use production parameters"
     echo "   --port"
     echo "      port to listen on (default 5000)"
+    echo "   --root"
+    echo "      root folder for looking up datastores (default .)"
     exit "$1"
 }
 
-getopt_options="-o h -l prod,help,port"
+getopt_options="-o h -l prod,help,port:,root:"
 # shellcheck disable=SC2086 # we want option splitting
 getopt -Q $getopt_options -- "$@" || usage 1 "$0"
 # shellcheck disable=SC2086 # we want option splitting
@@ -26,6 +28,7 @@ eval set -- "$( getopt -q $getopt_options -- "$@" )"
 declare -x FLASK_APP=backend
 declare -x APP_MODE=dev
 declare -x FLASK_RUN_PORT=5000
+declare -x BACKEND_ROOT="."
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -36,7 +39,11 @@ while [ $# -gt 0 ]; do
             APP_MODE=prod
             ;;
         --port)
-            FLASK_RUN_PORT=$2
+            FLASK_RUN_PORT="$2"
+            shift
+            ;;
+        --root)
+            BACKEND_ROOT="$2"
             shift
             ;;
         --)
