@@ -16,24 +16,24 @@ class AdsIdentifier(Enum):
     ConductanceSignalList = 'ConductanceSignalList'
     Connections = 'Connections'
 
-class __AdsThumbnail(TypedDict):
+class AdsThumbnail(TypedDict):
     identifier: str
     algorithm: str
     tags: List[str]
 
-class __Ads(__AdsThumbnail):
+class Ads(AdsThumbnail):
     neuron: int
     sheet: str
     stimulus: str
     
-class __SerializablePerNeuronValue(__Ads):
+class SerializablePerNeuronValue(Ads):
     values: List[float]
     unit: str
     ids: List[int]
     valueName: str
     period: float
 
-def get_ads_list(path_to_datastore: str) -> List[__AdsThumbnail]:
+def get_ads_list(path_to_datastore: str) -> List[AdsThumbnail]:
     datastore = load_datastore(path_to_datastore)
     duplicateless = set(
         json.dumps({
@@ -45,7 +45,7 @@ def get_ads_list(path_to_datastore: str) -> List[__AdsThumbnail]:
     )
     return [json.loads(s) for s in sorted(duplicateless)]
 
-def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[__SerializablePerNeuronValue]:
+def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[SerializablePerNeuronValue]:
     datastore = load_datastore(path_to_datastore)
     ads = datastore.get_analysis_result(
         identifier=AdsIdentifier.PerNeuronValue.value,
