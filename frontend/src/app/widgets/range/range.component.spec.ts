@@ -1,6 +1,14 @@
+import { Pipe, PipeTransform } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RangeComponent } from './range.component';
+
+@Pipe({ name: 'scientific' })
+class FakeScientificPipe implements PipeTransform {
+  transform(value: any, ...args: any[]) {
+    return value;
+  }
+}
 
 describe('RangeComponent', () => {
   let component: RangeComponent;
@@ -8,9 +16,8 @@ describe('RangeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RangeComponent ]
-    })
-    .compileComponents();
+      declarations: [RangeComponent, FakeScientificPipe],
+    }).compileComponents();
   });
 
   beforeEach(() => {

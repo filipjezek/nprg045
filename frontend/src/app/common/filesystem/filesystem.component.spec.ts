@@ -8,14 +8,14 @@ describe('FilesystemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FilesystemComponent ]
-    })
-    .compileComponents();
+      declarations: [FilesystemComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FilesystemComponent);
     component = fixture.componentInstance;
+    component.files = { content: [], datastore: false, name: 'testfs' };
     fixture.detectChanges();
   });
 

@@ -17,7 +17,7 @@ import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
 import { closeOverlay, openOverlay } from 'src/app/store/actions/ui.actions';
 import { State } from 'src/app/store/reducers';
-import { selectRouteParam } from 'src/app/store/selectors/router.selectors';
+import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 
 @Component({
   selector: 'mozaik-header',
@@ -39,13 +39,12 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
   faFolderTree = faFolderTree;
   filesystemOpen = false;
   filesystem$ = this.store.select((x) => x.fs.datastores);
-  datastore$ = this.store.select(selectRouteParam('path'));
+  datastore$ = this.store.select(routerSelectors.selectRouteParam('path'));
 
   constructor(
     private store: Store<State>,
     private gEventS: GlobalEventService,
-    protected router: Router,
-    protected route: ActivatedRoute
+    private router: Router
   ) {
     super();
   }

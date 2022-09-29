@@ -2,7 +2,7 @@ import { Component, Input, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import { State } from 'src/app/store/reducers';
-import { selectCurrentRoute } from 'src/app/store/selectors/router.selectors';
+import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 
 @Component({
   selector: 'mozaik-category-list',
@@ -15,7 +15,7 @@ export class CategoryListComponent implements OnInit {
   @Input() param: string;
   @Input() labelTransform: (val: string, index: number) => any = null;
   faCircleQuestion = faCircleQuestion;
-  route$ = this.store.select(selectCurrentRoute);
+  route$ = this.store.select(routerSelectors.selectCurrentRoute);
 
   constructor(private store: Store<State>) {}
 

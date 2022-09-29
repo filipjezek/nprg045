@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { tap } from 'rxjs';
 import { State } from 'src/app/store/reducers';
-import { selectRouteParam } from 'src/app/store/selectors/router.selectors';
+import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 
 export interface Labelled<T> {
   label: string;
@@ -16,7 +16,7 @@ export interface Labelled<T> {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeaturesComponent implements OnInit {
-  datastore$ = this.store.select(selectRouteParam('path'));
+  datastore$ = this.store.select(routerSelectors.selectRouteParam('path'));
   staticLinks: Labelled<string[]>[] = [{ label: 'Model', value: ['model'] }];
   ads$ = this.store.select((x) => x.ads.allAds);
   stimuli$ = this.store

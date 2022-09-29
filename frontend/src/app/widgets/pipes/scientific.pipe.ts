@@ -11,8 +11,8 @@ export class ScientificPipe implements PipeTransform {
 
   transform(value: number): string {
     if (typeof value !== 'number') return value;
-    if (value < 10000 || value > 1e-4)
+    if (Math.abs(value) < 10000 && Math.abs(value) > 1e-4)
       return this.decimal.transform(value, '1.0-4');
-    return value.toExponential(2);
+    return value.toExponential(2).replace('+', '');
   }
 }

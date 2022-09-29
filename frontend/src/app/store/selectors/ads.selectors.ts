@@ -1,7 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import { State } from '../reducers';
 import { Ads, PerNeuronValue } from '../reducers/ads.reducer';
-import { selectQueryParam } from './router.selectors';
+import { routerSelectors } from './router.selectors';
 
 export function getSortedStimuli(ads: Ads[]) {
   const stimuli = Array.from(new Set(ads.map((a) => a.stimulus)));
@@ -18,7 +18,7 @@ export function getValueNames(ads: PerNeuronValue[], stimulus: string) {
 }
 
 export const selectStimulus = createSelector(
-  selectQueryParam('stimulus'),
+  routerSelectors.selectQueryParam('stimulus'),
   (x: State) => x.ads.selectedAds,
   (index, ads) => {
     return getSortedStimuli(ads)[+index];

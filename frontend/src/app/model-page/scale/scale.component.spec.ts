@@ -8,12 +8,12 @@ describe('ScaleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ScaleComponent ]
-    })
-    .compileComponents();
+      declarations: [ScaleComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ScaleComponent);
     component = fixture.componentInstance;
+    component.extent = { max: 100, min: -10 };
     fixture.detectChanges();
   });
 

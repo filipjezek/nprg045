@@ -25,11 +25,7 @@ import {
   selectAvailableValueNames,
   selectStimulus,
 } from '../store/selectors/ads.selectors';
-import {
-  selectQueryParam,
-  selectRouteData,
-  selectRouteParam,
-} from '../store/selectors/router.selectors';
+import { routerSelectors } from '../store/selectors/router.selectors';
 import { RadioOption } from '../widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
@@ -61,9 +57,9 @@ export class ModelPageComponent
   selectedNodes: NetworkNode[] = [];
   hoveredNode: NetworkNode;
 
-  datastore$ = this.store.select(selectRouteParam('path'));
+  datastore$ = this.store.select(routerSelectors.selectRouteParam('path'));
   model$ = this.store.select((x) => x.model.currentModel);
-  displayedPnv$ = this.store.select(selectRouteData).pipe(
+  displayedPnv$ = this.store.select(routerSelectors.selectRouteData).pipe(
     map((data) => data['ads'] as AdsIdentifier),
     switchMap((identifier) =>
       identifier !== AdsIdentifier.PerNeuronValue
@@ -71,7 +67,7 @@ export class ModelPageComponent
         : combineLatest([
             this.store.select((x) => x.ads.selectedAds as PerNeuronValue[]),
             this.store.select(selectStimulus),
-            this.store.select(selectQueryParam('valueName')),
+            this.store.select(routerSelectors.selectQueryParam('valueName')),
           ]).pipe(
             map(([ads, stimulus, valueName]) =>
               ads.filter(

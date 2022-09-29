@@ -8,14 +8,16 @@ describe('NetworkGraphComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NetworkGraphComponent ]
-    })
-    .compileComponents();
+      declarations: [NetworkGraphComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NetworkGraphComponent);
     component = fixture.componentInstance;
+    component.nodes = [];
+    component.allNodes = [];
+    component.selectedNodes = [];
     fixture.detectChanges();
   });
 
