@@ -3,7 +3,7 @@
 Example session:
 ![example](example.png)
 
-- [documentation](dokumentace.pdf) (in czech, outdated)
+- [developer documentation](docs.md)
 
 ## How to run visualization
 
@@ -54,3 +54,11 @@ ng serve
   - hovering and selection also works in the info sidebar
 - click any analysis data structure in the top listing to load it
   - currently supports only PerNeuronValue
+
+## Notes
+
+Datastore selection is constrained to a specific directory. By default, it is the root project directory. This can be changed using the `--root` arg:
+
+```bash
+./run.sh --root /my/path
+```
