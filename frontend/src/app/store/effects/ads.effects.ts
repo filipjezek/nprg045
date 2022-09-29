@@ -29,7 +29,7 @@ import {
   loadSpecificAds,
   specificAdsLoaded,
 } from '../actions/ads.actions';
-import { selectRouteParam } from '../selectors/router.selectors';
+import { routerSelectors } from '../selectors/router.selectors';
 import { Router } from '@angular/router';
 import { Ads, AdsIdentifier, PerNeuronValue } from '../reducers/ads.reducer';
 import { getSortedStimuli, getValueNames } from '../selectors/ads.selectors';
@@ -37,17 +37,19 @@ import { getSortedStimuli, getValueNames } from '../selectors/ads.selectors';
 @Injectable()
 export class AdsEffects {
   datastoreChanged$ = createEffect(() =>
-    this.store.select(selectRouteParam('path')).pipe(
+    this.store.select(routerSelectors.selectRouteParam('path')).pipe(
       filter((x) => !!x),
       distinctUntilChanged(),
       map((path) => loadAds({ path }))
     )
   );
   adsSelected$ = createEffect(() =>
-    this.store.select(selectRouteParam('adsIndex')).pipe(
+    this.store.select(routerSelectors.selectRouteParam('adsIndex')).pipe(
       filter((x) => !!x),
       distinctUntilChanged(),
-      withLatestFrom(this.store.select(selectRouteParam('path'))),
+      withLatestFrom(
+        this.store.select(routerSelectors.selectRouteParam('path'))
+      ),
       map(([index, path]) => loadSpecificAds({ index: +index, path }))
     )
   );
