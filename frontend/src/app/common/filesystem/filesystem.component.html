@@ -1,6 +1,6 @@
 <ng-container *ngIf="files; else empty">
   <ng-container *ngIf="files.content.length; else singleDatastore">
-    <mozaik-folder [info]="files" [open]="true"></mozaik-folder>
+    <mozaik-folder [info]="files"></mozaik-folder>
   </ng-container>
   <ng-template #singleDatastore>
     <mozaik-datastore

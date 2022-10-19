@@ -29,6 +29,7 @@ declare -x FLASK_APP=backend
 declare -x APP_MODE=dev
 declare -x FLASK_RUN_PORT=5000
 declare -x BACKEND_ROOT="."
+roots=()
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -43,7 +44,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         --root)
-            BACKEND_ROOT="$2"
+            roots+=("$2")
             shift
             ;;
         --)
@@ -58,4 +59,11 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-flask run
+if [ ${#roots[@]} -gt 0 ]; then
+    BACKEND_ROOT="${roots[0]}"
+    for r in ${roots[*]:1}; do
+        BACKEND_ROOT+=";$r"
+    done
+fi
+
+python3 -m flask run

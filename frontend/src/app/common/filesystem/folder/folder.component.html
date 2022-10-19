@@ -1,28 +1,42 @@
-<header [class.open]="open" (click)="open = !open">
+<header
+  [class.open]="isString(info) ? false : info.open"
+  (click)="toggleFolder()"
+>
   <fa-icon [icon]="faChevronRight" class="folder-marker"></fa-icon>
-  <span class="name">{{ info.name }}</span>
+  <span class="name">{{ isString(info) ? info : info.name }}</span>
+  <fa-icon
+    *ngIf="loading"
+    [icon]="faCircleNotch"
+    class="loading-marker"
+    [spin]="true"
+  ></fa-icon>
 </header>
-<div class="content" @folder *ngIf="open">
+<div class="content" @folder *ngIf="!isString(info) && info.open">
   <mozaik-datastore
-    [link]="['datastore', (context && context + '/') + info.name, 'model']"
+    [link]="['datastore', extContext + info.name, 'model']"
     *ngIf="info.datastore"
     name="."
   ></mozaik-datastore>
-  <ng-container *ngFor="let item of info.content">
-    <ng-container *ngIf="item.content.length; else datastore">
+  <ng-container *ngFor="let item of info.content; trackBy: trackByName">
+    <ng-container
+      *ngIf="
+        isString(item) || item.content.length || !item.datastore;
+        else datastore
+      "
+    >
       <mozaik-folder
         [info]="item"
-        [context]="(context && context + '/') + info.name"
+        [context]="extContext + info.name"
       ></mozaik-folder>
     </ng-container>
     <ng-template #datastore>
       <mozaik-datastore
         [link]="[
           'datastore',
-          (context && context + '/') + info.name + '/' + item.name,
+          extContext + info.name + '/' + cast(item).name,
           'model'
         ]"
-        [name]="item.name"
+        [name]="cast(item).name"
       ></mozaik-datastore>
     </ng-template>
   </ng-container>

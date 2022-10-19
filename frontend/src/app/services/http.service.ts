@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable, throwError, of } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { retry, delay } from 'rxjs/operators';
+import { DOCUMENT, Location } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
-  public apiUrl = 'http://localhost:5000/api/';
+  public apiUrl = '/api/';
 
   private retryPipeline = retry({
     count: 5,
@@ -19,7 +21,11 @@ export class HttpService {
     },
   });
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, @Inject(DOCUMENT) doc: Document) {
+    this.apiUrl =
+      (environment.production ? doc.location.origin : 'http://localhost:5000') +
+      this.apiUrl;
+  }
 
   get<T>(url: string, params?: HttpParams): Observable<T> {
     return this.http

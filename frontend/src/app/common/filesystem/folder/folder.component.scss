@@ -25,6 +25,10 @@ header {
     transition: transform 0.1s;
     flex-shrink: 0;
   }
+  .loading-marker {
+    margin-left: auto;
+    opacity: 0.8;
+  }
 }
 
 .content {

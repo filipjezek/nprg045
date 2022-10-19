@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { auditTime } from 'rxjs';
 import { fade } from './animations';
-import { loadFilesystem } from './store/actions/filesystem.actions';
+import { loadDirectory } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
 
 @Component({
@@ -44,6 +44,6 @@ export class AppComponent implements OnInit {
   constructor(private store: Store<State>) {}
 
   ngOnInit(): void {
-    this.store.dispatch(loadFilesystem());
+    this.store.dispatch(loadDirectory({}));
   }
 }

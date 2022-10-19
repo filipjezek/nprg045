@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
@@ -15,36 +15,41 @@ import { FilesystemService } from 'src/app/services/filesystem.service';
 import {
   apiError,
   filesystemLoaded,
-  loadFilesystem,
+  loadDirectory,
+  loadRecursiveFilesystem,
 } from '../actions/filesystem.actions';
 
 @Injectable()
 export class FilesystemEffects {
-  loadFilesystem$ = createEffect(() =>
+  loadRecursiveFilesystem$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadFilesystem),
-      switchMap(() =>
-        this.fsService.loadFilesystem().pipe(
-          map((fs) => filesystemLoaded({ fs })),
+      ofType(loadRecursiveFilesystem),
+      tap(() => this.store.dispatch(loadingOverlayIncrement())),
+      switchMap(({ path }) =>
+        this.fsService.loadRecursiveFilesystem(path).pipe(
+          map((fs) => filesystemLoaded({ fs, path })),
           catchError((err: HttpErrorResponse) => {
             this.toastS.add(new Toast('Failed to load filesystem'));
             return of(apiError({ error: err }));
           })
         )
-      )
+      ),
+      tap(() => this.store.dispatch(loadingOverlayDecrement()))
     )
   );
 
-  loadingOverlayInc$ = createEffect(() =>
+  loadDirectory$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadFilesystem),
-      map(() => loadingOverlayIncrement())
-    )
-  );
-  loadingOverlayDec$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(filesystemLoaded, apiError),
-      map(() => loadingOverlayDecrement())
+      ofType(loadDirectory),
+      switchMap(({ path }) =>
+        this.fsService.loadDirectory(path).pipe(
+          map((fs) => filesystemLoaded({ fs, path })),
+          catchError((err: HttpErrorResponse) => {
+            this.toastS.add(new Toast('Failed to load directory'));
+            return of(apiError({ error: err }));
+          })
+        )
+      )
     )
   );
 

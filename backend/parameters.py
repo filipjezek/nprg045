@@ -1,17 +1,20 @@
 import os
-from typing import TypedDict
+from typing import List, TypedDict
 from pathlib import Path
 
 class BackendParams(TypedDict):
-    root_path: Path
+    root_paths: List[Path]
     
 def init_params() -> BackendParams:
-    path = Path(os.environ['BACKEND_ROOT'] if 'BACKEND_ROOT' in os.environ else os.getcwd())
-    if not path.is_absolute():
-        path = Path(os.getcwd()) / path
+    paths = os.environ['BACKEND_ROOT'].split(';') if 'BACKEND_ROOT' in os.environ else [os.getcwd()]
+    for i in range(len(paths)):
+        p = Path(paths[i])
+        if not p.is_absolute():
+            p = Path(os.getcwd()) / p
+        paths[i] = p.resolve()
     
     return {
-        'root_path': path.resolve()
+        'root_paths': paths,
     }
 
 params = init_params()

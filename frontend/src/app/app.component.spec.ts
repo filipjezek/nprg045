@@ -6,7 +6,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { StoreStub } from './testing/store.stub';
-import { loadFilesystem } from './store/actions/filesystem.actions';
+import { loadRecursiveFilesystem } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
 
 describe('AppComponent', () => {
@@ -39,7 +39,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     expect(storeStub.dispatch).toHaveBeenCalled();
     expect(storeStub.dispatch.calls.mostRecent().args).toEqual([
-      loadFilesystem(),
+      loadRecursiveFilesystem(),
     ]);
   });
 });
