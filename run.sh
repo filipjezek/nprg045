@@ -66,7 +66,9 @@ if [ ${#roots[@]} -gt 0 ]; then
     done
 fi
 
-until python3 -m flask run; do
-    echo "flask server crashed with exit code $?. Restarting..."
-    sleep 1
-done
+python3 -m flask run
+
+# until python3 -m flask run; do
+#     echo "flask server crashed with exit code $?. Restarting..."
+#     sleep 1
+# done

@@ -1,7 +1,12 @@
 import { Inject, Injectable } from '@angular/core';
-import { Observable, throwError, of } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { retry, delay } from 'rxjs/operators';
+import { Observable, throwError, of, from, ReadableStreamLike } from 'rxjs';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpParams,
+} from '@angular/common/http';
+import { retry, delay, switchMap } from 'rxjs/operators';
 import { DOCUMENT, Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
 
@@ -53,5 +58,44 @@ export class HttpService {
         params: params,
       })
       .pipe(this.retryPipeline as any);
+  }
+
+  consumeStream(
+    url: string,
+    options: {
+      params?: HttpParams;
+      body?: any;
+      method: string;
+    }
+  ): Observable<string> {
+    return from(
+      fetch(
+        this.apiUrl +
+          url +
+          (options.params ? '?' + options.params.toString() : ''),
+        {
+          method: options.method,
+          body: options.body,
+        }
+      )
+    ).pipe(
+      switchMap((resp) =>
+        resp.ok
+          ? from(
+              resp.body.pipeThrough(
+                new TextDecoderStream()
+              ) as ReadableStreamLike<string>
+            )
+          : throwError(
+              () =>
+                new HttpErrorResponse({
+                  status: resp.status,
+                  statusText: resp.statusText,
+                  url: resp.url,
+                })
+            )
+      ),
+      this.retryPipeline as any
+    );
   }
 }

@@ -13,7 +13,7 @@ import {
   loadingOverlayIncrement,
 } from '../actions/ui.actions';
 import { Toast } from 'src/app/widgets/services/toast';
-import { ModelService } from 'src/app/model-page/model.service';
+import { ModelService } from 'src/app/services/model.service';
 
 @Injectable()
 export class ModelEffects {
@@ -29,9 +29,10 @@ export class ModelEffects {
       ofType(loadModel),
       switchMap(({ path }) =>
         this.modelS.loadModel(path).pipe(
-          map(({ model }) => modelLoaded({ model })),
+          map((model) => modelLoaded({ model })),
           catchError((err: HttpErrorResponse) => {
             this.toastS.add(new Toast('Failed to load data'));
+            console.log(err);
             return of(apiError({ error: err }));
           })
         )

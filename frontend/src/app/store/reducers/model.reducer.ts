@@ -97,7 +97,7 @@ export function getAllIncomingConnections(
 }
 
 export interface ModelState {
-  currentModel?: ModelNetwork;
+  currentModel: ModelNetwork;
 }
 
 export interface State extends fromRoot.State {

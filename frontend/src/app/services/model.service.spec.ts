@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Subject, take } from 'rxjs';
-import { HttpService } from '../services/http.service';
+import { HttpService } from './http.service';
 
 import { Model, ModelService } from './model.service';
 
