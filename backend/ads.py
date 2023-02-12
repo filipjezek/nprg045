@@ -1,9 +1,11 @@
 from enum import Enum
-from typing import List, TypedDict
+from typing import List, TypedDict, cast, Any
 import json
 from .model import load_datastore
 import numpy as np
 import math
+import quantities
+
 
 class AdsIdentifier(Enum):
     SingleValue = 'SingleValue'
@@ -16,22 +18,26 @@ class AdsIdentifier(Enum):
     ConductanceSignalList = 'ConductanceSignalList'
     Connections = 'Connections'
 
+
 class AdsThumbnail(TypedDict):
     identifier: str
     algorithm: str
     tags: List[str]
 
+
 class Ads(AdsThumbnail):
     neuron: int
     sheet: str
     stimulus: str
-    
+
+
 class SerializablePerNeuronValue(Ads):
     values: List[float]
     unit: str
     ids: List[int]
     valueName: str
     period: float
+
 
 def get_ads_list(path_to_datastore: str) -> List[AdsThumbnail]:
     datastore = load_datastore(path_to_datastore)
@@ -45,14 +51,16 @@ def get_ads_list(path_to_datastore: str) -> List[AdsThumbnail]:
     )
     return [json.loads(s) for s in sorted(duplicateless)]
 
+
 def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[SerializablePerNeuronValue]:
     datastore = load_datastore(path_to_datastore)
-    ads = datastore.get_analysis_result(
+    ads = cast(Any, datastore.get_analysis_result(
         identifier=AdsIdentifier.PerNeuronValue.value,
         analysis_algorithm=alg,
         **kwargs
-    )
-    return [{
+    ))
+
+    return [cast(SerializablePerNeuronValue, {
         'identifier': AdsIdentifier.PerNeuronValue.value,
         'algorithm': alg,
         'tags': tags,
@@ -61,8 +69,7 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kw
         'stimulus': a.stimulus_id,
         'ids': [int(id) for id in a.ids],
         'period': float(a.period) if a.period else None,
-        'unit': '' if a.value_units is None else a.value_units.dimensionality.unicode,
+        'unit': '' if a.value_units is None or a.value_units is quantities.unitquantity.Dimensionless else a.value_units.dimensionality.unicode,
         'valueName': a.value_name,
         'values': [None if math.isnan(i) else i for i in a.values.tolist()]
-    } for a in ads]
-    
+    }) for a in ads]

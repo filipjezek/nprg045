@@ -120,8 +120,9 @@ export class ModelPageComponent
       }
       return { min: 0, max: period };
     }),
-    distinctUntilKeyChanged('min'),
-    distinctUntilKeyChanged('max'),
+    distinctUntilChanged(
+      (prev, curr) => prev.min == curr.min && prev.max == curr.max
+    ),
     tap((range) => {
       const fromCtrl = this.optionsForm.get(['pnv', 'from']);
       const toCtrl = this.optionsForm.get(['pnv', 'to']);
