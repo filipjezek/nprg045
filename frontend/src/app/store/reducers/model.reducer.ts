@@ -1,5 +1,11 @@
 import { createReducer, on } from '@ngrx/store';
-import { modelLoaded } from '../actions/model.actions';
+import {
+  connectionsLoadingProgress,
+  loadModel,
+  metadataLoaded,
+  modelLoaded,
+  positionsLoadingProgress,
+} from '../actions/model.actions';
 import * as fromRoot from './index';
 
 export const modelFeatureKey = 'model';
@@ -96,8 +102,34 @@ export function getAllIncomingConnections(
   return res;
 }
 
+export interface NetworkMetadata {
+  connections: {
+    from: string;
+    to: string;
+    size: number;
+  }[];
+  positions: {
+    sheet: string;
+    size: number;
+  }[];
+}
+export interface NetworkProgress {
+  connections: {
+    from: string;
+    to: string;
+    size: number;
+    current: number;
+  }[];
+  positions: {
+    sheet: string;
+    size: number;
+    current: number;
+  }[];
+}
+
 export interface ModelState {
   currentModel: ModelNetwork;
+  loading: NetworkProgress;
 }
 
 export interface State extends fromRoot.State {
@@ -106,12 +138,40 @@ export interface State extends fromRoot.State {
 
 export const initialState: ModelState = {
   currentModel: null,
+  loading: null,
 };
 
 export const reducer = createReducer(
   initialState,
+  on(loadModel, (state) => ({ ...state, currentModel: null })),
   on(modelLoaded, (state, { model }) => ({
     ...state,
     currentModel: { ...model },
+    loading: null,
+  })),
+  on(metadataLoaded, (state, { meta }) => ({
+    ...state,
+    loading: {
+      connections: meta.connections.map((conn) => ({ ...conn, current: 0 })),
+      positions: meta.positions.map((pos) => ({ ...pos, current: 0 })),
+    },
+  })),
+  on(connectionsLoadingProgress, (state, { src, tgt, current }) => ({
+    ...state,
+    loading: state.loading && {
+      ...state.loading,
+      connections: state.loading.connections.map((conn) =>
+        conn.from == src && conn.to == tgt ? { ...conn, current } : conn
+      ),
+    },
+  })),
+  on(positionsLoadingProgress, (state, { sheet, current }) => ({
+    ...state,
+    loading: state.loading && {
+      ...state.loading,
+      positions: state.loading.positions.map((pos) =>
+        pos.sheet == sheet ? { ...pos, current } : pos
+      ),
+    },
   }))
 );

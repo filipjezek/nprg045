@@ -1,0 +1,7 @@
+<div class="info">
+  <div class="label">{{ label }}</div>
+  <div class="progress">
+    {{ current }} / {{ total }} ({{ current / total | percent }})
+  </div>
+</div>
+<div class="bar" [style.width.%]="(current / total) * 100"></div>

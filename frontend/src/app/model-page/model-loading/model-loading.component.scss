@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 2px #00000078;
+  background-color: white;
+  padding: 10px 20px;
+  max-width: 670px;
+  margin: 10px auto;
+
+  h1 {
+    font-size: 1.05em;
+  }
+}

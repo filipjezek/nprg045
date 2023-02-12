@@ -1,5 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { ElementRef, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
@@ -27,6 +27,12 @@ import { WidgetsModule } from './widgets/widgets.module';
 import { AdsEffects } from './store/effects/ads.effects';
 import { RouteReuseStrategy } from '@angular/router';
 import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
+import { Dialog } from './dialog';
+import { createCustomElement } from '@angular/elements';
+
+const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
+  selector: string;
+})[] = [];
 
 @NgModule({
   declarations: [
@@ -80,4 +86,11 @@ import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(injector: Injector) {
+    customEls.forEach((el) => {
+      const custEl = createCustomElement<Dialog>(el, { injector });
+      customElements.define(el.selector, custEl);
+    });
+  }
+}

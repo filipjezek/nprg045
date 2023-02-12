@@ -12,6 +12,7 @@ import {
 } from './category-list/category-list.component';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ProgressComponent } from './progress/progress.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     ScientificPipe,
     CategoryListComponent,
     WrapPipe,
+    ProgressComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -31,6 +33,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     KeyboardClickDirective,
     ScientificPipe,
     CategoryListComponent,
+    ProgressComponent,
   ],
 })
 export class WidgetsModule {}

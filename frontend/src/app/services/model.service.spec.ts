@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Subject, take } from 'rxjs';
 import { HttpService } from './http.service';
 
-import { Model, ModelService } from './model.service';
+import { TransportModel, ModelService } from './model.service';
 
 describe('ModelService', () => {
   let service: ModelService;
@@ -26,7 +26,7 @@ describe('ModelService', () => {
   });
 
   it('should parse data from server', (done) => {
-    const subj = new Subject<Model>();
+    const subj = new Subject<TransportModel>();
     httpStub.get.and.returnValue(subj);
     service
       .loadModel('path')

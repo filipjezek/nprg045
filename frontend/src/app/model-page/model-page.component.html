@@ -66,3 +66,7 @@
     ></mozaik-selected-data>
   </div>
 </div>
+<mozaik-model-loading
+  *ngIf="loading$ | async"
+  [progress]="loading$ | async"
+></mozaik-model-loading>

@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  padding: 10px;
+
+  .info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    font-size: 0.9em;
+  }
+  .progress {
+    text-align: right;
+  }
+  .bar {
+    height: 5px;
+    background-color: var(--secondary);
+    transition: 0.2s;
+    width: 0%;
+    overflow: hidden;
+  }
+}

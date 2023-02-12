@@ -1,0 +1,18 @@
+<section class="positions">
+  <h1>Neuron positions</h1>
+  <mozaik-progress
+    *ngFor="let sheet of progress.positions"
+    [current]="sheet.current"
+    [total]="sheet.size"
+    [label]="sheet.sheet"
+  ></mozaik-progress>
+</section>
+<section class="connections">
+  <h1>Neuron connections</h1>
+  <mozaik-progress
+    *ngFor="let conn of progress.connections"
+    [current]="conn.current"
+    [total]="conn.size"
+    [label]="conn.from + ' → ' + conn.to"
+  ></mozaik-progress>
+</section>

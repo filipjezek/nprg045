@@ -13,6 +13,7 @@ import { NetworkGraphComponent } from './network-graph/network-graph.component';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { SelectedDataComponent } from './selected-data/selected-data.component';
 import { ScaleComponent } from './scale/scale.component';
+import { ModelLoadingComponent } from './model-loading/model-loading.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ScaleComponent } from './scale/scale.component';
     TooltipComponent,
     SelectedDataComponent,
     ScaleComponent,
+    ModelLoadingComponent,
   ],
   imports: [
     CommonModule,
