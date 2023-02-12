@@ -6,7 +6,7 @@ import {
   HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
-import { retry, delay, switchMap } from 'rxjs/operators';
+import { retry, delay, switchMap, tap } from 'rxjs/operators';
 import { DOCUMENT, Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
 
@@ -68,17 +68,21 @@ export class HttpService {
       method: string;
     }
   ): Observable<string> {
-    return from(
-      fetch(
-        this.apiUrl +
-          url +
-          (options.params ? '?' + options.params.toString() : ''),
-        {
-          method: options.method,
-          body: options.body,
-        }
-      )
-    ).pipe(
+    return of(null).pipe(
+      // we need the switchmap to delay the fetch request until the subscription
+      switchMap(() =>
+        from(
+          fetch(
+            this.apiUrl +
+              url +
+              (options.params ? '?' + options.params.toString() : ''),
+            {
+              method: options.method,
+              body: options.body,
+            }
+          )
+        )
+      ),
       switchMap((resp) =>
         resp.ok
           ? from(

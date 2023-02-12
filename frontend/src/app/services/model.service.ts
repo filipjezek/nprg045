@@ -4,6 +4,7 @@ import {
   auditTime,
   concat,
   concatWith,
+  delay,
   from,
   last,
   map,
@@ -43,7 +44,7 @@ export interface TransportSheet {
   providedIn: 'root',
 })
 export class ModelService {
-  private readonly progressThrottle = 100;
+  private readonly progressThrottle = 200;
 
   constructor(private http: HttpService, private store: Store<State>) {}
 
