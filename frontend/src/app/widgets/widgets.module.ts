@@ -13,6 +13,7 @@ import {
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProgressComponent } from './progress/progress.component';
+import { TimePipe } from './pipes/time.pipe';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ProgressComponent } from './progress/progress.component';
     CategoryListComponent,
     WrapPipe,
     ProgressComponent,
+    TimePipe,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -34,6 +36,7 @@ import { ProgressComponent } from './progress/progress.component';
     ScientificPipe,
     CategoryListComponent,
     ProgressComponent,
+    TimePipe,
   ],
 })
 export class WidgetsModule {}

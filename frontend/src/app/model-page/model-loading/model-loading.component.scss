@@ -1,7 +1,7 @@
 :host {
   display: block;
   position: relative;
-  z-index: 10;
+  z-index: var(--z-model-loading);
   box-shadow: 0 0 2px #00000078;
   background-color: white;
   padding: 10px 20px;

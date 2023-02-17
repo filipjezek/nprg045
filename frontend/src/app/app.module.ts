@@ -29,10 +29,11 @@ import { RouteReuseStrategy } from '@angular/router';
 import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
 import { Dialog } from './dialog';
 import { createCustomElement } from '@angular/elements';
+import { NetworkTrackerComponent } from './common/network-tracker/network-tracker.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
-})[] = [];
+})[] = [NetworkTrackerComponent];
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     DatastoreComponent,
     NotFoundComponent,
     AdsComponent,
+    NetworkTrackerComponent,
   ],
   imports: [
     BrowserModule,

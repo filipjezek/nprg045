@@ -5,8 +5,27 @@ main {
 }
 mozaik-header {
   position: relative;
-  z-index: 11;
+  z-index: var(--z-header);
 }
 mozaik-loading-overlay {
-  z-index: 9;
+  z-index: var(--z-loading);
+}
+
+.open-network {
+  z-index: var(--z-net-button);
+  position: fixed;
+  bottom: 70px;
+  right: 70px;
+  border-radius: 50%;
+  font-size: 32px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 3px #00000078;
+  padding: 10px 13px;
+  background-color: white;
+  transition: 0.1s;
+
+  &:hover {
+    box-shadow: 0 0 5px #00000078;
+  }
 }

@@ -1,8 +1,11 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import { auditTime } from 'rxjs';
 import { fade } from './animations';
+import { NetworkTrackerComponent } from './common/network-tracker/network-tracker.component';
+import { DialogService } from './services/dialog.service';
 import { loadDirectory } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
 
@@ -40,10 +43,20 @@ export class AppComponent implements OnInit {
     .select((x) => x.ui.loadingOverlay > 0)
     .pipe(auditTime(50));
   overlay$ = this.store.select((x) => x.ui.overlay);
+  showNetworkButton$ = this.store.select((x) => x.net.requests.length > 0);
 
-  constructor(private store: Store<State>) {}
+  faSatelliteDish = faSatelliteDish;
+
+  constructor(private store: Store<State>, private dialogS: DialogService) {}
 
   ngOnInit(): void {
     this.store.dispatch(loadDirectory({}));
+  }
+
+  openNetwork() {
+    const ref = this.dialogS.open(NetworkTrackerComponent, true, {
+      zIndex: 11,
+    });
+    ref.addEventListener('close', () => this.dialogS.close());
   }
 }

@@ -17,13 +17,15 @@ export interface State {
   };
 }
 
+const defaultOverlay = {
+  zIndex: 8,
+  opacity: 0.6,
+  open: false,
+};
+
 export const initialState: State = {
   loadingOverlay: 0,
-  overlay: {
-    zIndex: 8,
-    opacity: 0.6,
-    open: false,
-  },
+  overlay: defaultOverlay,
 };
 
 export const reducer = createReducer(
@@ -39,7 +41,7 @@ export const reducer = createReducer(
   on(openOverlay, (state, { overlay }) => ({
     ...state,
     overlay: {
-      ...state.overlay,
+      ...defaultOverlay,
       ...overlay,
       open: true,
     },

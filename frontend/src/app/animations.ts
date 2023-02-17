@@ -9,14 +9,18 @@ export const fade = animation([
 
 export const dialogOpen = animation([
   style({ height: 0, overflowY: 'hidden', overflowX: 'hidden' }),
-  query('*', style({ opacity: 0 })),
+  query('*', style({ opacity: 0 }), { optional: true }),
   animate('0.1s ease-out', style({ height: '*' })),
-  query('*', animate('0.15s 0.1s ease-in-out', style({ opacity: 1 }))),
+  query('*', animate('0.15s 0.1s ease-in-out', style({ opacity: 1 })), {
+    optional: true,
+  }),
 ]);
 
 export const dialogClose = animation([
   style({ height: '*', overflowY: 'hidden', overflowX: 'hidden' }),
-  query('*', animate('0.05s ease-in-out', style({ opacity: 0 }))),
-  query('*', style({ opacity: 0 })),
+  query('*', animate('0.05s ease-in-out', style({ opacity: 0 })), {
+    optional: true,
+  }),
+  query('*', style({ opacity: 0 }), { optional: true }),
   animate('0.07s 0.04s ease-in', style({ height: 0 })),
 ]);

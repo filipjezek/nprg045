@@ -70,7 +70,7 @@ function mergeFolder(
   if (typeof old == 'string') {
     return {
       ...replacement,
-      name: replacement.name.startsWith(old) ? replacement.name : old,
+      name: old.endsWith(replacement.name) ? old : replacement.name,
       open: true,
     };
   }
@@ -85,7 +85,7 @@ function mergeFolder(
   return {
     open: old.open,
     ...replacement,
-    name: replacement.name.startsWith(old.name) ? replacement.name : old.name,
+    name: old.name.endsWith(replacement.name) ? old.name : replacement.name,
     content: replacement.content.map((x) => {
       if (typeof x == 'string' && oldContent.has(x)) {
         return oldContent.get(x);

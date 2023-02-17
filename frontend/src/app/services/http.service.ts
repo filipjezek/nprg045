@@ -1,63 +1,124 @@
 import { Inject, Injectable } from '@angular/core';
-import { Observable, throwError, of, from, ReadableStreamLike } from 'rxjs';
+import {
+  Observable,
+  throwError,
+  of,
+  from,
+  ReadableStreamLike,
+  pipe,
+  defer,
+} from 'rxjs';
 import {
   HttpClient,
   HttpErrorResponse,
-  HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
-import { retry, delay, switchMap, tap } from 'rxjs/operators';
-import { DOCUMENT, Location } from '@angular/common';
+import {
+  retry,
+  delay,
+  switchMap,
+  finalize,
+  first,
+  raceWith,
+} from 'rxjs/operators';
+import { DOCUMENT } from '@angular/common';
 import { environment } from 'src/environments/environment';
+import { Store } from '@ngrx/store';
+import { State } from '../store/reducers';
+import {
+  requestCancel,
+  requestFinished,
+  requestRetried,
+  requestStarted,
+} from '../store/actions/network.actions';
+import { Actions, ofType } from '@ngrx/effects';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
+  private static requestCount = 0;
   public apiUrl = '/api/';
 
-  private retryPipeline = retry({
-    count: 5,
-    delay: (e, i) => {
-      if (![503, 504, 0, 429, 425].includes(e.status)) {
-        return throwError(() => e);
-      }
-      return of(e).pipe(delay(i * 500));
-    },
-  });
+  private retryPipeline = (id: number) =>
+    pipe(
+      raceWith(
+        this.actions$.pipe(
+          ofType(requestCancel),
+          first((a) => a.id == id),
+          switchMap(() => throwError(() => new Error('User cancelled')))
+        )
+      ),
+      retry({
+        count: 5,
+        delay: (e, i) => {
+          if (![503, 504, 0, 429, 425].includes(e.status)) {
+            return throwError(() => e);
+          }
+          this.store.dispatch(requestRetried({ id }));
+          return of(e).pipe(delay(i * 500));
+        },
+      }),
+      finalize(() => this.store.dispatch(requestFinished({ id })))
+    );
 
-  constructor(private http: HttpClient, @Inject(DOCUMENT) doc: Document) {
+  constructor(
+    private http: HttpClient,
+    @Inject(DOCUMENT) doc: Document,
+    private store: Store<State>,
+    private actions$: Actions
+  ) {
     this.apiUrl =
       (environment.production ? doc.location.origin : 'http://localhost:5000') +
       this.apiUrl;
   }
 
   get<T>(url: string, params?: HttpParams): Observable<T> {
-    return this.http
-      .get<T>(this.apiUrl + url, {
-        params: params,
-      })
-      .pipe(this.retryPipeline as any);
+    return defer<Observable<T>>(() => {
+      const id = HttpService.requestCount++;
+      this.store.dispatch(requestStarted({ id, url, method: 'GET' }));
+
+      return this.http
+        .get<T>(this.apiUrl + url, {
+          params: params,
+        })
+        .pipe(this.retryPipeline(id) as any);
+    });
   }
 
   post<T>(url: string, body: any): Observable<T> {
-    return this.http
-      .post<T>(this.apiUrl + url, body)
-      .pipe(this.retryPipeline as any);
+    return defer<Observable<T>>(() => {
+      const id = HttpService.requestCount++;
+      this.store.dispatch(requestStarted({ id, url, method: 'POST' }));
+
+      return this.http
+        .post<T>(this.apiUrl + url, body)
+        .pipe(this.retryPipeline(id) as any);
+    });
   }
 
   put(url: string, body: any): Observable<void> {
-    return this.http
-      .put<void>(this.apiUrl + url, body)
-      .pipe(this.retryPipeline as any);
+    return defer<Observable<void>>(() => {
+      const id = HttpService.requestCount++;
+      this.store.dispatch(requestStarted({ id, url, method: 'PUT' }));
+
+      return this.http
+        .put<void>(this.apiUrl + url, body)
+        .pipe(this.retryPipeline(id) as any);
+    });
   }
 
   delete(url: string, params?: HttpParams): Observable<void> {
-    return this.http
-      .delete<void>(this.apiUrl + url, {
-        params: params,
-      })
-      .pipe(this.retryPipeline as any);
+    return defer<Observable<void>>(() => {
+      const id = HttpService.requestCount++;
+      this.store.dispatch(requestStarted({ id, url, method: 'DELETE' }));
+
+      return this.http
+        .delete<void>(this.apiUrl + url, {
+          params: params,
+        })
+        .pipe(this.retryPipeline(id) as any);
+    });
   }
 
   consumeStream(
@@ -68,38 +129,39 @@ export class HttpService {
       method: string;
     }
   ): Observable<string> {
-    return of(null).pipe(
-      // we need the switchmap to delay the fetch request until the subscription
-      switchMap(() =>
-        from(
-          fetch(
-            this.apiUrl +
-              url +
-              (options.params ? '?' + options.params.toString() : ''),
-            {
-              method: options.method,
-              body: options.body,
-            }
-          )
+    return defer<Observable<string>>(() => {
+      const id = HttpService.requestCount++;
+      this.store.dispatch(requestStarted({ id, url, method: 'GET' }));
+
+      return from(
+        fetch(
+          this.apiUrl +
+            url +
+            (options.params ? '?' + options.params.toString() : ''),
+          {
+            method: options.method,
+            body: options.body,
+          }
         )
-      ),
-      switchMap((resp) =>
-        resp.ok
-          ? from(
-              resp.body.pipeThrough(
-                new TextDecoderStream()
-              ) as ReadableStreamLike<string>
-            )
-          : throwError(
-              () =>
-                new HttpErrorResponse({
-                  status: resp.status,
-                  statusText: resp.statusText,
-                  url: resp.url,
-                })
-            )
-      ),
-      this.retryPipeline as any
-    );
+      ).pipe(
+        switchMap((resp) =>
+          resp.ok
+            ? from(
+                resp.body.pipeThrough(
+                  new TextDecoderStream()
+                ) as ReadableStreamLike<string>
+              )
+            : throwError(
+                () =>
+                  new HttpErrorResponse({
+                    status: resp.status,
+                    statusText: resp.statusText,
+                    url: resp.url,
+                  })
+              )
+        ),
+        this.retryPipeline(id) as any
+      );
+    });
   }
 }

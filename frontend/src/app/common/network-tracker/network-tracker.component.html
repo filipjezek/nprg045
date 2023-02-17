@@ -1,0 +1,18 @@
+<h1>Ongoing network requests</h1>
+<div>
+  <div
+    class="request"
+    *ngFor="let req of requests$ | async; trackBy: trackById"
+  >
+    <span class="method {{ req.method | lowercase }}">{{ req.method }}</span>
+    <span class="url">{{ req.url }}</span>
+    <span class="retries" *ngIf="req.retries">retries: {{ req.retries }}</span>
+    <span class="duration">{{ req.duration | time }}</span>
+    <button class="cancel" title="Cancel request" (click)="cancel(req.id)">
+      <fa-icon [icon]="faBan"></fa-icon>
+    </button>
+  </div>
+  <div class="actions">
+    <button class="close" (click)="close.emit()">Close</button>
+  </div>
+</div>

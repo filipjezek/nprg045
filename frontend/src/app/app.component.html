@@ -7,6 +7,13 @@
   @fade
   *ngIf="showLoadingOverlay$ | async"
 ></mozaik-loading-overlay>
+<button
+  (click)="openNetwork()"
+  class="open-network"
+  *ngIf="showNetworkButton$ | async"
+>
+  <fa-icon [icon]="faSatelliteDish"></fa-icon>
+</button>
 <mozaik-overlay
   @fade
   *ngIf="(overlay$ | async).open"

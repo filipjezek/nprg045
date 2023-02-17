@@ -1,0 +1,79 @@
+:host {
+  display: block;
+  background-color: var(--background);
+  color: var(--background-text);
+  box-shadow: 0 0 3px 0px #00000078;
+  padding: 15px;
+  min-width: 310px;
+  width: 40%;
+  max-width: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &:focus {
+    outline: none;
+  }
+
+  h1 {
+    font-size: 1.2em;
+  }
+
+  .request {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .method {
+      border-radius: 2px;
+      color: white;
+      background-color: black;
+      box-shadow: 0 0 3px #00000078;
+      padding: 0 5px;
+      margin-right: 4px;
+
+      &.get {
+        background-color: green;
+      }
+      &.post {
+        background-color: rgb(32, 32, 156);
+      }
+      &.put {
+        background-color: rgb(145, 109, 11);
+      }
+      &.delete {
+        background-color: rgb(148, 31, 31);
+      }
+    }
+
+    .retries {
+      background-color: #ffd3d3;
+      padding: 2px;
+      border-radius: 2px;
+      margin: auto;
+    }
+    .duration {
+      margin-right: 8px;
+      margin-left: auto;
+    }
+    .cancel {
+      cursor: pointer;
+    }
+  }
+
+  .actions {
+    text-align: right;
+    margin-top: 18px;
+
+    .close {
+      border: 0;
+      background-color: transparent;
+      font-size: 1em;
+      cursor: pointer;
+      color: var(--background-text);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

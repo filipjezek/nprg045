@@ -18,20 +18,20 @@ class RecursiveFolderInfo(TypedDict):
 __ignored_folders = {'node_modules'}
 
 
-def find_datastores(path: Path) -> RecursiveFolderInfo:
+def find_datastores(path: Path, level=0) -> RecursiveFolderInfo:
     stores = get_directory(path)
     content = list(
         filter(
             lambda p: len(p['content']) > 0 or p['datastore'],
             map(
-                lambda p: find_datastores(path / p),
+                lambda p: find_datastores(path / p, level + 1),
                 filter(lambda p: not (len(p) > 1 and p.startswith('.'))
                        and p not in __ignored_folders,  stores['content'])
             )
         ),
     )
 
-    if len(content) == 1 and not stores['datastore']:
+    if len(content) == 1 and not stores['datastore'] and level > 0:
         # collapse long paths
         stores['datastore'] = content[0]['datastore']
         stores['name'] += '/' + content[0]['name']
