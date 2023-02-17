@@ -76,7 +76,7 @@ def get_recursive_filesystem():
 
     content = list(map(find_datastores, params['root_paths']))
     for ds, p in zip(content, params['root_paths']):
-        ds['name'] = str(p)[1:] or '.'  # strip slash
+        ds['name'] = str(p.parent / ds['name'])[1:] or '.'
 
     return flask.jsonify({
         'name': '/',

@@ -4,12 +4,23 @@
 >
   <fa-icon [icon]="faChevronRight" class="folder-marker"></fa-icon>
   <span class="name">{{ isString(info) ? info : info.name }}</span>
-  <fa-icon
-    *ngIf="loading"
-    [icon]="faCircleNotch"
-    class="loading-marker"
-    [spin]="true"
-  ></fa-icon>
+  <span class="actions">
+    <fa-icon
+      *ngIf="loading"
+      [icon]="faCircleNotch"
+      class="loading-marker"
+      [spin]="true"
+    ></fa-icon>
+    <button title="reload" (click)="$event.stopPropagation(); refresh()">
+      <fa-icon [icon]="faRotateRight"></fa-icon>
+    </button>
+    <button
+      title="load recursively"
+      (click)="$event.stopPropagation(); loadRecursive()"
+    >
+      <fa-icon [icon]="faDiagramProject"></fa-icon>
+    </button>
+  </span>
 </header>
 <div class="content" @folder *ngIf="!isString(info) && info.open">
   <mozaik-datastore
@@ -33,7 +44,9 @@
       <mozaik-datastore
         [link]="[
           'datastore',
-          extContext + info.name + '/' + cast(item).name,
+          (extContext + info.name == '/' ? '' : extContext + info.name) +
+            '/' +
+            cast(item).name,
           'model'
         ]"
         [name]="cast(item).name"

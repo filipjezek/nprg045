@@ -52,7 +52,7 @@ function replaceFolder(
     ...fs,
     content: fs.content.map((f) => {
       if (typeof f == 'string' && path == f) {
-        return { ...replacer(f), name: f };
+        return { ...replacer(f) };
       }
       if (typeof f != 'string' && path.startsWith(f.name)) {
         return replaceFolder(f, path.slice(f.name.length + 1), replacer);
@@ -68,7 +68,11 @@ function mergeFolder(
   replacement: FolderInfo
 ): FolderInfo {
   if (typeof old == 'string') {
-    return { ...replacement, name: old, open: true };
+    return {
+      ...replacement,
+      name: replacement.name.startsWith(old) ? replacement.name : old,
+      open: true,
+    };
   }
 
   const oldContent = new Map<string, FolderInfo>();
@@ -79,8 +83,9 @@ function mergeFolder(
   });
 
   return {
+    open: old.open,
     ...replacement,
-    name: old.name,
+    name: replacement.name.startsWith(old.name) ? replacement.name : old.name,
     content: replacement.content.map((x) => {
       if (typeof x == 'string' && oldContent.has(x)) {
         return oldContent.get(x);
