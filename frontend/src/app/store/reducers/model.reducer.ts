@@ -1,12 +1,16 @@
 import { createReducer, on } from '@ngrx/store';
 import {
+  addSelectedNodes,
   connectionsLoadingProgress,
+  hoverNode,
   loadModel,
   metadataLoaded,
   modelLoaded,
   positionsLoadingProgress,
+  selectNodes,
 } from '../actions/model.actions';
 import * as fromRoot from './index';
+import { unionBy } from 'lodash-es';
 
 export const modelFeatureKey = 'model';
 
@@ -130,6 +134,8 @@ export interface NetworkProgress {
 export interface ModelState {
   currentModel: ModelNetwork;
   loading: NetworkProgress;
+  selected: NetworkNode[];
+  hovered: NetworkNode;
 }
 
 export interface State extends fromRoot.State {
@@ -139,11 +145,18 @@ export interface State extends fromRoot.State {
 export const initialState: ModelState = {
   currentModel: null,
   loading: null,
+  selected: [],
+  hovered: null,
 };
 
 export const reducer = createReducer(
   initialState,
-  on(loadModel, (state) => ({ ...state, currentModel: null })),
+  on(loadModel, (state) => ({
+    ...state,
+    currentModel: null,
+    selected: [],
+    hovered: null,
+  })),
   on(modelLoaded, (state, { model }) => ({
     ...state,
     currentModel: { ...model },
@@ -173,5 +186,41 @@ export const reducer = createReducer(
         pos.sheet == sheet ? { ...pos, current } : pos
       ),
     },
-  }))
+  })),
+  on(hoverNode, (state, { node }) => ({
+    ...state,
+    hovered: typeof node == 'number' ? state.currentModel.nodes[node] : node,
+  })),
+  on(selectNodes, (state, { nodes }) => {
+    const normalized =
+      nodes.length > 0 && typeof nodes[0] == 'number'
+        ? (nodes as number[]).map((n) => state.currentModel.nodes[n])
+        : (nodes as NetworkNode[]);
+    if (
+      nodes.length == 1 &&
+      state.selected.find((n) => n.id == normalized[0].id)
+    ) {
+      return { ...state, selected: [] };
+    }
+    return { ...state, selected: normalized };
+  }),
+  on(addSelectedNodes, (state, { nodes }) => {
+    const normalized =
+      nodes.length > 0 && typeof nodes[0] == 'number'
+        ? (nodes as number[]).map((n) => state.currentModel.nodes[n])
+        : (nodes as NetworkNode[]);
+    if (
+      nodes.length == 1 &&
+      state.selected.find((n) => n.id == normalized[0].id)
+    ) {
+      return {
+        ...state,
+        selected: state.selected.filter((n) => n.id != normalized[0].id),
+      };
+    }
+    return {
+      ...state,
+      selected: unionBy(state.selected, normalized, (n) => n.id),
+    };
+  })
 );

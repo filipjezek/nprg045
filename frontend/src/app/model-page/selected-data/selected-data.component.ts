@@ -1,12 +1,18 @@
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+  combineLatest,
+  distinctUntilChanged,
+  shareReplay,
+  takeUntil,
+} from 'rxjs';
+import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+import {
+  addSelectedNodes,
+  hoverNode,
+  selectNodes,
+} from 'src/app/store/actions/model.actions';
+import { State } from 'src/app/store/reducers/model.reducer';
 import {
   Connection,
   getAllIncomingConnections,
@@ -17,47 +23,48 @@ import {
   selector: 'mozaik-selected-data',
   templateUrl: './selected-data.component.html',
   styleUrls: ['./selected-data.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectedDataComponent implements OnChanges {
-  @Input() selectedNodes: NetworkNode[];
-  @Input() allNodes: NetworkNode[];
-  @Input() hoveredNode: NetworkNode;
-  @Output() hoveredNodeChange = new EventEmitter<NetworkNode>();
-  @Output() select = new EventEmitter<NetworkNode[]>();
+export class SelectedDataComponent
+  extends UnsubscribingComponent
+  implements OnInit
+{
+  selectedNodes$ = this.store.select((x) => x.model.selected);
+  allNodes$ = this.store.select((x) => x.model.currentModel?.nodes || []);
+  hoveredNode$ = this.store.select((x) => x.model.hovered).pipe(shareReplay(1));
 
   nodeData: { node: NetworkNode; in: { [key: string]: Connection[] } }[];
 
-  constructor() {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedNodes'] || changes['allNodes']) {
-      this.nodeData = this.selectedNodes.map((n) => ({
-        node: n,
-        in: getAllIncomingConnections(n, this.allNodes),
-      }));
-    }
+  constructor(private store: Store<State>) {
+    super();
   }
 
-  hoverNode(n: NetworkNode) {
-    this.hoveredNode = n;
-    this.hoveredNodeChange.emit(n);
+  ngOnInit(): void {
+    combineLatest([
+      this.allNodes$.pipe(distinctUntilChanged()),
+      this.selectedNodes$.pipe(distinctUntilChanged()),
+    ])
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(([all, selected]) => {
+        this.nodeData = selected.map((n) => ({
+          node: n,
+          in: getAllIncomingConnections(n, all),
+        }));
+      });
   }
-  handleSelect(e: MouseEvent, node: NetworkNode) {
+
+  hoverNode(n: NetworkNode | number) {
+    this.store.dispatch(hoverNode({ node: n }));
+  }
+  handleSelect(e: MouseEvent, node: NetworkNode | number) {
     e.preventDefault();
-    if (this.selectedNodes.find((n) => n.id === node.id)) {
-      if (e.shiftKey) {
-        this.selectedNodes = this.selectedNodes.filter((n) => n.id !== node.id);
-      } else {
-        this.selectedNodes = [];
-      }
+    if (e.shiftKey) {
+      this.store.dispatch(
+        addSelectedNodes({ nodes: [node] as number[] | NetworkNode[] })
+      );
     } else {
-      if (e.shiftKey) {
-        this.selectedNodes = [...this.selectedNodes, node];
-      } else {
-        this.selectedNodes = [node];
-      }
+      this.store.dispatch(
+        selectNodes({ nodes: [node] as number[] | NetworkNode[] })
+      );
     }
-    this.select.emit(this.selectedNodes);
   }
 }

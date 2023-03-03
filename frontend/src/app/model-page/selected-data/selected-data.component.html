@@ -1,7 +1,7 @@
 <div class="node" *ngFor="let node of nodeData">
   <h1
     class="node-anchor"
-    [class.hovered]="hoveredNode?.id === node.node.id"
+    [class.hovered]="(hoveredNode$ | async)?.id === node.node.id"
     (mouseenter)="hoverNode(node.node)"
     (mouseleave)="hoverNode(null)"
     (click)="handleSelect($event, node.node)"
@@ -15,8 +15,8 @@
         <tr *ngFor="let sheet of node.node.sheets | keyvalue">
           <td>{{ sheet.key }}</td>
           <td>
-            [{{ sheet.value.x | number: "1.0-4" }},
-            {{ sheet.value.y | number: "1.0-4" }}]
+            [{{ sheet.value.x | number : "1.0-4" }},
+            {{ sheet.value.y | number : "1.0-4" }}]
           </td>
         </tr>
       </tbody>
@@ -40,15 +40,15 @@
               <td>
                 <span
                   class="node-anchor"
-                  [class.hovered]="hoveredNode?.id === tgt.node"
-                  (mouseenter)="hoverNode(allNodes[tgt.node])"
+                  [class.hovered]="(hoveredNode$ | async)?.id === tgt.node"
+                  (mouseenter)="hoverNode(tgt.node)"
                   (mouseleave)="hoverNode(null)"
-                  (click)="handleSelect($event, allNodes[tgt.node])"
+                  (click)="handleSelect($event, tgt.node)"
                   >#{{ tgt.node }}</span
                 >
               </td>
-              <td>{{ tgt.weight | number: "1.0-4" }}</td>
-              <td>{{ tgt.delay | number: "1.0-4" }}</td>
+              <td>{{ tgt.weight | number : "1.0-4" }}</td>
+              <td>{{ tgt.delay | number : "1.0-4" }}</td>
             </tr>
           </tbody>
         </table>
@@ -72,15 +72,15 @@
             <td>
               <span
                 class="node-anchor"
-                [class.hovered]="hoveredNode?.id === tgt.from"
-                (mouseenter)="hoverNode(allNodes[tgt.from])"
+                [class.hovered]="(hoveredNode$ | async)?.id === tgt.from"
+                (mouseenter)="hoverNode(tgt.from)"
                 (mouseleave)="hoverNode(null)"
-                (click)="handleSelect($event, allNodes[tgt.from])"
+                (click)="handleSelect($event, tgt.from)"
                 >#{{ tgt.from }}</span
               >
             </td>
-            <td>{{ tgt.weight | number: "1.0-4" }}</td>
-            <td>{{ tgt.delay | number: "1.0-4" }}</td>
+            <td>{{ tgt.weight | number : "1.0-4" }}</td>
+            <td>{{ tgt.delay | number : "1.0-4" }}</td>
           </tr>
         </tbody>
       </table>

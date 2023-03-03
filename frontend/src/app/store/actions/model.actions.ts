@@ -1,5 +1,9 @@
 import { createAction, props } from '@ngrx/store';
-import { ModelNetwork, NetworkMetadata } from '../reducers/model.reducer';
+import {
+  ModelNetwork,
+  NetworkMetadata,
+  NetworkNode,
+} from '../reducers/model.reducer';
 
 export const loadModel = createAction(
   '[model page] load model',
@@ -24,4 +28,17 @@ export const modelLoaded = createAction(
 export const apiError = createAction(
   '[model API] error',
   props<{ error: any }>()
+);
+
+export const hoverNode = createAction(
+  '[model page] hover node',
+  props<{ node: NetworkNode | number }>()
+);
+export const selectNodes = createAction(
+  '[model page] select nodes',
+  props<{ nodes: NetworkNode[] | number[] }>()
+);
+export const addSelectedNodes = createAction(
+  '[model page] add selected nodes',
+  props<{ nodes: NetworkNode[] | number[] }>()
 );

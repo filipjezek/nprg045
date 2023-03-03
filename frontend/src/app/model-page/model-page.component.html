@@ -49,21 +49,11 @@
         [nodes]="sheet.value"
         [edgeDir]="optionsForm.value.edges"
         [allNodes]="(model$ | async)?.nodes"
-        (select)="selectedNodes = $event"
-        [selectedNodes]="selectedNodes"
-        [hoveredNode]="hoveredNode"
-        (hoveredNodeChange)="hoveredNode = $event"
       ></mozaik-network-graph>
     </div>
   </div>
   <div class="col">
-    <mozaik-selected-data
-      [allNodes]="(model$ | async)?.nodes"
-      [selectedNodes]="selectedNodes"
-      [hoveredNode]="hoveredNode"
-      (hoveredNodeChange)="hoveredNode = $event"
-      (select)="selectedNodes = $event"
-    ></mozaik-selected-data>
+    <mozaik-selected-data></mozaik-selected-data>
   </div>
 </div>
 <mozaik-model-loading

@@ -14,24 +14,34 @@
   </h2>
   <mozaik-tooltip
     #nodeTooltip
-    *ngIf="hoveredNode && hoveredNode.sheets[sheetName]"
+    *ngIf="(hoveredNode$ | async)?.sheets[sheetName]"
     [ngStyle]="tooltipPos"
   >
-    <h1>Neuron #{{ hoveredNode.id }}</h1>
+    <h1>Neuron #{{ (hoveredNode$ | async).id }}</h1>
     <table>
       <tbody>
         <tr>
           <td>X</td>
-          <td>{{ hoveredNode.sheets[sheetName].x | number: "1.0-4" }} μm</td>
+          <td>
+            {{
+              (hoveredNode$ | async).sheets[sheetName].x | number : "1.0-4"
+            }}
+            μm
+          </td>
         </tr>
         <tr>
           <td>Y</td>
-          <td>{{ hoveredNode.sheets[sheetName].y | number: "1.0-4" }} μm</td>
+          <td>
+            {{
+              (hoveredNode$ | async).sheets[sheetName].y | number : "1.0-4"
+            }}
+            μm
+          </td>
         </tr>
         <tr *ngIf="pnv">
           <td>Z</td>
           <td>
-            {{ pnv.values.get(hoveredNode.id) | number: "1.0-4" }}
+            {{ pnv.values.get((hoveredNode$ | async).id) | number : "1.0-4" }}
             {{ pnv.unit }}
           </td>
         </tr>
@@ -44,11 +54,11 @@
       <tbody>
         <tr>
           <td>Weight</td>
-          <td>{{ hoveredEdge.weight | number: "1.0-4" }}</td>
+          <td>{{ hoveredEdge.weight | number : "1.0-4" }}</td>
         </tr>
         <tr>
           <td>Delay</td>
-          <td>{{ hoveredEdge.delay | number: "1.0-4" }}</td>
+          <td>{{ hoveredEdge.delay | number : "1.0-4" }}</td>
         </tr>
       </tbody>
     </table>

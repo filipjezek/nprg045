@@ -12,7 +12,7 @@ import { HeaderComponent } from './common/header/header.component';
 import { reducers, metaReducers, State } from './store/reducers';
 import { LoadingOverlayComponent } from './common/loading-overlay/loading-overlay.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { modelLoaded } from './store/actions/model.actions';
+import { hoverNode, modelLoaded } from './store/actions/model.actions';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FilesystemEffects } from './store/effects/filesystem.effects';
 import { FilesystemComponent } from './common/filesystem/filesystem.component';
@@ -75,6 +75,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
       }),
       actionSanitizer: (a) =>
         a.type === modelLoaded.type ? { ...a, model: {} } : a,
+      actionsBlocklist: [hoverNode.type],
       logOnly: environment.production,
     }),
     HttpClientModule,

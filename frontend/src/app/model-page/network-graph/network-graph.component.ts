@@ -16,12 +16,25 @@ import {
   getIncomingConnections,
   getOutgoingConnections,
   NetworkNode,
+  State,
 } from 'src/app/store/reducers/model.reducer';
 import * as d3 from 'd3';
 import * as d3Lasso from 'd3-lasso';
-import { GlobalEventService } from 'src/app/services/global-event.service';
-import { takeUntil } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  pairwise,
+  startWith,
+  take,
+  takeUntil,
+} from 'rxjs';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+import { Store } from '@ngrx/store';
+import {
+  addSelectedNodes,
+  hoverNode,
+  selectNodes,
+} from 'src/app/store/actions/model.actions';
 
 type anySelection = d3.Selection<any, any, any, any>;
 
@@ -59,23 +72,15 @@ export class NetworkGraphComponent
   @Input() nodes: NetworkNode[];
   @Input() sheetName: string;
   @Input() allNodes: NetworkNode[];
-  @Input() get selectedNodes(): NetworkNode[] {
-    return this._selectedNodes;
-  }
-  set selectedNodes(nodes: NetworkNode[]) {
-    if (
-      this._selectedNodes === nodes ||
-      (!nodes.length && !this._selectedNodes.length)
-    )
-      return;
-    this._selectedNodes = nodes;
-  }
-  private _selectedNodes: NetworkNode[] = [];
+
+  selectedNodes$ = this.store
+    .select((x) => x.model.selected)
+    .pipe(distinctUntilChanged((a, b) => a === b || (!a.length && !b.length)));
+
   @Input() edgeDir: EdgeDirection;
   @Input() pnv: PNVData = null;
   @Input() pnvExtent: { min: number; max: number };
   @Input() pnvFilter: { from: number; to: number };
-  @Output() select = new EventEmitter<NetworkNode[]>();
 
   private scales: {
     x: d3.ScaleLinear<any, any>;
@@ -101,6 +106,7 @@ export class NetworkGraphComponent
   private edges: anySelection;
   private grid: anySelection;
   private svg: anySelection;
+  private lasso: d3Lasso.Lasso;
 
   private readonly width = 410;
   private readonly height = 410;
@@ -112,52 +118,33 @@ export class NetworkGraphComponent
   };
 
   hoveredEdge: Connection;
-  @Input() hoveredNode: NetworkNode;
-  @Output() hoveredNodeChange = new EventEmitter<NetworkNode>();
+  hoveredNode$ = this.store.select((x) => x.model.hovered);
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
   filteredPnv = 0;
 
-  constructor(private gEventS: GlobalEventService) {
+  constructor(private store: Store<State>) {
     super();
   }
 
   ngOnInit(): void {
     this.filteredPnv = this.pnv?.values.size;
+    this.subscribeHoveredNode();
   }
 
   ngAfterViewInit(): void {
     this.initSvg();
     this.initAxes();
-    this.redraw();
     this.initZoom();
     this.initLasso();
-
-    this.gEventS.escapePressed
-      .pipe(takeUntil(this.onDestroy$))
-      .subscribe(() => {
-        this.select.emit([]);
-      });
+    this.redraw();
+    this.subscribeSelection();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['edgeDir'] || changes['selectedNodes']) {
-      if (this.svg) {
-        this.updateSelection();
-      }
-    }
-    if (changes['hoveredNode'] && this.svg) {
-      if (changes['hoveredNode'].previousValue) {
-        this.circles.select('.hovered').classed('hovered', false);
-      }
-      if (this.hoveredNode && this.hoveredNode.sheets[this.sheetName]) {
-        const tgt = this.circles
-          .select(`[data-id="${this.hoveredNode.id}"]`)
-          .classed('hovered', true);
-        const bboxNode = (tgt.node() as HTMLElement).getBoundingClientRect();
-        this.tooltipPos = {
-          ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
-        };
-      }
+    if (changes['edgeDir'] && this.svg) {
+      this.selectedNodes$.pipe(take(1)).subscribe((selected) => {
+        this.updateSelection(selected);
+      });
     }
     if (changes['pnv'] && this.svg) {
       const ch = changes['pnv'];
@@ -172,6 +159,30 @@ export class NetworkGraphComponent
     if (changes['pnvFilter'] && this.svg && this.pnv) {
       this.filterPnv();
     }
+  }
+
+  private subscribeHoveredNode() {
+    this.hoveredNode$
+      .pipe(
+        filter(() => !!this.svg),
+        startWith(null),
+        pairwise(),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe(([prev, curr]) => {
+        if (prev) {
+          this.circles.select('.hovered').classed('hovered', false);
+        }
+        if (curr?.sheets[this.sheetName]) {
+          const tgt = this.circles
+            .select(`[data-id="${curr.id}"]`)
+            .classed('hovered', true);
+          const bboxNode = (tgt.node() as HTMLElement).getBoundingClientRect();
+          this.tooltipPos = {
+            ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
+          };
+        }
+      });
   }
 
   private initSvg() {
@@ -238,12 +249,16 @@ export class NetworkGraphComponent
             : this.scales.z(this.pnv.values.get(n.id))
         );
     } else {
-      circleProcess = circleProcess.data(this.nodes).join('path');
+      circleProcess = circleProcess
+        .data(this.nodes)
+        .join('path')
+        .style('stroke', null);
     }
     circleProcess
       .classed('node', true)
       .attr('d', (n) => `M${this.displayX(n)},${this.displayY(n)}h0`)
       .attr('data-id', (n) => n.id);
+    this.rebindLasso();
   }
 
   private filterPnv() {
@@ -380,15 +395,15 @@ export class NetworkGraphComponent
       .call(zoom.transform, d3.zoomIdentity);
   }
 
-  private updateEdges() {
+  private updateEdges(selected: NetworkNode[]) {
     let inLinks: Connection[] = [];
     let outLinks: Connection[] = [];
-    const set = new Set(this.selectedNodes.map((n) => n.id));
+    const set = new Set(selected.map((n) => n.id));
     if (
       this.edgeDir === EdgeDirection.outgoing ||
       this.edgeDir === EdgeDirection.all
     ) {
-      outLinks = getOutgoingConnections(this.selectedNodes, this.sheetName);
+      outLinks = getOutgoingConnections(selected, this.sheetName);
     }
     if (
       this.edgeDir === EdgeDirection.incoming ||
@@ -427,12 +442,20 @@ export class NetworkGraphComponent
       .attr('y2', (conn) => this.displayY(this.allNodes[conn.to]));
   }
 
-  private updateSelection() {
+  private subscribeSelection() {
+    this.selectedNodes$
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((selected) => {
+        this.updateSelection(selected);
+      });
+  }
+
+  private updateSelection(selected: NetworkNode[]) {
     this.circles
       .selectAll('.selected, .neighbor')
       .classed('selected neighbor', false);
-    this.updateEdges();
-    this.selectedNodes.forEach((n) =>
+    this.updateEdges(selected);
+    selected.forEach((n) =>
       this.circles.select(`[data-id="${n.id}"]`).classed('selected', true)
     );
   }
@@ -441,28 +464,18 @@ export class NetworkGraphComponent
     const tgt: HTMLElement = e.target as HTMLElement;
     if (tgt.matches('.node')) {
       const id = +tgt.dataset['id'];
-      if (tgt.classList.contains('selected')) {
-        if (e.shiftKey) {
-          this.selectedNodes = this.selectedNodes.filter((n) => n.id !== id);
-        } else {
-          this.selectedNodes = [];
-        }
+      if (e.shiftKey) {
+        this.store.dispatch(addSelectedNodes({ nodes: [id] }));
       } else {
-        if (e.shiftKey) {
-          this.selectedNodes = [...this.selectedNodes, this.allNodes[id]];
-        } else {
-          this.selectedNodes = [this.allNodes[id]];
-        }
+        this.store.dispatch(selectNodes({ nodes: [id] }));
       }
     }
-    this.select.emit(this.selectedNodes);
   }
 
   handleMouseEnter(e: MouseEvent) {
     const tgt = e.target as HTMLElement;
     if (tgt.matches('.node')) {
-      this.hoveredNode = d3.select(tgt).datum() as any;
-      this.hoveredNodeChange.emit(this.hoveredNode);
+      this.store.dispatch(hoverNode({ node: d3.select(tgt).datum() as any }));
     } else if (tgt.matches('.link')) {
       this.hoveredEdge = d3.select(tgt).datum() as any;
       this.tooltipPos = {
@@ -473,8 +486,7 @@ export class NetworkGraphComponent
   handleMouseLeave(e: MouseEvent) {
     const tgt = e.target as HTMLElement;
     if (tgt.matches('.node')) {
-      this.hoveredNode = null;
-      this.hoveredNodeChange.emit(null);
+      this.store.dispatch(hoverNode({ node: null }));
     } else if (tgt.matches('.link')) {
       this.hoveredEdge = null;
     }
@@ -488,35 +500,43 @@ export class NetworkGraphComponent
   }
 
   private initLasso() {
-    const lasso = d3Lasso
+    this.lasso = d3Lasso
       .lasso()
       .closePathSelect(true)
       .closePathDistance(1000)
       .hoverSelect(false)
-      .items(this.circles.selectAll('.node') as any)
       .targetArea(
         d3.select(this.container.nativeElement).select<Element>('svg')
       )
       .on('start', () => {
-        lasso.items().classed('not-possible', true).classed('selected', false);
+        this.lasso
+          .items()
+          .classed('not-possible', true)
+          .classed('selected', false);
       })
       .on('draw', () => {
-        lasso
+        this.lasso
           .possibleItems()
           .classed('not-possible', false)
           .classed('possible', true);
-        lasso
+        this.lasso
           .notPossibleItems()
           .classed('not-possible', true)
           .classed('possible', false);
       })
       .on('end', () => {
-        lasso.items().classed('not-possible possible', false);
-        this.select.emit([
-          ...new Set([...this.selectedNodes, ...lasso.selectedItems().data()]),
-        ]);
+        this.lasso.items().classed('not-possible possible', false);
+        this.store.dispatch(
+          addSelectedNodes({ nodes: this.lasso.selectedItems().data() })
+        );
       });
-    d3.select(this.container.nativeElement).select<Element>('svg').call(lasso);
+    d3.select(this.container.nativeElement)
+      .select<Element>('svg')
+      .call(this.lasso);
+  }
+
+  private rebindLasso() {
+    this.lasso.items(this.circles.selectAll('.node') as any);
   }
 
   private recalcTooltipPos(x: number, y: number) {

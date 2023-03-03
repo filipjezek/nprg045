@@ -6,7 +6,7 @@ import {
   ElementRef,
   Directive,
 } from '@angular/core';
-import { UnsubscribingComponent } from './unsubscribing.mixin';
+import { UnsubscribingComponent } from './mixins/unsubscribing.mixin';
 
 @Directive({})
 export abstract class Dialog extends UnsubscribingComponent {

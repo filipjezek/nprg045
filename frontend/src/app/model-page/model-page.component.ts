@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
@@ -19,7 +19,8 @@ import {
   tap,
 } from 'rxjs';
 import { UnsubscribingComponent } from '../mixins/unsubscribing.mixin';
-import { loadModel } from '../store/actions/model.actions';
+import { GlobalEventService } from '../services/global-event.service';
+import { loadModel, selectNodes } from '../store/actions/model.actions';
 import { AdsIdentifier, PerNeuronValue } from '../store/reducers/ads.reducer';
 import { NetworkNode, State } from '../store/reducers/model.reducer';
 import {
@@ -40,7 +41,7 @@ import {
 })
 export class ModelPageComponent
   extends UnsubscribingComponent
-  implements OnInit
+  implements OnInit, AfterViewInit
 {
   edges: RadioOption[] = [
     { label: 'Incoming', value: EdgeDirection.incoming },
@@ -54,9 +55,6 @@ export class ModelPageComponent
       to: this.fb.control<number>(null),
     }),
   });
-
-  selectedNodes: NetworkNode[] = [];
-  hoveredNode: NetworkNode;
 
   loading$ = this.store.select((x) => x.model.loading);
 
@@ -144,7 +142,11 @@ export class ModelPageComponent
 
   pnvValueNames$ = this.store.select(selectAvailableValueNames);
 
-  constructor(private store: Store<State>, private fb: FormBuilder) {
+  constructor(
+    private store: Store<State>,
+    private fb: FormBuilder,
+    private gEventS: GlobalEventService
+  ) {
     super();
   }
 
@@ -157,6 +159,14 @@ export class ModelPageComponent
       )
       .subscribe((path) => {
         this.store.dispatch(loadModel({ path }));
+      });
+  }
+
+  ngAfterViewInit(): void {
+    this.gEventS.escapePressed
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(() => {
+        this.store.dispatch(selectNodes({ nodes: [] }));
       });
   }
 }

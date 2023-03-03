@@ -25,6 +25,7 @@ import { AdsService } from 'src/app/services/ads.service';
 import {
   AdsLoaded,
   apiError,
+  clearSelectedAds,
   loadAds,
   loadSpecificAds,
   specificAdsLoaded,
@@ -45,12 +46,19 @@ export class AdsEffects {
   );
   adsSelected$ = createEffect(() =>
     this.store.select(routerSelectors.selectRouteParam('adsIndex')).pipe(
-      filter((x) => !!x),
+      filter((x) => !!x), // okay, because it is a string
       distinctUntilChanged(),
       withLatestFrom(
         this.store.select(routerSelectors.selectRouteParam('path'))
       ),
       map(([index, path]) => loadSpecificAds({ index: +index, path }))
+    )
+  );
+  adsClear$ = createEffect(() =>
+    this.store.select(routerSelectors.selectRouteParam('adsIndex')).pipe(
+      distinctUntilChanged(),
+      filter((x) => !x), // okay, because it is a string
+      map(() => clearSelectedAds())
     )
   );
 
@@ -69,6 +77,7 @@ export class AdsEffects {
         this.adsS.loadAds(path).pipe(
           map((ads) => AdsLoaded({ ads })),
           catchError((err: HttpErrorResponse) => {
+            console.log(err);
             this.toastS.add(new Toast('Failed to load data structures'));
             return of(apiError({ error: err }));
           })

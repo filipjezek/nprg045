@@ -1,5 +1,10 @@
 import { createReducer, on } from '@ngrx/store';
-import { AdsLoaded, loadAds, specificAdsLoaded } from '../actions/ads.actions';
+import {
+  AdsLoaded,
+  clearSelectedAds,
+  loadAds,
+  specificAdsLoaded,
+} from '../actions/ads.actions';
 
 export const adsFeatureKey = 'ads';
 
@@ -55,5 +60,6 @@ export const reducer = createReducer(
   on(specificAdsLoaded, (state, { ads }) => ({
     ...state,
     selectedAds: ads,
-  }))
+  })),
+  on(clearSelectedAds, (state) => ({ ...state, selectedAds: [] }))
 );
