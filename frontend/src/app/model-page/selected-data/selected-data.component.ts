@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   combineLatest,
@@ -66,5 +72,24 @@ export class SelectedDataComponent
         selectNodes({ nodes: [node] as number[] | NetworkNode[] })
       );
     }
+  }
+
+  trackById(index: number, item: { node: NetworkNode }) {
+    return item.node.id;
+  }
+}
+
+@Pipe({
+  name: 'sumsheets',
+})
+export class SumSheetsPipe implements PipeTransform {
+  transform(value: {
+    [key: string]: Connection[] | NetworkNode['sheets'][string];
+  }) {
+    return Object.values(value).reduce(
+      (total, conns) =>
+        total + ('length' in conns ? conns.length : conns.connections.length),
+      0
+    );
   }
 }

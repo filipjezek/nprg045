@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProgressComponent } from './progress/progress.component';
 import { TimePipe } from './pipes/time.pipe';
+import { CollapsibleComponent } from './collapsible/collapsible.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { TimePipe } from './pipes/time.pipe';
     WrapPipe,
     ProgressComponent,
     TimePipe,
+    CollapsibleComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -37,6 +39,7 @@ import { TimePipe } from './pipes/time.pipe';
     CategoryListComponent,
     ProgressComponent,
     TimePipe,
+    CollapsibleComponent,
   ],
 })
 export class WidgetsModule {}

@@ -1,15 +1,19 @@
-<div class="node" *ngFor="let node of nodeData">
+<mozaik-collapsible
+  class="node"
+  *ngFor="let node of nodeData; trackBy: trackById"
+>
   <h1
+    slot="header"
     class="node-anchor"
     [class.hovered]="(hoveredNode$ | async)?.id === node.node.id"
     (mouseenter)="hoverNode(node.node)"
     (mouseleave)="hoverNode(null)"
-    (click)="handleSelect($event, node.node)"
+    (click)="$event.shiftKey ? handleSelect($event, node.node) : null"
   >
     Neuron #{{ node.node.id }}
   </h1>
-  <section class="positions">
-    <h2>Positions</h2>
+  <mozaik-collapsible class="positions">
+    <h2 slot="header">Positions</h2>
     <table>
       <tbody>
         <tr *ngFor="let sheet of node.node.sheets | keyvalue">
@@ -21,12 +25,14 @@
         </tr>
       </tbody>
     </table>
-  </section>
-  <section class="outgoing">
-    <h2>Outgoing</h2>
+  </mozaik-collapsible>
+  <mozaik-collapsible class="outgoing">
+    <h2 slot="header">Outgoing ({{ node.node.sheets | sumsheets }})</h2>
     <ng-container *ngFor="let sheet of node.node.sheets | keyvalue">
-      <section class="sheet" *ngIf="sheet.value.connections.length">
-        <h3>{{ sheet.key }}</h3>
+      <mozaik-collapsible class="sheet" *ngIf="sheet.value.connections.length">
+        <h3 slot="header">
+          {{ sheet.key }} ({{ sheet.value.connections.length }})
+        </h3>
         <table>
           <thead>
             <tr>
@@ -52,38 +58,40 @@
             </tr>
           </tbody>
         </table>
-      </section>
+      </mozaik-collapsible>
     </ng-container>
-  </section>
-  <section class="incoming">
-    <h2>Incoming</h2>
-    <section class="sheet" *ngFor="let sheet of node.in | keyvalue">
-      <h3>{{ sheet.key }}</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>From</th>
-            <th>Weight</th>
-            <th>Delay</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let tgt of sheet.value">
-            <td>
-              <span
-                class="node-anchor"
-                [class.hovered]="(hoveredNode$ | async)?.id === tgt.from"
-                (mouseenter)="hoverNode(tgt.from)"
-                (mouseleave)="hoverNode(null)"
-                (click)="handleSelect($event, tgt.from)"
-                >#{{ tgt.from }}</span
-              >
-            </td>
-            <td>{{ tgt.weight | number : "1.0-4" }}</td>
-            <td>{{ tgt.delay | number : "1.0-4" }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </section>
-</div>
+  </mozaik-collapsible>
+  <mozaik-collapsible class="incoming">
+    <h2 slot="header">Incoming ({{ node.in | sumsheets }})</h2>
+    <ng-container *ngFor="let sheet of node.in | keyvalue">
+      <mozaik-collapsible class="sheet" *ngIf="sheet.value.length">
+        <h3 slot="header">{{ sheet.key }} ({{ sheet.value.length }})</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>Weight</th>
+              <th>Delay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tgt of sheet.value">
+              <td>
+                <span
+                  class="node-anchor"
+                  [class.hovered]="(hoveredNode$ | async)?.id === tgt.from"
+                  (mouseenter)="hoverNode(tgt.from)"
+                  (mouseleave)="hoverNode(null)"
+                  (click)="handleSelect($event, tgt.from)"
+                  >#{{ tgt.from }}</span
+                >
+              </td>
+              <td>{{ tgt.weight | number : "1.0-4" }}</td>
+              <td>{{ tgt.delay | number : "1.0-4" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </mozaik-collapsible>
+    </ng-container>
+  </mozaik-collapsible>
+</mozaik-collapsible>

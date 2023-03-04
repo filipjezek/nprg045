@@ -1,0 +1,7 @@
+<header [class.open]="open" (click)="open = !open">
+  <fa-icon [icon]="faChevronRight" class="folder-marker"></fa-icon
+  ><ng-content select="[slot=header]"></ng-content>
+</header>
+<div class="content" @collapse *ngIf="open">
+  <ng-content></ng-content>
+</div>

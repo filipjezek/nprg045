@@ -1,0 +1,19 @@
+header {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+
+  &.open {
+    .folder-marker {
+      transform: rotate(90deg);
+    }
+  }
+  .folder-marker {
+    text-align: center;
+    display: inline-block;
+    width: 20px;
+    transition: transform 0.1s;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+}
