@@ -1,8 +1,12 @@
 <mozaik-header></mozaik-header>
-<mozaik-features></mozaik-features>
-<main>
-  <router-outlet></router-outlet>
-</main>
+<mozaik-multiview>
+  <mozaik-multiview-partition>
+    <mozaik-ds-select></mozaik-ds-select>
+  </mozaik-multiview-partition>
+  <mozaik-multiview-partition>
+    <router-outlet></router-outlet>
+  </mozaik-multiview-partition>
+</mozaik-multiview>
 <mozaik-loading-overlay
   @fade
   *ngIf="showLoadingOverlay$ | async"

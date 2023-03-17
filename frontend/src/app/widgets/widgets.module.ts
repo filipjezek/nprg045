@@ -15,6 +15,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProgressComponent } from './progress/progress.component';
 import { TimePipe } from './pipes/time.pipe';
 import { CollapsibleComponent } from './collapsible/collapsible.component';
+import { MultiviewComponent } from './multiview/multiview.component';
+import { MultiviewPartitionComponent } from './multiview/multiview-partition/multiview-partition.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { CollapsibleComponent } from './collapsible/collapsible.component';
     ProgressComponent,
     TimePipe,
     CollapsibleComponent,
+    MultiviewComponent,
+    MultiviewPartitionComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -40,6 +44,8 @@ import { CollapsibleComponent } from './collapsible/collapsible.component';
     ProgressComponent,
     TimePipe,
     CollapsibleComponent,
+    MultiviewComponent,
+    MultiviewPartitionComponent,
   ],
 })
 export class WidgetsModule {}

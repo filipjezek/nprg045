@@ -13,6 +13,7 @@ export class GlobalEventService {
   public spacePressed: Observable<KeyboardEvent>;
   public escapePressed: Observable<KeyboardEvent>;
   public mouseReleased: Observable<MouseEvent>;
+  public mouseMove: Observable<MouseEvent>;
   public overlayClicked: Observable<MouseEvent>;
 
   constructor(@Inject(DOCUMENT) private doc: Document) {
@@ -44,5 +45,6 @@ export class GlobalEventService {
     this.mouseReleased = fromEvent<MouseEvent>(this.doc, 'mouseup').pipe(
       share()
     );
+    this.mouseMove = fromEvent<MouseEvent>(this.doc, 'mousemove').pipe(share());
   }
 }

@@ -121,19 +121,6 @@ def get_specific_ads():
     match identifier:
         case AdsIdentifier.PerNeuronValue:
             a = get_per_neuron_value(str(path), alg, tags)
-            for i in a:
-                try:
-                    flask.jsonify(i)
-                except:
-                    for x in i['ids']:
-                        if type(x) == int64:
-                            print('culprit is id')
-                    for x in i['values']:
-                        if type(x) == int64:
-                            print('culprit is value')
-                    if type(i['period']) == int64:
-                        print('culprit is period')
-                    print(i)
             return flask.jsonify(a)
         case _:
             return flask.Response(status=400)

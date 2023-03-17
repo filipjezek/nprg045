@@ -30,6 +30,7 @@ import { MozaikRouteReuseStrategy } from './route-reuse-strategy';
 import { Dialog } from './dialog';
 import { createCustomElement } from '@angular/elements';
 import { NetworkTrackerComponent } from './common/network-tracker/network-tracker.component';
+import { DsSelectComponent } from './common/ds-select/ds-select.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -48,6 +49,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     NotFoundComponent,
     AdsComponent,
     NetworkTrackerComponent,
+    DsSelectComponent,
   ],
   imports: [
     BrowserModule,

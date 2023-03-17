@@ -1,0 +1,13 @@
+<div
+  class="column"
+  [style.flex-basis.%]="ratios[x]"
+  *ngFor="let col of partitions$ | async; index as x; count as width"
+>
+  <div class="handle" (mousedown)="startDrag($event, x)" *ngIf="x > 0"></div>
+  <div class="content">
+    <ng-container
+      [ngTemplateOutlet]="item.content"
+      *ngFor="let item of col"
+    ></ng-container>
+  </div>
+</div>
