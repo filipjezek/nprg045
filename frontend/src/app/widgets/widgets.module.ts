@@ -17,6 +17,8 @@ import { TimePipe } from './pipes/time.pipe';
 import { CollapsibleComponent } from './collapsible/collapsible.component';
 import { MultiviewComponent } from './multiview/multiview.component';
 import { MultiviewPartitionComponent } from './multiview/multiview-partition/multiview-partition.component';
+import { PurefnPipe } from './pipes/purefn.pipe';
+import { KeyValueNoSortPipe } from './pipes/keyvaluenosort.pipe';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { MultiviewPartitionComponent } from './multiview/multiview-partition/mul
     CollapsibleComponent,
     MultiviewComponent,
     MultiviewPartitionComponent,
+    PurefnPipe,
+    KeyValueNoSortPipe,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -46,6 +50,8 @@ import { MultiviewPartitionComponent } from './multiview/multiview-partition/mul
     CollapsibleComponent,
     MultiviewComponent,
     MultiviewPartitionComponent,
+    PurefnPipe,
+    KeyValueNoSortPipe,
   ],
 })
 export class WidgetsModule {}

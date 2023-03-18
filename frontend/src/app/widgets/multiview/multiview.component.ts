@@ -1,9 +1,14 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChildren,
+  EventEmitter,
+  HostBinding,
   Input,
   OnInit,
+  Output,
   QueryList,
 } from '@angular/core';
 import { MultiviewPartitionComponent } from './multiview-partition/multiview-partition.component';
@@ -35,44 +40,61 @@ export type GroupingFn = (
   selector: 'mozaik-multiview',
   templateUrl: './multiview.component.html',
   styleUrls: ['./multiview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultiviewComponent
   extends UnsubscribingComponent
   implements OnInit, AfterViewInit
 {
-  @Input() set xAxisOrder(fn: OrderingFn) {
-    this.xOrderSubj.next(fn);
+  @Input() set mainAxisOrder(fn: OrderingFn) {
+    this.mainOrderSubj.next(fn);
   }
-  get xAxisOrder(): OrderingFn {
-    return this.xOrderSubj.value;
+  get mainAxisOrder(): OrderingFn {
+    return this.mainOrderSubj.value;
   }
-  @Input() set yAxisOrder(fn: OrderingFn) {
-    this.yOrderSubj.next(fn);
+  @Input() set secondaryAxisOrder(fn: OrderingFn) {
+    this.secondaryOrderSubj.next(fn);
   }
-  get yAxisOrder(): OrderingFn {
-    return this.yOrderSubj.value;
+  get secondaryAxisOrder(): OrderingFn {
+    return this.secondaryOrderSubj.value;
   }
-  @Input() set yAxisGroup(fn: GroupingFn) {
-    this.yGroupSubj.next(fn);
+  @Input() set secondaryAxisGroup(fn: GroupingFn) {
+    this.secondaryGroupSubj.next(fn);
   }
-  get yAxisGroup(): GroupingFn {
-    return this.yGroupSubj.value;
+  get secondaryAxisGroup(): GroupingFn {
+    return this.secondaryGroupSubj.value;
   }
-  private xOrderSubj = new BehaviorSubject<OrderingFn>(undefined);
-  private yOrderSubj = new BehaviorSubject<OrderingFn>(undefined);
-  private yGroupSubj = new BehaviorSubject<GroupingFn>(undefined);
+  private mainOrderSubj = new BehaviorSubject<OrderingFn>(undefined);
+  private secondaryOrderSubj = new BehaviorSubject<OrderingFn>(undefined);
+  private secondaryGroupSubj = new BehaviorSubject<GroupingFn>(undefined);
 
   /**
-   * width percentage of columns
+   * size basis of groups
    */
   @Input() ratios: number[] = [];
+  @Output() ratiosChange = new EventEmitter<number[]>();
+  /**
+   * is size basis a percentage or number of pixels
+   */
+  @Input() relativeRatios = true;
+  /**
+   * default row size when size basis is number of pixels
+   */
+  @Input() defaultGroupSize = 100;
+  /**
+   * is the main axis vertical or horizontal?
+   */
+  @Input() @HostBinding('class.vertical') vertical = false;
 
   @ContentChildren(MultiviewPartitionComponent)
   private partitions: QueryList<MultiviewPartitionComponent>;
 
   partitions$: Observable<MultiviewPartitionComponent[][]>;
 
-  constructor(private gEventS: GlobalEventService) {
+  constructor(
+    private gEventS: GlobalEventService,
+    private changeDetector: ChangeDetectorRef
+  ) {
     super();
   }
 
@@ -80,6 +102,7 @@ export class MultiviewComponent
 
   ngAfterViewInit(): void {
     this.partitions$ = this.createPartitions();
+    this.changeDetector.markForCheck();
   }
 
   private createPartitions() {
@@ -87,15 +110,15 @@ export class MultiviewComponent
       this.partitions.changes.pipe(startWith(this.partitions)) as Observable<
         QueryList<MultiviewPartitionComponent>
       >,
-      this.xOrderSubj.pipe(
+      this.mainOrderSubj.pipe(
         map((fn) => fn || ((() => 0) as OrderingFn)),
         distinctUntilChanged()
       ),
-      this.yOrderSubj.pipe(
+      this.secondaryOrderSubj.pipe(
         map((fn) => fn || ((() => 0) as OrderingFn)),
         distinctUntilChanged()
       ),
-      this.yGroupSubj.pipe(
+      this.secondaryGroupSubj.pipe(
         map((fn) => fn || (((p, i) => i) as GroupingFn)),
         distinctUntilChanged()
       ),
@@ -108,7 +131,9 @@ export class MultiviewComponent
       delay(0),
       tap((grid) => {
         if (grid.length != this.ratios.length) {
-          this.ratios = Array(grid.length).fill(100 / grid.length);
+          this.ratios = Array(grid.length).fill(
+            this.relativeRatios ? 100 / grid.length : this.defaultGroupSize
+          );
         }
       }),
       takeUntil(this.onDestroy$)
@@ -117,23 +142,35 @@ export class MultiviewComponent
 
   startDrag(initE: MouseEvent, index: number) {
     initE.preventDefault();
-    const right = (initE.target as HTMLElement).closest(
-      '.column'
+    const second = (initE.target as HTMLElement).closest(
+      '.group'
     ) as HTMLElement;
-    const left = right.previousElementSibling as HTMLElement;
+    const first = second.previousElementSibling as HTMLElement;
 
     const totalPct = this.ratios[index] + this.ratios[index - 1];
-    const initialLeftWidth = left.clientWidth;
-    const totalWidth = right.clientWidth + initialLeftWidth;
+    const initialFirstSize = this.vertical
+      ? first.clientHeight
+      : first.clientWidth;
+    const totalSize =
+      (this.vertical ? second.clientHeight : second.clientWidth) +
+      initialFirstSize;
 
     this.gEventS.mouseMove
       .pipe(takeUntil(this.gEventS.mouseReleased))
       .subscribe((e) => {
         e.preventDefault();
-        let leftWidth = initialLeftWidth + e.x - initE.x;
-        leftWidth = Math.max(0, Math.min(leftWidth, totalWidth));
-        this.ratios[index - 1] = totalPct * (leftWidth / totalWidth);
-        this.ratios[index] = totalPct - this.ratios[index - 1];
+        let firstSize =
+          initialFirstSize + (this.vertical ? e.y - initE.y : e.x - initE.x);
+        if (this.relativeRatios) {
+          firstSize = Math.max(0, Math.min(firstSize, totalSize));
+          this.ratios[index - 1] = totalPct * (firstSize / totalSize);
+          this.ratios[index] = totalPct - this.ratios[index - 1];
+        } else {
+          firstSize = Math.max(0, firstSize);
+          this.ratios[index - 1] = firstSize;
+        }
+        this.ratiosChange.emit([...this.ratios]);
+        this.changeDetector.markForCheck();
       });
   }
 }

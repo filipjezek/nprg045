@@ -9,7 +9,10 @@ export function getSortedStimuli(ads: Ads[]) {
   return stimuli;
 }
 
-export function getValueNames(ads: PerNeuronValue[], stimulus: string) {
+export function getValueNames(
+  ads: PerNeuronValue[],
+  stimulus: Record<string, any>
+) {
   return new Set(
     ads
       .filter((a) => a.stimulus === stimulus || a.stimulus === null)

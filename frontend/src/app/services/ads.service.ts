@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Ads, AdsIdentifier, AdsThumb } from '../store/reducers/ads.reducer';
+import { Ads, AdsIdentifier } from '../store/reducers/ads.reducer';
 import { HttpService } from './http.service';
 
 @Injectable({
@@ -10,8 +10,8 @@ import { HttpService } from './http.service';
 export class AdsService {
   constructor(private http: HttpService) {}
 
-  public loadAds(path: string): Observable<AdsThumb[]> {
-    return this.http.get<AdsThumb[]>(
+  public loadAds(path: string): Observable<Omit<Ads, 'index'>[]> {
+    return this.http.get<Omit<Ads, 'index'>[]>(
       'analysis_ds_list',
       new HttpParams().append('path', path)
     );
@@ -22,12 +22,12 @@ export class AdsService {
     identifier: AdsIdentifier,
     alg: string,
     tags: string[]
-  ): Observable<Ads[]> {
+  ): Observable<Omit<Ads, 'index'>> {
     let params = new HttpParams()
       .append('path', path)
       .append('identifier', identifier)
       .append('algorithm', alg)
       .appendAll({ tags });
-    return this.http.get<Ads[]>('analysis_ds', params);
+    return this.http.get<Omit<Ads, 'index'>>('analysis_ds', params);
   }
 }

@@ -13,7 +13,7 @@ const routes: Routes = [
             (m) => m.ModelPageModule
           ),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'model' },
+      // { path: '', pathMatch: 'full', redirectTo: 'model' },
     ],
   },
   { path: '**', component: NotFoundComponent },

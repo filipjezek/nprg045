@@ -20,28 +20,29 @@ export enum AdsIdentifier {
   Connections = 'Connections',
 }
 
-export interface AdsThumb {
+export interface Ads {
+  index: number;
   identifier: AdsIdentifier;
   algorithm: string;
   tags: string[];
-}
-
-export interface Ads extends AdsThumb {
   neuron: number;
   sheet: string;
-  stimulus: string;
-}
-
-export interface PerNeuronValue extends Ads {
-  values: number[];
-  ids: number[];
+  stimulus: Record<string, any>;
   unit: string;
   valueName: string;
   period: number;
 }
 
+export interface PerNeuronValue extends Ads {
+  values: number[];
+  ids: number[];
+}
+
 export interface State {
-  allAds: AdsThumb[];
+  // ADS will not change until another datastore is loaded
+  // therefore duplicated data between allAds and selectedAds
+  // dont really matter
+  allAds: Ads[];
   selectedAds: Ads[];
 }
 
@@ -59,7 +60,7 @@ export const reducer = createReducer(
   })),
   on(specificAdsLoaded, (state, { ads }) => ({
     ...state,
-    selectedAds: ads,
+    selectedAds: [...state.selectedAds, ads],
   })),
   on(clearSelectedAds, (state) => ({ ...state, selectedAds: [] }))
 );

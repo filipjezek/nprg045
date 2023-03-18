@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+}
+
+.empty {
+  border-bottom: 1px solid var(--secondary-light);
+  margin: auto;
+  width: 20px;
+}

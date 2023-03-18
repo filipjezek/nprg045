@@ -75,7 +75,9 @@ export class AdsEffects {
       distinctUntilKeyChanged('path'),
       switchMap(({ path }) =>
         this.adsS.loadAds(path).pipe(
-          map((ads) => AdsLoaded({ ads })),
+          map((ads) =>
+            AdsLoaded({ ads: ads.map((a, i) => ({ ...a, index: i })) })
+          ),
           catchError((err: HttpErrorResponse) => {
             console.log(err);
             this.toastS.add(new Toast('Failed to load data structures'));
@@ -95,23 +97,27 @@ export class AdsEffects {
               .select((x) => x.ads.allAds)
               .pipe(filter((ads) => ads.length > index))
           ),
-          withLatestFrom(this.store.select((x) => x.ads.allAds[index]))
-        )
-      ),
-      switchMap(([path, thumb]) =>
-        this.adsS
-          .loadSpecificAds(path, thumb.identifier, thumb.algorithm, thumb.tags)
-          .pipe(
-            tap((ads) => this.prepareQueryParams(ads)),
-            map((ads) => {
-              return specificAdsLoaded({ ads });
-            }),
-            catchError((err: HttpErrorResponse) => {
-              console.log(err);
-              this.toastS.add(new Toast('Failed to load data structures'));
-              return of(apiError({ error: err }));
-            })
+          withLatestFrom(this.store.select((x) => x.ads.allAds[index])),
+          switchMap(([path, thumb]) =>
+            this.adsS
+              .loadSpecificAds(
+                path,
+                thumb.identifier,
+                thumb.algorithm,
+                thumb.tags
+              )
+              .pipe(
+                map((ads) => {
+                  return specificAdsLoaded({ ads: { ...ads, index } });
+                }),
+                catchError((err: HttpErrorResponse) => {
+                  console.log(err);
+                  this.toastS.add(new Toast('Failed to load data structures'));
+                  return of(apiError({ error: err }));
+                })
+              )
           )
+        )
       )
     )
   );
@@ -130,36 +136,4 @@ export class AdsEffects {
     private adsS: AdsService,
     private router: Router
   ) {}
-
-  private prepareQueryParams(ads: Ads[]) {
-    if (!ads.length) return;
-    const qParams = this.router.routerState.snapshot.root.queryParams;
-    const newParams: Record<string, string | number> = {};
-    const stimuli = getSortedStimuli(ads);
-    if (
-      (!qParams['stimulus'] || stimuli.length <= +qParams['stimulus']) &&
-      ads.find((a) => a.stimulus !== null)
-    ) {
-      newParams['stimulus'] = 0;
-    }
-    const stimulus =
-      stimuli[
-        'stimulus' in newParams ? +newParams['stimulus'] : +qParams['stimulus']
-      ] || null;
-
-    if (ads[0].identifier === AdsIdentifier.PerNeuronValue) {
-      const valueNames = getValueNames(ads as PerNeuronValue[], stimulus);
-      if (!qParams['valueName'] || !valueNames.has(qParams['valueName'])) {
-        let min: string = undefined;
-        valueNames.forEach((val) => {
-          if (min === undefined || val < min) min = val;
-        });
-        newParams['valueName'] = min;
-      }
-    }
-    this.router.navigate([], {
-      queryParams: newParams,
-      queryParamsHandling: 'merge',
-    });
-  }
 }

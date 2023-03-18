@@ -1,13 +1,16 @@
 <div
-  class="column"
-  [style.flex-basis.%]="ratios[x]"
-  *ngFor="let col of partitions$ | async; index as x; count as width"
+  class="group"
+  [style.flex-basis]="relativeRatios ? ratios[i] + '%' : ratios[i] + 'px'"
+  *ngFor="let col of partitions$ | async; index as i; count as size"
 >
-  <div class="handle" (mousedown)="startDrag($event, x)" *ngIf="x > 0"></div>
+  <div class="handle" (mousedown)="startDrag($event, i)" *ngIf="i > 0"></div>
   <div class="content">
     <ng-container
       [ngTemplateOutlet]="item.content"
       *ngFor="let item of col"
     ></ng-container>
   </div>
+</div>
+<div class="group" *ngIf="!relativeRatios">
+  <div class="handle" (mousedown)="startDrag($event, ratios.length)"></div>
 </div>

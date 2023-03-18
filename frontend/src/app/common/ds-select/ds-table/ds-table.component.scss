@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  box-shadow: 0 0 2px #00000078;
+  background-color: white;
+  font-size: 0.9em;
+}
+
+.header {
+  font-weight: bold;
+  color: var(--secondary-dark-text);
+  background-color: var(--secondary-dark);
+}
+.row {
+  padding: 0 10px;
+}
+
+.table-body {
+  .row:nth-child(even) {
+    background-color: #eee;
+  }
+
+  mozaik-cell-generic,
+  mozaik-cell-object,
+  mozaik-cell-list,
+  mozaik-cell-link,
+  mozaik-cell-keyvalue,
+  mozaik-cell-empty {
+    margin: auto 0;
+    overflow-y: auto;
+  }
+}

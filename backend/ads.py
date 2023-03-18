@@ -1,10 +1,9 @@
 from enum import Enum
-from typing import List, TypedDict, cast, Any
-import json
+from typing import List, TypedDict, cast, Any, Dict
 from .model import load_datastore
-import numpy as np
 import math
 import quantities
+import ast
 
 
 class AdsIdentifier(Enum):
@@ -19,37 +18,32 @@ class AdsIdentifier(Enum):
     Connections = 'Connections'
 
 
-class AdsThumbnail(TypedDict):
+class Ads(TypedDict):
     identifier: str
     algorithm: str
     tags: List[str]
-
-
-class Ads(AdsThumbnail):
-    neuron: int
     sheet: str
-    stimulus: str
+    stimulus: Dict
+    valueName: str
+    period: float
+    neuron: int
+    unit: str
 
 
 class SerializablePerNeuronValue(Ads):
     values: List[float]
-    unit: str
     ids: List[int]
-    valueName: str
-    period: float
 
 
-def get_ads_list(path_to_datastore: str) -> List[AdsThumbnail]:
+def get_ads_list(path_to_datastore: str) -> List[Ads]:
+    order = ['identifier', 'algorithm', 'stimulus',
+             'valueName', 'sheet', 'neuron']
     datastore = load_datastore(path_to_datastore)
-    duplicateless = set(
-        json.dumps({
-            'algorithm': ads.analysis_algorithm,
-            'identifier': ads.identifier,
-            'tags': list(sorted(ads.tags))
-        }) for ads in datastore.analysis_results
-        if ads.identifier != AdsIdentifier.Connections.value
-    )
-    return [json.loads(s) for s in sorted(duplicateless)]
+    return list(sorted(
+        (__get_ads_base(ads) for ads in datastore.analysis_results),
+        key=lambda d: tuple(str(d[key]) if key ==
+                            'stimulus' else d[key] or '' for key in order)
+    ))
 
 
 def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[SerializablePerNeuronValue]:
@@ -61,15 +55,21 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kw
     ))
 
     return [cast(SerializablePerNeuronValue, {
-        'identifier': AdsIdentifier.PerNeuronValue.value,
-        'algorithm': alg,
-        'tags': tags,
-        'neuron': int(a.neuron) if a.neuron else None,
-        'sheet': a.sheet_name,
-        'stimulus': a.stimulus_id,
         'ids': [int(id) for id in a.ids],
-        'period': float(a.period) if a.period else None,
-        'unit': '' if a.value_units is None or a.value_units is quantities.unitquantity.Dimensionless else a.value_units.dimensionality.unicode,
-        'valueName': a.value_name,
-        'values': [None if math.isnan(i) else i for i in a.values.tolist()]
+        'values': [None if math.isnan(i) else i for i in a.values.tolist()],
+        **__get_ads_base(a)
     }) for a in ads]
+
+
+def __get_ads_base(ads: Any) -> Ads:
+    return cast(Ads, {
+        'algorithm': ads.analysis_algorithm,
+        'identifier': ads.identifier,
+        'tags': list(sorted(ads.tags)),
+        'neuron': int(ads.neuron) if ads.neuron else None,
+        'sheet': ads.sheet_name,
+        'stimulus': ads.stimulus_id and ast.literal_eval(ads.stimulus_id),
+        'period': float(ads.period) if ads.period else None,
+        'unit': '' if ads.value_units is None or ads.value_units is quantities.unitquantity.Dimensionless else ads.value_units.dimensionality.unicode,
+        'valueName': ads.value_name,
+    })
