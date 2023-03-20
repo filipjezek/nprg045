@@ -1,0 +1,53 @@
+<h1>SQL Help</h1>
+<article>
+  <section class="alasql">
+    <p>
+      The analysis data structure list is backed by
+      <a href="https://github.com/AlaSQL/alasql">AlaSQL</a>. It supports
+      <a href="https://github.com/alasql/alasql/wiki/Supported-SQL-statements"
+        >most of the SQL-99 language</a
+      >,
+      <a href="https://github.com/AlaSQL/alasql/wiki/JSON">JS object queries</a
+      >, as well as
+      <a href="https://github.com/AlaSQL/alasql/wiki/GRAPH">graph queries</a>.
+    </p>
+    <p>
+      Also see known
+      <a href="https://github.com/AlaSQL/alasql#limitations">limitations</a>.
+    </p>
+    <p>
+      The data is loaded into <code class="table-name">data</code> table. Feel
+      free to create other utility tables, but keep in mind that they will not
+      survive page reload (unless you connect them to
+      <a href="https://github.com/AlaSQL/alasql#localstorage-and-dom-storage"
+        >local storage</a
+      >
+      or
+      <a href="https://github.com/AlaSQL/alasql/wiki/IndexedDB">IndexedDB</a>).
+    </p>
+  </section>
+  <section class="functions">
+    <h2>Special functions</h2>
+    <ul>
+      <li>
+        <code class="fn-name">MAKE_LINK(value)</code> accepts index of a data
+        structure and is displayed as a clickable link in the result table.
+      </li>
+      <li>
+        <code class="fn-name">MAKE_DIFF(value)</code> hides common properties
+        from objects and returns only differing fields.
+      </li>
+    </ul>
+  </section>
+  <section class="editor">
+    <h2>Editor</h2>
+    <p>
+      The autocompletion and syntax highlighting is based on the SQL-99 standard
+      (plus AlaSQL functions), but might differ in some details. The pretty
+      printing feature does not play nice with JSON literals.
+    </p>
+  </section>
+</article>
+<div class="actions">
+  <mozaik-button (click)="close.emit()">Close</mozaik-button>
+</div>

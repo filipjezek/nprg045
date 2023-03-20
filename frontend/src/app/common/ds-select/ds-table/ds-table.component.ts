@@ -1,5 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { isEqual } from 'lodash-es';
+import { LinkWrapper } from '../user-sql-functions/make-link';
+import {
+  CellGenericComponent,
+  DSCell,
+  DSCELL_VAL,
+} from './cell-generic/cell-generic.component';
+import { CellKeyvalueComponent } from './cell-keyvalue/cell-keyvalue.component';
+import { CellLinkComponent } from './cell-link/cell-link.component';
+import { CellListComponent } from './cell-list/cell-list.component';
+import { CellObjectComponent } from './cell-object/cell-object.component';
 
 enum ColType {
   string,
@@ -17,6 +28,7 @@ enum ColType {
   styleUrls: ['./ds-table.component.scss'],
 })
 export class DsTableComponent implements OnInit {
+  @Input() rowHeight: number = 45;
   @Input() get src(): Record<string, any>[] {
     return this._src;
   }
@@ -33,16 +45,30 @@ export class DsTableComponent implements OnInit {
       const length = keys.length;
       this.colSizes = Array(length).fill(100 / length);
       this.colSchema = schema;
+      this.page = 1;
+    } else if (val.length != this._src.length) {
+      this.page = 1;
     }
     this._src = val;
   }
-  @Input() rowHeight: number = 40;
+  private _src: Record<string, any>[] = [];
 
   colSizes: number[] = [];
   colSchema: Record<string, ColType>;
-
-  private _src: Record<string, any>[] = [];
   ColType = ColType;
+  cellTypes: Record<ColType, new (...args: any) => DSCell<any>> = {
+    [ColType.array]: CellListComponent,
+    [ColType.boolean]: CellGenericComponent,
+    [ColType.keyvalue]: CellKeyvalueComponent,
+    [ColType.link]: CellLinkComponent,
+    [ColType.number]: CellGenericComponent,
+    [ColType.object]: CellObjectComponent,
+    [ColType.string]: CellGenericComponent,
+  };
+
+  clampRowsControl = new FormControl<boolean>(false);
+  pageSizeControl = new FormControl<number>(20, { updateOn: 'blur' });
+  page = 1;
 
   constructor() {}
 
@@ -66,6 +92,9 @@ export class DsTableComponent implements OnInit {
     if (value instanceof Array) {
       return ColType.array;
     }
+    if (value instanceof LinkWrapper) {
+      return ColType.link;
+    }
     if (Object.values(value).every((val) => this.isPrimitive(val))) {
       return ColType.keyvalue;
     }
@@ -77,7 +106,7 @@ export class DsTableComponent implements OnInit {
     const schema: Record<string, ColType> = {};
     for (let i = 0; i < values.length && notFound.size; ++i) {
       notFound.forEach((key) => {
-        if (values[i][key] !== null) {
+        if (values[i][key] !== null && values[i][key] !== undefined) {
           schema[key] = this.getColType(values[i][key]);
           notFound.delete(key);
         }
@@ -85,5 +114,15 @@ export class DsTableComponent implements OnInit {
     }
     notFound.forEach((key) => (schema[key] = ColType.object));
     return schema;
+  }
+
+  ceil(num: number) {
+    return Math.ceil(num);
+  }
+
+  getInjector(value: any) {
+    return Injector.create({
+      providers: [{ provide: DSCELL_VAL, useValue: value }],
+    });
   }
 }

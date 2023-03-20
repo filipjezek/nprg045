@@ -1,0 +1,10 @@
+<input
+  [type]="type"
+  maxlength="200"
+  [autocomplete]="autocomplete"
+  [placeholder]="placeholder"
+  [formControl]="control"
+  (blur)="readonly ? null : onTouched()"
+  (input)="onChange(value)"
+  [readonly]="readonly"
+/>

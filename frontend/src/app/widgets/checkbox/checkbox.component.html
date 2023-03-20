@@ -1,0 +1,16 @@
+<label (mousedown)="changeState()">
+  <ng-content></ng-content>
+  <div
+    [tabindex]="tabindex"
+    [@splash]="checkboxState"
+    class="box {{ checkboxState }}"
+  >
+    <span class="splash"></span><span class="check"></span>
+    <input
+      type="checkbox"
+      [formControl]="control"
+      (blur)="onTouched()"
+      (change)="onChange(value)"
+    />
+  </div>
+</label>

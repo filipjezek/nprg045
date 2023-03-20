@@ -1,6 +1,6 @@
 <div
   class="item"
-  *ngFor="let item of values | keyvalue"
+  *ngFor="let item of value | keyvalue"
   [style.border-color]="colorFromString | purefn : item.key"
 >
   <span class="key">{{ item.key }}:</span

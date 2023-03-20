@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  margin-bottom: 10px;
+
+  .editor-container {
+    background-color: white;
+    box-shadow: 0 0 2px #00000078;
+    flex-grow: 1;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    align-self: flex-end;
+    margin-left: 10px;
+
+    mozaik-button {
+      margin-top: 5px;
+    }
+  }
+}

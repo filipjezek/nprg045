@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  background-color: var(--background);
+  color: var(--background-text);
+  box-shadow: 0 0 3px 0px #00000078;
+  min-width: 400px;
+  width: 40%;
+  max-width: 750px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 15px 40px;
+
+  h1 {
+    font-size: 1.4em;
+  }
+  h2 {
+    font-size: 1.1em;
+  }
+  a {
+    color: var(--primary);
+  }
+  code {
+    font-size: 1.2em;
+    background-color: #f2ebda;
+  }
+}
+
+.actions {
+  text-align: right;
+  margin-top: 18px;
+
+  .close {
+    border: 0;
+    background-color: transparent;
+    font-size: 1em;
+    cursor: pointer;
+    color: var(--background-text);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  text-align: center;
+}
+
+a,
+button,
+span {
+  margin: 4px;
+  display: inline-block;
+  border-radius: 4px;
+  padding: 3px;
+  font-size: 0.9em;
+  min-width: 24px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+a,
+button {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+  &.current {
+    box-shadow: 0 0 2px #00000078;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    text-decoration: none;
+  }
+}
+
+span {
+  cursor: default;
+  opacity: 0.5;
+}

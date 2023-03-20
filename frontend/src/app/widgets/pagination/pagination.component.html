@@ -1,0 +1,111 @@
+<ng-container *ngIf="current === 1; else linksLeft">
+  <span class="double">&#x276E;&#x276E;</span>
+  <span>&#x276E;</span>
+</ng-container>
+<ng-template #linksLeft>
+  <ng-container *ngIf="baseParam; else leftWithHref">
+    <a
+      [routerLink]="[baseUrl, setParam()]"
+      class="double"
+      (click)="onNavigate(1)"
+      >&#x276E;&#x276E;</a
+    >
+    <a
+      [routerLink]="[baseUrl, setParam(current - 1)]"
+      (click)="onNavigate(current - 1)"
+      >&#x276E;</a
+    >
+  </ng-container>
+  <ng-template #leftWithHref>
+    <ng-container *ngIf="baseUrl; else leftButtons">
+      <a
+        [routerLink]="[baseUrl, urlParams]"
+        class="double"
+        (click)="onNavigate(1)"
+        >&#x276E;&#x276E;</a
+      >
+      <a
+        [routerLink]="[baseUrl, current - 1, urlParams]"
+        (click)="onNavigate(current - 1)"
+        >&#x276E;</a
+      >
+    </ng-container>
+    <ng-template #leftButtons>
+      <button class="double" (click)="onNavigate(1)">&#x276E;&#x276E;</button>
+      <button (click)="onNavigate(current - 1)">&#x276E;</button>
+    </ng-template>
+  </ng-template>
+</ng-template>
+
+<ng-container *ngIf="baseParam; else middleWithHref">
+  <a
+    [routerLink]="
+      page === 1 ? [baseUrl, setParam()] : [baseUrl, setParam(page)]
+    "
+    [class.current]="current === page"
+    *ngFor="let page of links"
+    (click)="onNavigate(page)"
+    >{{ page }}</a
+  >
+</ng-container>
+<ng-template #middleWithHref>
+  <ng-container *ngIf="baseUrl; else middleButtons">
+    <a
+      [routerLink]="
+        page === 1 ? [baseUrl, urlParams] : [baseUrl, page, urlParams]
+      "
+      [class.current]="current === page"
+      *ngFor="let page of links"
+      (click)="onNavigate(page)"
+      >{{ page }}</a
+    >
+  </ng-container>
+  <ng-template #middleButtons>
+    <button
+      [class.current]="current === page"
+      *ngFor="let page of links"
+      (click)="onNavigate(page)"
+    >
+      {{ page }}
+    </button>
+  </ng-template>
+</ng-template>
+
+<ng-container *ngIf="current >= max; else linksRight">
+  <span>&#x276F;</span>
+  <span class="double">&#x276F;&#x276F;</span>
+</ng-container>
+<ng-template #linksRight>
+  <ng-container *ngIf="baseParam; else rightWithHref">
+    <a
+      [routerLink]="[baseUrl, setParam(current + 1)]"
+      (click)="onNavigate(current + 1)"
+      >&#x276F;</a
+    >
+    <a
+      [routerLink]="[baseUrl, setParam(max)]"
+      class="double"
+      (click)="onNavigate(max)"
+      >&#x276F;&#x276F;</a
+    >
+  </ng-container>
+  <ng-template #rightWithHref>
+    <ng-container *ngIf="baseUrl; else rightButtons">
+      <a
+        [routerLink]="[baseUrl, current + 1, urlParams]"
+        (click)="onNavigate(current + 1)"
+        >&#x276F;</a
+      >
+      <a
+        [routerLink]="[baseUrl, max, urlParams]"
+        class="double"
+        (click)="onNavigate(max)"
+        >&#x276F;&#x276F;</a
+      >
+    </ng-container>
+    <ng-template #rightButtons>
+      <button (click)="onNavigate(current + 1)">&#x276F;</button>
+      <button class="double" (click)="onNavigate(max)">&#x276F;&#x276F;</button>
+    </ng-template>
+  </ng-template>
+</ng-template>

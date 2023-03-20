@@ -1,0 +1,65 @@
+<ng-container
+  *ngIf="link; then linkTemplate; else buttonTemplate"
+></ng-container>
+
+<ng-template #buttonTemplate>
+  <button
+    #button
+    (click)="onClick($event)"
+    [ngStyle]="styles"
+    [type]="type"
+    [disabled]="disabled"
+  >
+    <fa-icon [icon]="faCircleNotch" [spin]="true" *ngIf="loading"></fa-icon>
+    <ng-container *ngTemplateOutlet="tempOutlet"></ng-container>
+    <span
+      class="ripple"
+      *ngIf="active"
+      #ripple
+      [@rippleEffect]="{
+        value: true,
+        params: {
+          rippleSize: rippleSize,
+          rippleX: rippleX,
+          rippleY: rippleY,
+          endLeft: rippleX - rippleSize / 2,
+          endTop: rippleY - rippleSize / 2
+        }
+      }"
+    >
+    </span>
+  </button>
+</ng-template>
+
+<ng-template #linkTemplate>
+  <a
+    #button
+    (click)="onClick($event)"
+    [ngStyle]="styles"
+    [attr.disabled]="disabled"
+    [routerLink]="link"
+  >
+    <fa-icon [icon]="faCircleNotch" [spin]="true" *ngIf="loading"></fa-icon>
+    <ng-container *ngTemplateOutlet="tempOutlet"></ng-container>
+    <span
+      class="ripple"
+      *ngIf="active"
+      #ripple
+      [@rippleEffect]="{
+        value: true,
+        params: {
+          rippleSize: rippleSize,
+          rippleX: rippleX,
+          rippleY: rippleY,
+          endLeft: rippleX - rippleSize / 2,
+          endTop: rippleY - rippleSize / 2
+        }
+      }"
+    >
+    </span>
+  </a>
+</ng-template>
+
+<ng-template #tempOutlet>
+  <ng-content></ng-content>
+</ng-template>

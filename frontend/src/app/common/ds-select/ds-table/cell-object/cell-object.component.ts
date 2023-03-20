@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  Input,
+  OnInit,
+} from '@angular/core';
+import { DSCell, DSCELL_VAL } from '../cell-generic/cell-generic.component';
 
 @Component({
   selector: 'mozaik-cell-object',
@@ -6,8 +13,8 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   styleUrls: ['./cell-object.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CellObjectComponent implements OnInit {
-  constructor() {}
+export class CellObjectComponent implements OnInit, DSCell<any> {
+  constructor(@Inject(DSCELL_VAL) public value: any) {}
 
   ngOnInit(): void {}
 }

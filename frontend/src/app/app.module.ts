@@ -36,10 +36,13 @@ import { CellObjectComponent } from './common/ds-select/ds-table/cell-object/cel
 import { CellLinkComponent } from './common/ds-select/ds-table/cell-link/cell-link.component';
 import { CellKeyvalueComponent } from './common/ds-select/ds-table/cell-keyvalue/cell-keyvalue.component';
 import { CellListComponent } from './common/ds-select/ds-table/cell-list/cell-list.component';
+import { SqlEditorComponent } from './common/ds-select/sql-editor/sql-editor.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SqlHelpComponent } from './common/ds-select/sql-editor/sql-help/sql-help.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
-})[] = [NetworkTrackerComponent];
+})[] = [NetworkTrackerComponent, SqlHelpComponent];
 
 @NgModule({
   declarations: [
@@ -60,6 +63,8 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     CellLinkComponent,
     CellKeyvalueComponent,
     CellListComponent,
+    SqlEditorComponent,
+    SqlHelpComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,6 +99,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     FontAwesomeModule,
     BrowserAnimationsModule,
     StoreRouterConnectingModule.forRoot(),
+    ReactiveFormsModule,
     WidgetsModule,
   ],
   providers: [

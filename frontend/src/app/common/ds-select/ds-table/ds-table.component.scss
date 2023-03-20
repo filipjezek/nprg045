@@ -1,14 +1,30 @@
 :host {
   display: block;
+}
+
+.settings {
+  padding: 10px;
+  text-align: right;
+}
+
+.table,
+.no-results {
   box-shadow: 0 0 2px #00000078;
   background-color: white;
   font-size: 0.9em;
+}
+
+.no-results {
+  font-style: italic;
+  padding: 10px;
 }
 
 .header {
   font-weight: bold;
   color: var(--secondary-dark-text);
   background-color: var(--secondary-dark);
+  position: sticky;
+  top: 0;
 }
 .row {
   padding: 0 10px;
@@ -27,5 +43,22 @@
   mozaik-cell-empty {
     margin: auto 0;
     overflow-y: auto;
+  }
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 25px 20px 15px;
+
+  label {
+    margin-right: 30px;
+    font-size: 0.9em;
+
+    mozaik-input {
+      width: 50px;
+      font-size: 1.1em;
+    }
   }
 }

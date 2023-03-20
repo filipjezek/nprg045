@@ -1,3 +1,9 @@
 <h1>{{ path$ | async }}</h1>
 
+<mozaik-sql-editor
+  [content]="querySubj.value"
+  (query)="querySubj.next($event)"
+  (error)="error = $event"
+></mozaik-sql-editor>
+<pre class="error-container" *ngIf="error">{{ error }}</pre>
 <mozaik-ds-table [src]="sqlres$ | async"></mozaik-ds-table>

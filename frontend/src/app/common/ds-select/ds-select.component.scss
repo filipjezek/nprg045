@@ -5,3 +5,10 @@
 h1 {
   font-size: 1em;
 }
+
+.error-container {
+  background-color: rgb(255, 184, 184);
+  box-shadow: 0 0 2px #00000078;
+  padding: 10px;
+  white-space: pre-line;
+}

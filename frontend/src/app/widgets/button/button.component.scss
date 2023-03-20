@@ -1,0 +1,62 @@
+:host {
+  display: inline-block;
+
+  &.loading button,
+  &.loading a {
+    padding-left: calc(1.4em - 3px);
+    padding-right: 3px;
+  }
+}
+button,
+a {
+  line-height: normal;
+  vertical-align: middle;
+  text-decoration: none;
+  font-weight: normal;
+  font-size: 1em;
+  border: 0;
+  color: var(--secondary-dark-text);
+  background-color: var(--secondary-dark);
+  padding: 6px 0.7em;
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px 0px #00000078;
+  transition: background-color 0.2s ease-in-out, padding-left 0.1s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+
+  & > fa-icon {
+    font-size: 0.85em;
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+:host:not(.loading) button:not(:disabled):hover,
+:host:not(.loading) a:not(:disabled):hover {
+  background-color: var(--secondary);
+  color: var(--secondary-text);
+}
+button:disabled,
+:host.loading button,
+a:disabled,
+:host.loading a {
+  cursor: default;
+  background-color: #8f8f8f;
+  box-shadow: none;
+}
+.ripple {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 0;
+  display: block;
+}
+button:focus,
+a:focus {
+  outline: rgb(158, 213, 250);
+}

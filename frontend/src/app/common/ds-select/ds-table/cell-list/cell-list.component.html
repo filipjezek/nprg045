@@ -1,3 +1,3 @@
-<div class="item" [class.object]="isObject(item)" *ngFor="let item of values">
+<div class="item" [class.object]="isObject(item)" *ngFor="let item of value">
   {{ isObject(item) ? (item | json) : item }}
 </div>

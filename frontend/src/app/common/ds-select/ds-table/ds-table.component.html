@@ -1,3 +1,8 @@
+<div class="settings">
+  <mozaik-checkbox [formControl]="clampRowsControl"
+    >Fixed height rows</mozaik-checkbox
+  >
+</div>
 <div class="no-results" *ngIf="!src?.length; else table">No results</div>
 <ng-template #table>
   <div class="table">
@@ -6,52 +11,59 @@
         <mozaik-multiview-partition
           *ngFor="let item of src[0] | keyvaluenosort"
         >
-          <mozaik-cell-generic>
-            {{ item.key }}
-          </mozaik-cell-generic>
+          <mozaik-cell-generic [value]="item.key"> </mozaik-cell-generic>
         </mozaik-multiview-partition>
       </mozaik-multiview>
     </div>
     <div class="table-body">
-      <div
-        class="row"
-        *ngFor="let row of src"
-        [style.height.px]="rowHeight"
-        #rowEl
-      >
-        <mozaik-multiview [(ratios)]="colSizes">
-          <mozaik-multiview-partition *ngFor="let item of row | keyvaluenosort">
-            <ng-container
-              *ngIf="item.value === null || item.value === ''; else cell"
-              ><mozaik-cell-empty></mozaik-cell-empty>
-            </ng-container>
-            <ng-template #cell>
-              <ng-container [ngSwitch]="colSchema[item.key]">
-                <mozaik-cell-object *ngSwitchCase="ColType.object">{{
-                  item.value | json
-                }}</mozaik-cell-object>
-                <ng-container *ngSwitchCase="ColType.array">
-                  <mozaik-cell-empty *ngIf="item.value.length == 0; else list">
-                  </mozaik-cell-empty>
-                  <ng-template #list>
-                    <mozaik-cell-list [values]="item.value"></mozaik-cell-list>
-                  </ng-template>
-                </ng-container>
-                <mozaik-cell-keyvalue
-                  [values]="item.value"
-                  *ngSwitchCase="ColType.keyvalue"
-                ></mozaik-cell-keyvalue>
-                <mozaik-cell-link
-                  *ngSwitchCase="ColType.link"
-                ></mozaik-cell-link>
-                <mozaik-cell-generic *ngSwitchDefault>{{
-                  item.value
-                }}</mozaik-cell-generic>
+      <ng-container *ngFor="let row of src; index as i">
+        <div
+          class="row"
+          [style.height.px]="clampRowsControl.value ? rowHeight : null"
+          *ngIf="
+            i >= (page - 1) * pageSizeControl.value &&
+            i < page * pageSizeControl.value
+          "
+        >
+          <mozaik-multiview [(ratios)]="colSizes">
+            <mozaik-multiview-partition
+              *ngFor="let item of row | keyvaluenosort"
+            >
+              <ng-container
+                *ngIf="
+                  item.value === null ||
+                    item.value === '' ||
+                    item.value === undefined;
+                  else cell
+                "
+                ><mozaik-cell-empty></mozaik-cell-empty>
               </ng-container>
-            </ng-template>
-          </mozaik-multiview-partition>
-        </mozaik-multiview>
-      </div>
+              <ng-template #cell>
+                <ng-template
+                  *ngComponentOutlet="
+                    cellTypes[colSchema[item.key]];
+                    injector: getInjector | purefn : item.value
+                  "
+                ></ng-template>
+              </ng-template>
+            </mozaik-multiview-partition>
+          </mozaik-multiview>
+        </div>
+      </ng-container>
     </div>
+  </div>
+  <div class="pagination-container">
+    <label
+      >Page size
+      <mozaik-input
+        [formControl]="pageSizeControl"
+        type="number"
+      ></mozaik-input>
+    </label>
+    <mozaik-pagination
+      [current]="page"
+      [max]="ceil | purefn : src.length / pageSizeControl.value"
+      (paginate)="page = $event"
+    ></mozaik-pagination>
   </div>
 </ng-template>
