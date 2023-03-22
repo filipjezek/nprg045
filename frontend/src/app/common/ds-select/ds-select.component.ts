@@ -12,6 +12,8 @@ import { State } from 'src/app/store/reducers/';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 import alasql from 'alasql';
 import { makeLink } from './user-sql-functions/make-link';
+import { subtract } from './user-sql-functions/subtract';
+import { makeIntersection } from './user-sql-functions/make-intersection';
 
 @Component({
   selector: 'mozaik-ds-select',
@@ -48,8 +50,9 @@ export class DsSelectComponent implements OnInit {
       )
     ),
     combineLatestWith(this.querySubj),
-    tap(([_, query]) => console.log(alasql.parse(query))),
+    // tap(([_, query]) => console.log(alasql.parse(query))),
     map(([data, query]) => alasql(query)),
+    tap(console.log),
     retry({
       delay: (error) => {
         this.error = error;
@@ -69,5 +72,7 @@ export class DsSelectComponent implements OnInit {
 
   private addUserFunctions() {
     alasql.fn['MAKE_LINK'] = makeLink;
+    alasql.fn['SUBTRACT'] = subtract;
+    alasql.aggr['MAKE_INTERSECTION'] = makeIntersection;
   }
 }
