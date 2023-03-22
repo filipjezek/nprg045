@@ -48,6 +48,7 @@ export class DsSelectComponent implements OnInit {
       )
     ),
     combineLatestWith(this.querySubj),
+    tap(([_, query]) => console.log(alasql.parse(query))),
     map(([data, query]) => alasql(query)),
     retry({
       delay: (error) => {

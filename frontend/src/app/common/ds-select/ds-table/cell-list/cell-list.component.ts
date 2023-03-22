@@ -19,6 +19,6 @@ export class CellListComponent implements OnInit, DSCell<any[]> {
   ngOnInit(): void {}
 
   isObject(value: any) {
-    return typeof value === 'object' || value === undefined;
+    return typeof value === 'object' || value === undefined || value === null;
   }
 }

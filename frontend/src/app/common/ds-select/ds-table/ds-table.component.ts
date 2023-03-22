@@ -1,6 +1,7 @@
 import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { isEqual } from 'lodash-es';
+import { isPrimitive } from 'src/app/utils/is-primitive';
 import { LinkWrapper } from '../user-sql-functions/make-link';
 import {
   CellGenericComponent,
@@ -74,10 +75,6 @@ export class DsTableComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  private isPrimitive(value: any) {
-    return !value || ['number', 'string', 'boolean'].includes(typeof value);
-  }
-
   private getColType(value: any) {
     switch (typeof value) {
       case 'boolean':
@@ -95,7 +92,7 @@ export class DsTableComponent implements OnInit {
     if (value instanceof LinkWrapper) {
       return ColType.link;
     }
-    if (Object.values(value).every((val) => this.isPrimitive(val))) {
+    if (Object.values(value).every((val) => isPrimitive(val))) {
       return ColType.keyvalue;
     }
     return ColType.object;
