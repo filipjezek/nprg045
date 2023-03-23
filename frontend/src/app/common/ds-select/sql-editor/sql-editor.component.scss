@@ -6,6 +6,7 @@
     background-color: white;
     box-shadow: 0 0 2px #00000078;
     flex-grow: 1;
+    max-width: calc(100% - 88px);
   }
 
   .buttons {
@@ -14,6 +15,7 @@
     flex-direction: column;
     align-self: flex-end;
     margin-left: 10px;
+    flex-shrink: 0;
 
     mozaik-button {
       margin-top: 5px;

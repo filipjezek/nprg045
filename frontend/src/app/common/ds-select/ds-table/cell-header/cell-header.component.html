@@ -1,0 +1,16 @@
+<div class="sort" (click)="sortData()">
+  <ng-container *ngIf="(sort$ | async)?.key == key; else unsorted">
+    <fa-icon
+      [icon]="faSortUp"
+      *ngIf="(sort$ | async)?.asc; else sortDesc"
+    ></fa-icon>
+    <ng-template #sortDesc>
+      <fa-icon [icon]="faSortDown"></fa-icon>
+    </ng-template>
+  </ng-container>
+  <ng-template #unsorted>
+    <fa-icon [icon]="faSort" class="unsorted"></fa-icon>
+  </ng-template>
+
+  <div class="key">{{ key }}</div>
+</div>

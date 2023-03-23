@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { isEqual } from 'lodash-es';
 import { isPrimitive } from 'src/app/utils/is-primitive';
-import { LinkWrapper } from '../user-sql-functions/make-link';
+import { LinkWrapper } from '../sql/user-sql-functions/make-link';
 import {
   CellGenericComponent,
   DSCell,
@@ -121,5 +121,15 @@ export class DsTableComponent implements OnInit {
     return Injector.create({
       providers: [{ provide: DSCELL_VAL, useValue: value }],
     });
+  }
+
+  isEmpty(val: any) {
+    return (
+      val === null ||
+      val === '' ||
+      val === undefined ||
+      isEqual(val, []) ||
+      isEqual(val, {})
+    );
   }
 }

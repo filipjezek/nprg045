@@ -1,0 +1,27 @@
+:host {
+  overflow-x: auto;
+
+  fa-icon {
+    margin-right: 8px;
+
+    &.unsorted {
+      visibility: hidden;
+    }
+  }
+
+  .sort {
+    padding: 12px 5px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      .key {
+        text-decoration: underline;
+      }
+      .unsorted {
+        visibility: visible;
+      }
+    }
+  }
+}

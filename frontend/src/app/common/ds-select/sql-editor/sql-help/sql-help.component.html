@@ -16,8 +16,8 @@
       <a href="https://github.com/AlaSQL/alasql#limitations">limitations</a>.
     </p>
     <p>
-      The data is loaded into <code class="table-name">data</code> table. Feel
-      free to create other utility tables, but keep in mind that they will not
+      The data is loaded into <code class="table">data</code> table. Feel free
+      to create other utility tables, but keep in mind that they will not
       survive page reload (unless you connect them to
       <a href="https://github.com/AlaSQL/alasql#localstorage-and-dom-storage"
         >local storage</a
@@ -25,19 +25,11 @@
       or
       <a href="https://github.com/AlaSQL/alasql/wiki/IndexedDB">IndexedDB</a>).
     </p>
-  </section>
-  <section class="functions">
-    <h2>Special functions</h2>
-    <ul>
-      <li>
-        <code class="fn-name">MAKE_LINK(value)</code> accepts index of a data
-        structure and is displayed as a clickable link in the result table.
-      </li>
-      <li>
-        <code class="fn-name">MAKE_DIFF(value)</code> hides common properties
-        from objects and returns only differing fields.
-      </li>
-    </ul>
+    <p>
+      Please note that equality comparison of JSON objects and arrays is wildly
+      unpredictable, so a better option is to compare
+      <code class="fn">JSON_STRINGIFY</code>-ied values
+    </p>
   </section>
   <section class="editor">
     <h2>Editor</h2>
@@ -46,6 +38,140 @@
       (plus AlaSQL functions), but might differ in some details. The pretty
       printing feature does not play nice with JSON literals.
     </p>
+  </section>
+  <section class="functions">
+    <h2>Special functions</h2>
+    <ul>
+      <li>
+        <code><span class="fn">MAKE_LINK</span>(value)</code> accepts index of a
+        data structure and is displayed as a clickable link in the result table.
+      </li>
+      <li>
+        <code><span class="fn">JSON_STRINGIFY</span>(value)</code> converts
+        value to a deterministic JSON string.
+      </li>
+      <li>
+        <code><span class="fn">JSON_PARSE</span>(value)</code> converts a JSON
+        string to a JS object.
+      </li>
+      <li>
+        <code><span class="fn">MAKE_INTERSECTION</span>(value)</code> is an
+        aggregation function. It returns the intersection of the column values.
+        <mozaik-collapsible class="examples">
+          <header slot="header">Examples</header>
+          <pre class="example"><span class="comment"
+>-- data: [
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">2</span>&#125;&#125;,
+-- ]</span>
+
+<span class="keyword">SELECT</span> <span class="fn">MAKE_INTERSECTION</span>(a) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="comment">
+-- returns: [
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>&#125;&#125;,
+-- ]</span>
+</pre>
+          <pre class="example"><span class="comment"
+>-- data: [
+--   &#123;a: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">7</span>]&#125;,
+--   &#123;a: [<span class="number">3</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="number">6</span>]&#125;,
+-- ]</span>
+
+<span class="keyword">SELECT</span> <span class="fn">MAKE_INTERSECTION</span>(a) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="comment">
+-- returns: [
+--   &#123;a: [<span class="number">1</span>, <span class="number">7</span>]&#125;,
+-- ]</span>
+</pre>
+        </mozaik-collapsible>
+      </li>
+      <li>
+        <code><span class="fn">SUBTRACT</span>(minuend, subtrahend)</code>
+        removes from minuend properties with the same name and value both in
+        minuend and subtrahend.
+        <mozaik-collapsible class="examples">
+          <header slot="header">Examples</header>
+          <pre class="example">
+<span class="keyword">SELECT</span> <span class="fn">SUBTRACT</span>(
+  @&#123;foo: <span class="number">1</span>, bar: <span class="number">2</span>, baz: <span class="number">3</span>&#125;,
+  @&#123;foo: <span class="number">2</span>, bar: <span class="number">2</span>, car: <span class="number">3</span>&#125;
+) a
+<span class="comment">
+-- returns: [
+--   &#123;a: &#123;foo: <span class="number">1</span>, baz: <span class="number">3</span>&#125;&#125;,
+-- ]</span>
+</pre>
+          <pre class="example">
+<span class="keyword">SELECT</span> <span class="fn">SUBTRACT</span>(
+  @[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],
+  @[<span class="number">4</span>, <span class="number">3</span>, <span class="number">7</span>]
+) a
+<span class="comment">
+-- returns: [
+--   &#123;a: [<span class="number">1</span>, <span class="number">2</span>]&#125;,
+-- ]</span>
+</pre>
+        </mozaik-collapsible>
+      </li>
+      <li>
+        <code><span class="fn">MAKE_DIFF</span>(value, diffId = 0)</code> hides
+        common properties from objects and returns only differing fields. This
+        happens after the query is executed and results are returned. The diff
+        is scoped to a single column. For more restrictive scoping use custom
+        <code>diffId</code>.
+        <mozaik-collapsible class="examples">
+          <header slot="header">Examples</header>
+          <pre class="example"><span class="comment"
+>-- data: [
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">2</span>&#125;&#125;,
+-- ]</span>
+
+<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="comment">
+-- returns: [
+--   &#123;a: &#123;x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;x: <span class="number">2</span>&#125;&#125;,
+-- ]</span>
+</pre>
+          <pre class="example"><span class="comment"
+>-- data: [
+--   &#123;a: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">7</span>]&#125;,
+--   &#123;a: [<span class="number">3</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="number">6</span>]&#125;,
+-- ]</span>
+
+<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="comment">
+-- returns: [
+--   &#123;a: [<span class="number">2</span>]&#125;,
+--   &#123;a: [<span class="number">3</span>, <span class="number">6</span>]&#125;,
+-- ]</span>
+</pre>
+          <pre class="example"><span class="comment"
+>-- data: [
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'bar'</span>, x: <span class="number">2</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'cow'</span>, x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;foo: <span class="string">'cow'</span>, x: <span class="number">2</span>&#125;&#125;,
+-- ]</span>
+
+<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a, <span class="number">23</span>) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="keyword">WHERE</span> a->foo = <span class="string">'bar'</span>
+<span class="keyword">UNION</span>
+<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a, <span class="number">42</span>) a <span class="keyword">FROM</span> <span class="table">data</span>
+<span class="keyword">WHERE</span> a->foo = <span class="string">'cow'</span>
+<span class="comment">
+-- returns: [
+--   &#123;a: &#123;x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;x: <span class="number">2</span>&#125;&#125;,
+--   &#123;a: &#123;x: <span class="number">1</span>&#125;&#125;,
+--   &#123;a: &#123;x: <span class="number">2</span>&#125;&#125;,
+-- ]</span>
+</pre>
+        </mozaik-collapsible>
+      </li>
+    </ul>
   </section>
 </article>
 <div class="actions">

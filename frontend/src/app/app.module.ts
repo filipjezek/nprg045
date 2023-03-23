@@ -39,6 +39,7 @@ import { CellListComponent } from './common/ds-select/ds-table/cell-list/cell-li
 import { SqlEditorComponent } from './common/ds-select/sql-editor/sql-editor.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SqlHelpComponent } from './common/ds-select/sql-editor/sql-help/sql-help.component';
+import { CellHeaderComponent } from './common/ds-select/ds-table/cell-header/cell-header.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -65,6 +66,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     CellListComponent,
     SqlEditorComponent,
     SqlHelpComponent,
+    CellHeaderComponent,
   ],
   imports: [
     BrowserModule,

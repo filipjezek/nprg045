@@ -1,4 +1,4 @@
-import { difference } from 'lodash-es';
+import { difference, clone } from 'lodash-es';
 import { isPrimitive } from 'src/app/utils/is-primitive';
 
 /**
@@ -17,6 +17,7 @@ export function subtract(a: any, b: any) {
     return difference(a, b);
   }
 
+  a = clone(a); // copy - we don't want to pollute the original data
   for (const bKey in b) {
     if (!Object.prototype.hasOwnProperty.call(b, bKey)) {
       continue;
@@ -29,4 +30,5 @@ export function subtract(a: any, b: any) {
       a[bKey] = keyDiff;
     }
   }
+  return a;
 }

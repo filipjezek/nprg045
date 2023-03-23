@@ -15,7 +15,7 @@ import { Prec } from '@codemirror/state';
 import { sql, SQLDialect } from '@codemirror/lang-sql';
 import {} from '@codemirror/lang-sql/';
 import { Ads } from 'src/app/store/reducers/ads.reducer';
-import { alasqlFunctions, alasqlDialect } from './sql-dialect';
+import { alasqlFunctions, alasqlDialect } from '../sql/sql-dialect';
 import { formatDialect } from 'sql-formatter';
 import { DialogService } from 'src/app/services/dialog.service';
 import { SqlHelpComponent } from './sql-help/sql-help.component';

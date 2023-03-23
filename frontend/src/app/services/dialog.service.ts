@@ -99,7 +99,7 @@ export class DialogService {
     dialogEl.style.transform = 'translate(-50%, -50%)';
     dialogEl.style.top = '50%';
     dialogEl.style.zIndex = overlayZIndex + 1 + '';
-    dialogEl.style.maxHeight = '95%';
+    dialogEl.style.maxHeight = 'calc(95% - 100px)';
     dialogEl.style.overflowY = 'auto';
     dialogEl.style.overflowX = 'hidden';
 

@@ -9,9 +9,9 @@
     <div class="row header">
       <mozaik-multiview [(ratios)]="colSizes">
         <mozaik-multiview-partition
-          *ngFor="let item of src[0] | keyvaluenosort"
+          *ngFor="let item of colSchema | keyvaluenosort"
         >
-          <mozaik-cell-generic [value]="item.key"> </mozaik-cell-generic>
+          <mozaik-cell-header [key]="item.key"></mozaik-cell-header>
         </mozaik-multiview-partition>
       </mozaik-multiview>
     </div>
@@ -27,22 +27,16 @@
         >
           <mozaik-multiview [(ratios)]="colSizes">
             <mozaik-multiview-partition
-              *ngFor="let item of row | keyvaluenosort"
+              *ngFor="let item of colSchema | keyvaluenosort"
             >
-              <ng-container
-                *ngIf="
-                  item.value === null ||
-                    item.value === '' ||
-                    item.value === undefined;
-                  else cell
-                "
+              <ng-container *ngIf="isEmpty | purefn : row[item.key]; else cell"
                 ><mozaik-cell-empty></mozaik-cell-empty>
               </ng-container>
               <ng-template #cell>
                 <ng-template
                   *ngComponentOutlet="
-                    cellTypes[colSchema[item.key]];
-                    injector: getInjector | purefn : item.value
+                    cellTypes[item.value];
+                    injector: getInjector | purefn : row[item.key]
                   "
                 ></ng-template>
               </ng-template>

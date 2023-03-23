@@ -21,7 +21,6 @@
   }
   code {
     font-size: 1.2em;
-    background-color: #f2ebda;
   }
 }
 
@@ -40,4 +39,36 @@
       text-decoration: underline;
     }
   }
+}
+
+code,
+code span,
+pre span {
+  &.fn,
+  &.table,
+  &.keyword {
+    color: #708;
+  }
+  &.number {
+    color: #164;
+  }
+  &.string {
+    color: #a11;
+  }
+
+  &.comment {
+    color: #666;
+  }
+}
+
+.example {
+  box-shadow: 0 0px 3px #00000078;
+  padding: 12px;
+  background: white;
+}
+
+.examples header {
+  margin: 10px 0;
+  font-size: 1.1em;
+  color: var(--primary-dark);
 }

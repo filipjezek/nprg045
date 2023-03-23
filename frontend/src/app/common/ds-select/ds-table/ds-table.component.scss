@@ -35,14 +35,16 @@
     background-color: #eee;
   }
 
-  mozaik-cell-generic,
-  mozaik-cell-object,
-  mozaik-cell-list,
-  mozaik-cell-link,
-  mozaik-cell-keyvalue,
-  mozaik-cell-empty {
-    margin: auto 0;
-    overflow-y: auto;
+  .row ::ng-deep {
+    mozaik-cell-generic,
+    mozaik-cell-object,
+    mozaik-cell-list,
+    mozaik-cell-link,
+    mozaik-cell-keyvalue,
+    mozaik-cell-empty {
+      margin: auto 0;
+      overflow-y: auto;
+    }
   }
 }
 

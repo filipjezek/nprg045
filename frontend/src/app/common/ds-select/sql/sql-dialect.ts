@@ -10,8 +10,11 @@ export const alasqlFunctions = Array.from(
 
     // user defined
     'MAKE_LINK',
-    'MAKE_INTERSECTION',
+    'JSON_STRINGIFY',
+    'JSON_PARSE',
     'SUBTRACT',
+    'MAKE_INTERSECTION',
+    'MAKE_DIFF',
   ])
 );
 

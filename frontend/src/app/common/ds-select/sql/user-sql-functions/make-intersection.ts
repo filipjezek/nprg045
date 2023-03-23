@@ -37,7 +37,7 @@ export function makeIntersection(val: any, acc: any, stage: AggregationStage) {
         acc[accKey],
         AggregationStage.step
       );
-      if (keyInters === null) {
+      if (keyInters === null && acc[accKey] !== null) {
         delete acc[accKey];
       } else {
         acc[accKey] = keyInters;
