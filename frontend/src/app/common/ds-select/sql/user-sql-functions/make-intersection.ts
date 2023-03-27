@@ -1,4 +1,4 @@
-import { intersection } from 'lodash-es';
+import { intersection, clone } from 'lodash-es';
 import { isPrimitive } from 'src/app/utils/is-primitive';
 
 export enum AggregationStage {
@@ -12,7 +12,7 @@ export enum AggregationStage {
  */
 export function makeIntersection(val: any, acc: any, stage: AggregationStage) {
   if (stage == AggregationStage.init) {
-    return val;
+    return clone(val);
   }
   if (stage == AggregationStage.step) {
     if (isPrimitive(val) && isPrimitive(acc)) {
