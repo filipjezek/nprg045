@@ -6,7 +6,7 @@ import {
 } from '../reducers/model.reducer';
 
 export const loadModel = createAction(
-  '[model page] load model',
+  '[root] load model',
   props<{ path: string }>()
 );
 export const metadataLoaded = createAction(

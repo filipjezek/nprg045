@@ -3,21 +3,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnChanges,
   OnInit,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {
-  Connection,
-  getIncomingConnections,
-  getOutgoingConnections,
-  NetworkNode,
-  State,
-} from 'src/app/store/reducers/model.reducer';
+import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
 import * as d3 from 'd3';
 import * as d3Lasso from 'd3-lasso';
 import {
@@ -35,6 +27,11 @@ import {
   hoverNode,
   selectNodes,
 } from 'src/app/store/actions/model.actions';
+import { State } from 'src/app/store/reducers';
+import {
+  getIncomingConnections,
+  getOutgoingConnections,
+} from 'src/app/utils/network';
 
 type anySelection = d3.Selection<any, any, any, any>;
 

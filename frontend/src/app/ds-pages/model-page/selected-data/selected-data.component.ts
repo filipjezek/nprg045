@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
+import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   combineLatest,
@@ -18,12 +12,9 @@ import {
   hoverNode,
   selectNodes,
 } from 'src/app/store/actions/model.actions';
-import { State } from 'src/app/store/reducers/model.reducer';
-import {
-  Connection,
-  getAllIncomingConnections,
-  NetworkNode,
-} from 'src/app/store/reducers/model.reducer';
+import { State } from 'src/app/store/reducers';
+import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
+import { getAllIncomingConnections } from 'src/app/utils/network';
 
 @Component({
   selector: 'mozaik-selected-data',

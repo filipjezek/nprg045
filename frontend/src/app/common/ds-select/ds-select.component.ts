@@ -44,7 +44,17 @@ export class DsSelectComponent
   implements OnInit
 {
   querySubj = new BehaviorSubject<string>(
-    'SELECT MAKE_LINK(`index`) link, algorithm, stimulus FROM data'
+    `SELECT
+  MAKE_LINK(\`index\`) link,
+  algorithm,
+  identifier,
+  MAKE_DIFF(stimulus, stimulus->name),
+  stimulus,
+  sheet,
+  neuron,
+  valueName
+FROM
+  data`
   );
 
   ads$ = this.store.select((x) => x.ads.allAds);
@@ -95,7 +105,7 @@ export class DsSelectComponent
   private computeColIntersection(col: string, data: dataToDiff) {
     const interMap = new Map<number, any>();
     data.forEach((row) => {
-      if (row[col][diffMeta] !== undefined) {
+      if (row[col]?.[diffMeta] !== undefined) {
         const diffId = row[col][diffMeta];
 
         if (!interMap.has(diffId)) {
@@ -131,7 +141,7 @@ export class DsSelectComponent
     data: dataToDiff
   ) {
     data.forEach((row) => {
-      if (row[col][diffMeta] !== undefined) {
+      if (row[col]?.[diffMeta] !== undefined) {
         row[col] = subtract(row[col], subtrahends.get(row[col][diffMeta]));
         delete row[col][diffMeta];
       }

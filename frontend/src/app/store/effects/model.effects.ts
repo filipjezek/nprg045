@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { switchMap, catchError, map, delay } from 'rxjs/operators';
+import {
+  switchMap,
+  catchError,
+  map,
+  delay,
+  filter,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
@@ -14,6 +21,7 @@ import {
 } from '../actions/ui.actions';
 import { Toast } from 'src/app/widgets/services/toast';
 import { ModelService } from 'src/app/services/model.service';
+import { routerSelectors } from '../selectors/router.selectors';
 
 @Injectable()
 export class ModelEffects {
@@ -37,6 +45,14 @@ export class ModelEffects {
           })
         )
       )
+    )
+  );
+
+  datastoreChange$ = createEffect(() =>
+    this.store.select(routerSelectors.selectRouteParam('path')).pipe(
+      filter((x) => !!x),
+      distinctUntilChanged(),
+      map((path) => loadModel({ path }))
     )
   );
 

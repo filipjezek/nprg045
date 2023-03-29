@@ -1,10 +1,14 @@
 <mozaik-header></mozaik-header>
-<mozaik-multiview [ratios]="[80, 20]">
+<mozaik-multiview [ratios]="[20, 80]">
   <mozaik-multiview-partition>
     <mozaik-ds-select></mozaik-ds-select>
   </mozaik-multiview-partition>
   <mozaik-multiview-partition>
-    <router-outlet></router-outlet>
+    <router-outlet *ngIf="!(modelLoading$ | async)"></router-outlet>
+    <mozaik-model-loading
+      *ngIf="modelLoading$ | async"
+      [progress]="modelLoading$ | async"
+    ></mozaik-model-loading>
   </mozaik-multiview-partition>
 </mozaik-multiview>
 <mozaik-loading-overlay

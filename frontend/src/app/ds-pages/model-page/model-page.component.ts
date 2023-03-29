@@ -2,33 +2,33 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
-  auditTime,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
-  distinctUntilKeyChanged,
   filter,
   map,
   Observable,
   of,
-  pluck,
   shareReplay,
   startWith,
   switchMap,
   takeUntil,
   tap,
 } from 'rxjs';
-import { UnsubscribingComponent } from '../mixins/unsubscribing.mixin';
-import { GlobalEventService } from '../services/global-event.service';
-import { loadModel, selectNodes } from '../store/actions/model.actions';
-import { AdsIdentifier, PerNeuronValue } from '../store/reducers/ads.reducer';
-import { NetworkNode, State } from '../store/reducers/model.reducer';
+import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+import { GlobalEventService } from 'src/app/services/global-event.service';
+import { selectNodes } from 'src/app/store/actions/model.actions';
+import {
+  AdsIdentifier,
+  PerNeuronValue,
+} from 'src/app/store/reducers/ads.reducer';
+import { State } from 'src/app/store/reducers';
 import {
   selectAvailableValueNames,
   selectStimulus,
-} from '../store/selectors/ads.selectors';
-import { routerSelectors } from '../store/selectors/router.selectors';
-import { RadioOption } from '../widgets/button-radio/button-radio.component';
+} from 'src/app/store/selectors/ads.selectors';
+import { routerSelectors } from 'src/app/store/selectors/router.selectors';
+import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
   PNVData,
@@ -56,9 +56,6 @@ export class ModelPageComponent
     }),
   });
 
-  loading$ = this.store.select((x) => x.model.loading);
-
-  datastore$ = this.store.select(routerSelectors.selectRouteParam('path'));
   model$ = this.store.select((x) => x.model.currentModel);
   displayedPnv$ = this.store.select(routerSelectors.selectRouteData).pipe(
     map((data) => data['ads'] as AdsIdentifier),
@@ -150,17 +147,7 @@ export class ModelPageComponent
     super();
   }
 
-  ngOnInit(): void {
-    this.datastore$
-      .pipe(
-        filter((x) => !!x),
-        distinctUntilChanged(),
-        takeUntil(this.onDestroy$)
-      )
-      .subscribe((path) => {
-        this.store.dispatch(loadModel({ path }));
-      });
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.gEventS.escapePressed

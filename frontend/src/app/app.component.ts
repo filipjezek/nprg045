@@ -44,6 +44,7 @@ export class AppComponent implements OnInit {
     .pipe(auditTime(50));
   overlay$ = this.store.select((x) => x.ui.overlay);
   showNetworkButton$ = this.store.select((x) => x.net.requests.length > 0);
+  modelLoading$ = this.store.select((x) => x.model.loading);
 
   faSatelliteDish = faSatelliteDish;
 

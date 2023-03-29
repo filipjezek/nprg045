@@ -40,6 +40,9 @@ import { SqlEditorComponent } from './common/ds-select/sql-editor/sql-editor.com
 import { ReactiveFormsModule } from '@angular/forms';
 import { SqlHelpComponent } from './common/ds-select/sql-editor/sql-help/sql-help.component';
 import { CellHeaderComponent } from './common/ds-select/ds-table/cell-header/cell-header.component';
+import { ModelLoadingComponent } from './common/model-loading/model-loading.component';
+import { ModelEffects } from './store/effects/model.effects';
+import { DsTabsComponent } from './common/ds-tabs/ds-tabs.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -67,6 +70,8 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     SqlEditorComponent,
     SqlHelpComponent,
     CellHeaderComponent,
+    ModelLoadingComponent,
+    DsTabsComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,7 +85,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
         strictActionTypeUniqueness: true,
       },
     }),
-    EffectsModule.forRoot([FilesystemEffects, AdsEffects]),
+    EffectsModule.forRoot([FilesystemEffects, AdsEffects, ModelEffects]),
     // for performance reasons many safe checks are disabled (store model is huge and freezing it
     // takes a long time), also some objects will not be displayed in devtools
     StoreDevtoolsModule.instrument({
