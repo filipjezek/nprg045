@@ -15,7 +15,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+import { Unsubscribing } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
 import { selectNodes } from 'src/app/store/actions/model.actions';
 import {
@@ -33,6 +33,7 @@ import {
   EdgeDirection,
   PNVData,
 } from './network-graph/network-graph.component';
+import { DsPage } from '../ds-page';
 
 @Component({
   selector: 'mozaik-model-page',
@@ -40,7 +41,7 @@ import {
   styleUrls: ['./model-page.component.scss'],
 })
 export class ModelPageComponent
-  extends UnsubscribingComponent
+  extends Unsubscribing(DsPage)
   implements OnInit, AfterViewInit
 {
   edges: RadioOption[] = [

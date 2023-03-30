@@ -75,19 +75,13 @@ export class DsTabsComponent
   ngAfterViewInit(): void {
     this.viewing$
       .pipe(
-        delay(0),
         map((viewing) => [this.viewContainerRefs, viewing] as const),
         takeUntil(this.onDestroy$)
       )
       .subscribe(([containers, ads]) => {
         containers.forEach(async (container, i) => {
           const ds = ads[i];
-          if (!(ds.index in this.tabs)) {
-            this.tabs[ds.index] = await this.createComponent(ds, container);
-          } else {
-            // this.tabs[ds.index].hostView.
-          }
-          container.insert(this.tabs[ds.index].hostView);
+          await this.createComponent(ds, container);
         });
       });
   }
@@ -123,7 +117,7 @@ export class DsTabsComponent
     return compref;
   }
 
-  trackByDsIndex(index: number, value: { ds: Ads }) {
-    return value.ds.index;
+  trackByDsIndex(index: number, value: { ds: Ads } | Ads) {
+    return 'index' in value ? value.index : value.ds.index;
   }
 }

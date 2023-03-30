@@ -1,12 +1,11 @@
 <p>ds-tabs works!</p>
 <header></header>
 <mozaik-multiview>
-  <!-- <ng-container
-    *ngFor="let ds of ready$ | async; index as i; trackBy: trackByDsIndex"
-  > -->
-  <mozaik-multiview-partition *ngIf="(ready$ | async)?.[0]?.viewing">
-    tab for index {{ (ready$ | async)?.[0]?.ds.index }}
-    <ng-template #tabContent></ng-template>
-  </mozaik-multiview-partition>
-  <!-- </ng-container> -->
+  <ng-container
+    *ngFor="let ds of viewing$ | async; index as i; trackBy: trackByDsIndex"
+  >
+    <mozaik-multiview-partition>
+      <ng-template #tabContent></ng-template>
+    </mozaik-multiview-partition>
+  </ng-container>
 </mozaik-multiview>
