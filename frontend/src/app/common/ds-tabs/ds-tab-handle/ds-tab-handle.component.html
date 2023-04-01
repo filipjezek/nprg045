@@ -1,0 +1,18 @@
+<div
+  class="tab"
+  (click)="viewTab()"
+  (auxclick)="$event.button == 1 ? closeTab() : null"
+  [class.viewing]="viewing"
+  [title]="ds | json"
+>
+  <span class="index">{{ ds.index }}</span>
+  <span class="algorithm" *ngIf="ds.algorithm">{{ ds.algorithm }}</span>
+  <span class="value" *ngIf="ds.valueName">{{ ds.valueName }}</span>
+  <span class="identifier" *ngIf="ds.identifier">{{ ds.identifier }}</span>
+  <span class="neuron" *ngIf="ds.neuron">{{ ds.neuron }}</span>
+  <span class="sheet" *ngIf="ds.sheet">{{ ds.sheet }}</span>
+  <code class="stimulus" *ngIf="ds.stimulus">{{ ds.stimulus | json }}</code>
+  <button class="close" (click)="$event.stopPropagation(); closeTab()">
+    &times;
+  </button>
+</div>

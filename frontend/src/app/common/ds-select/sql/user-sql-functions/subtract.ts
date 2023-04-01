@@ -1,4 +1,4 @@
-import { difference, clone } from 'lodash-es';
+import { difference, clone, isEqual } from 'lodash-es';
 import { isPrimitive } from 'src/app/utils/is-primitive';
 
 /**
@@ -24,7 +24,7 @@ export function subtract(a: any, b: any) {
     }
 
     const keyDiff = subtract(a[bKey], b[bKey]);
-    if (keyDiff === null) {
+    if (keyDiff === null || isEqual(keyDiff, []) || isEqual(keyDiff, {})) {
       delete a[bKey];
     } else {
       a[bKey] = keyDiff;

@@ -3,5 +3,5 @@ import { Ads } from '../store/reducers/ads.reducer';
 
 @Injectable()
 export class DsPage {
-  @Input() ads: Ads;
+  @Input() public ads: Ads;
 }

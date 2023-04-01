@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
-import { Observable, fromEvent } from 'rxjs';
-import { filter, share } from 'rxjs/operators';
+import { Observable, animationFrameScheduler, fromEvent } from 'rxjs';
+import { filter, observeOn, share } from 'rxjs/operators';
 import { DOCUMENT } from '@angular/common';
 
 @Injectable({
@@ -45,6 +45,9 @@ export class GlobalEventService {
     this.mouseReleased = fromEvent<MouseEvent>(this.doc, 'mouseup').pipe(
       share()
     );
-    this.mouseMove = fromEvent<MouseEvent>(this.doc, 'mousemove').pipe(share());
+    this.mouseMove = fromEvent<MouseEvent>(this.doc, 'mousemove').pipe(
+      observeOn(animationFrameScheduler),
+      share()
+    );
   }
 }

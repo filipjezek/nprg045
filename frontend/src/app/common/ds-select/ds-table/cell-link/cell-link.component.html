@@ -1,3 +1,5 @@
-<a [routerLink]="['datastore', path$ | async, 'ds', params$ | async]"
+<a
+  [routerLink]="['datastore', path$ | async, 'ds', params$ | async]"
+  (auxclick)="middleClick($event)"
   >#{{ value.index }}</a
 >

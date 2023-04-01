@@ -1,0 +1,65 @@
+.close {
+  background-color: transparent;
+  cursor: pointer;
+  transition: 0.1s;
+  color: inherit;
+  border: none;
+  border-radius: 2px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 5px;
+  z-index: 2;
+}
+.tab {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  padding: 5px 25px 5px 5px;
+  box-shadow: 0 0 3px #00000078;
+  margin: 2px 1px 0;
+  --bg: var(--secondary);
+  background-color: var(--bg);
+  color: var(--secondary-text);
+  cursor: default;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  transition: 0.1s;
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    background: linear-gradient(90deg, transparent 0%, var(--bg) 40%);
+    right: 0;
+    height: 100%;
+    top: 0;
+    width: 35px;
+  }
+
+  &.viewing {
+    --bg: var(--secondary-dark);
+    color: var(--secondary-dark-text);
+  }
+  &:hover {
+    .close {
+      background-color: #0000002e;
+
+      &:hover {
+        background-color: #00000048;
+      }
+    }
+  }
+
+  span,
+  code {
+    margin-right: 8px;
+    font-size: 0.9em;
+  }
+}
+
+:host.lifted .tab {
+  box-shadow: 0 0 4px 1px #00000078;
+}

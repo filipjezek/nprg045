@@ -43,6 +43,7 @@ import { CellHeaderComponent } from './common/ds-select/ds-table/cell-header/cel
 import { ModelLoadingComponent } from './common/model-loading/model-loading.component';
 import { ModelEffects } from './store/effects/model.effects';
 import { DsTabsComponent } from './common/ds-tabs/ds-tabs.component';
+import { DsTabHandleComponent } from './common/ds-tabs/ds-tab-handle/ds-tab-handle.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -72,6 +73,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     CellHeaderComponent,
     ModelLoadingComponent,
     DsTabsComponent,
+    DsTabHandleComponent,
   ],
   imports: [
     BrowserModule,

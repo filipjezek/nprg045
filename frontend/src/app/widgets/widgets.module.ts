@@ -23,6 +23,7 @@ import { PaginationComponent } from './pagination/pagination.component';
 import { InputComponent } from './input/input.component';
 import { ButtonComponent } from './button/button.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
+import { DraggableDirective } from './directives/draggable.directive';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
     InputComponent,
     ButtonComponent,
     CheckboxComponent,
+    DraggableDirective,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -64,6 +66,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
     InputComponent,
     ButtonComponent,
     CheckboxComponent,
+    DraggableDirective,
   ],
 })
 export class WidgetsModule {}

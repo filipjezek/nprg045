@@ -1,5 +1,17 @@
-<p>ds-tabs works!</p>
-<header></header>
+<div class="config"></div>
+<header>
+  <mozaik-ds-tab-handle
+    #handle
+    mozaikDraggable
+    *ngFor="let item of ready$ | async"
+    [ds]="item.ds"
+    [viewing]="item.viewing"
+    (lift)="handle.ignoreClick = false; initReorderedTabs()"
+    (swapLeft)="handle.ignoreClick = true; swapTabs(item.ds, true)"
+    (swapRight)="handle.ignoreClick = true; swapTabs(item.ds, false)"
+    (drop)="commitReoderedTabs()"
+  ></mozaik-ds-tab-handle>
+</header>
 <mozaik-multiview>
   <ng-container
     *ngFor="let ds of viewing$ | async; index as i; trackBy: trackByDsIndex"
