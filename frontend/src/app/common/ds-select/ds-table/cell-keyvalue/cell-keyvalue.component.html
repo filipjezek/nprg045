@@ -1,8 +1,1 @@
-<div
-  class="item"
-  *ngFor="let item of value | keyvalue"
-  [style.border-color]="colorFromString | purefn : item.key"
->
-  <span class="key">{{ item.key }}:</span
-  ><span class="value">{{ item.value | json }}</span>
-</div>
+<mozaik-property-bag [value]="value"></mozaik-property-bag>

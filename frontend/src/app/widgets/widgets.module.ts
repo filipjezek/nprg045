@@ -24,6 +24,8 @@ import { InputComponent } from './input/input.component';
 import { ButtonComponent } from './button/button.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
 import { DraggableDirective } from './directives/draggable.directive';
+import { PropertyBagComponent } from './property-bag/property-bag.component';
+import { DsInfoComponent } from './ds-info/ds-info.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +48,8 @@ import { DraggableDirective } from './directives/draggable.directive';
     ButtonComponent,
     CheckboxComponent,
     DraggableDirective,
+    PropertyBagComponent,
+    DsInfoComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -67,6 +71,8 @@ import { DraggableDirective } from './directives/draggable.directive';
     ButtonComponent,
     CheckboxComponent,
     DraggableDirective,
+    PropertyBagComponent,
+    DsInfoComponent,
   ],
 })
 export class WidgetsModule {}

@@ -15,7 +15,7 @@
   min-width: 100px;
   display: flex;
   align-items: center;
-  padding: 5px 25px 5px 5px;
+  padding: 8px 25px 8px 8px;
   box-shadow: 0 0 3px #00000078;
   margin: 2px 1px 0;
   --bg: var(--secondary);
@@ -42,6 +42,8 @@
   &.viewing {
     --bg: var(--secondary-dark);
     color: var(--secondary-dark-text);
+    padding-top: 4px;
+    border-top: 4px solid var(--primary-light);
   }
   &:hover {
     .close {
@@ -57,6 +59,10 @@
   code {
     margin-right: 8px;
     font-size: 0.9em;
+  }
+  .index {
+    font-size: 0.7em;
+    font-weight: bold;
   }
 }
 

@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   Inject,
-  Input,
   OnInit,
 } from '@angular/core';
-import { colorFromString } from 'src/app/utils/color-from-string';
 import { DSCell, DSCELL_VAL } from '../cell-generic/cell-generic.component';
 
 @Component({
@@ -22,6 +20,4 @@ export class CellKeyvalueComponent
   ) {}
 
   ngOnInit(): void {}
-
-  colorFromString = colorFromString;
 }
