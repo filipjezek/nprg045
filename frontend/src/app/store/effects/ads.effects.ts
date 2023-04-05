@@ -8,8 +8,9 @@ import {
   distinctUntilKeyChanged,
   filter,
   distinctUntilChanged,
-  tap,
   delayWhen,
+  pairwise,
+  tap,
 } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -25,15 +26,15 @@ import { AdsService } from 'src/app/services/ads.service';
 import {
   AdsLoaded,
   apiError,
-  clearSelectedAds,
   loadAds,
   loadSpecificAds,
+  removeFromSelectedAds,
   specificAdsLoaded,
 } from '../actions/ads.actions';
 import { routerSelectors } from '../selectors/router.selectors';
 import { Router } from '@angular/router';
-import { Ads, AdsIdentifier, PerNeuronValue } from '../reducers/ads.reducer';
-import { getSortedStimuli, getValueNames } from '../selectors/ads.selectors';
+import { difference } from 'lodash-es';
+import { closeTab } from '../actions/inspector.actions';
 
 @Injectable()
 export class AdsEffects {
@@ -54,19 +55,30 @@ export class AdsEffects {
       map(([index, path]) => loadSpecificAds({ index: +index, path }))
     )
   );
-  adsClear$ = createEffect(() =>
-    this.store.select(routerSelectors.selectRouteParam('adsIndex')).pipe(
-      distinctUntilChanged(),
-      filter((x) => !x), // okay, because it is a string
-      map(() => clearSelectedAds())
-    )
-  );
 
   loadingOverlayInc$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadAds, loadSpecificAds),
       map(() => loadingOverlayIncrement())
     )
+  );
+
+  tabClosed$ = createEffect(
+    () =>
+      this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
+        map((p) => (p ? p.split(',') : [])),
+        pairwise(),
+        filter(([first, second]) => first.length < second.length),
+        tap(([first, second]) => {
+          const diff: string[] = difference(first, second);
+          diff.forEach((index) => {
+            const parsed = +index;
+            this.store.dispatch(removeFromSelectedAds({ index: parsed }));
+            this.store.dispatch(closeTab({ index: parsed }));
+          });
+        })
+      ),
+    { dispatch: false }
   );
 
   loadAds$ = createEffect(() =>

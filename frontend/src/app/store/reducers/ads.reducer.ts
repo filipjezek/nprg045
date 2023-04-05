@@ -3,6 +3,7 @@ import {
   AdsLoaded,
   clearSelectedAds,
   loadAds,
+  removeFromSelectedAds,
   specificAdsLoaded,
 } from '../actions/ads.actions';
 
@@ -61,6 +62,10 @@ export const reducer = createReducer(
   on(specificAdsLoaded, (state, { ads }) => ({
     ...state,
     selectedAds: [...state.selectedAds, ads],
+  })),
+  on(removeFromSelectedAds, (state, { index }) => ({
+    ...state,
+    selectedAds: state.selectedAds.filter((ds) => ds.index != index),
   })),
   on(clearSelectedAds, (state) => ({ ...state, selectedAds: [] }))
 );

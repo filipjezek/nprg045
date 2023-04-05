@@ -9,3 +9,7 @@ export const initTab = createAction(
   '[ds page] init tab',
   props<{ index: number; state: TabState }>()
 );
+export const toggleDsInfo = createAction(
+  '[ds page] toggle ds info',
+  props<{ collapsed: boolean }>()
+);

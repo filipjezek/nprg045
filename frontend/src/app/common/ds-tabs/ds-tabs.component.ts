@@ -57,10 +57,7 @@ export class DsTabsComponent
 
   viewing$ = this.store
     .select(routerSelectors.selectRouteParam('viewing'))
-    .pipe(
-      this.paramToAds,
-      tap((ads) => console.log(ads[0].stimulus))
-    );
+    .pipe(this.paramToAds);
   ready$ = this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
     this.paramToAds,
     combineLatestWith(this.viewing$),

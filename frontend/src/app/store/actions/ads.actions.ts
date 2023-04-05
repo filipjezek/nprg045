@@ -17,7 +17,11 @@ export const specificAdsLoaded = createAction(
   '[ads API] specific data structure loaded',
   props<{ ads: Ads }>()
 );
-export const clearSelectedAds = createAction('[model page] clear selected ads');
+export const clearSelectedAds = createAction('[root] clear selected ads');
+export const removeFromSelectedAds = createAction(
+  '[ds inspector] remove from selected ads',
+  props<{ index: number }>()
+);
 export const apiError = createAction(
   '[ads API] error',
   props<{ error: any }>()
