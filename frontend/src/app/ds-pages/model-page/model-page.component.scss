@@ -1,38 +1,5 @@
 :host {
   display: block;
-  padding: 0 10px 20px;
-
-  .columns {
-    display: flex;
-    align-items: stretch;
-
-    .col:first-child {
-      flex-basis: 100%;
-    }
-    .col:last-child {
-      position: relative;
-      flex-basis: 200px;
-      flex-grow: 0;
-      flex-shrink: 0;
-
-      mozaik-selected-data {
-        position: absolute;
-        overflow-y: auto;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
-    }
-  }
-
-  .graphs {
-    display: grid;
-    margin: auto;
-    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
-    gap: 20px;
-    justify-content: space-evenly;
-  }
 }
 
 form {

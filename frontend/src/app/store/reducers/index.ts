@@ -5,6 +5,7 @@ import * as fromFs from './filesystem.reducer';
 import * as fromAds from './ads.reducer';
 import * as fromNet from './network.reducer';
 import * as fromModel from './model.reducer';
+import * as fromInspector from './inspector.reducer';
 import { routerReducer, RouterReducerState } from '@ngrx/router-store';
 
 export const stateFeatureKey = 'state';
@@ -15,6 +16,7 @@ export interface State {
   [fromAds.adsFeatureKey]: fromAds.State;
   [fromNet.netFeatureKey]: fromNet.State;
   [fromModel.modelFeatureKey]: fromModel.State;
+  [fromInspector.inspectorFeatureKey]: fromInspector.State;
   router: RouterReducerState;
 }
 
@@ -24,6 +26,7 @@ export const reducers: ActionReducerMap<State> = {
   [fromAds.adsFeatureKey]: fromAds.reducer,
   [fromNet.netFeatureKey]: fromNet.reducer,
   [fromModel.modelFeatureKey]: fromModel.reducer,
+  [fromInspector.inspectorFeatureKey]: fromInspector.reducer,
   router: routerReducer,
 };
 

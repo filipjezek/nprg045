@@ -1,5 +1,5 @@
 <mozaik-header></mozaik-header>
-<mozaik-multiview [ratios]="[20, 80]">
+<mozaik-multiview [ratios]="[20, 72, 8]">
   <mozaik-multiview-partition>
     <mozaik-ds-select></mozaik-ds-select>
   </mozaik-multiview-partition>
@@ -9,6 +9,9 @@
       *ngIf="modelLoading$ | async"
       [progress]="modelLoading$ | async"
     ></mozaik-model-loading>
+  </mozaik-multiview-partition>
+  <mozaik-multiview-partition>
+    <mozaik-selected-neurons></mozaik-selected-neurons>
   </mozaik-multiview-partition>
 </mozaik-multiview>
 <mozaik-loading-overlay

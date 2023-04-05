@@ -17,11 +17,11 @@ import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
 import { getAllIncomingConnections } from 'src/app/utils/network';
 
 @Component({
-  selector: 'mozaik-selected-data',
-  templateUrl: './selected-data.component.html',
-  styleUrls: ['./selected-data.component.scss'],
+  selector: 'mozaik-selected-neurons',
+  templateUrl: './selected-neurons.component.html',
+  styleUrls: ['./selected-neurons.component.scss'],
 })
-export class SelectedDataComponent
+export class SelectedNeuronsComponent
   extends UnsubscribingComponent
   implements OnInit
 {
@@ -68,16 +68,11 @@ export class SelectedDataComponent
   trackById(index: number, item: { node: NetworkNode }) {
     return item.node.id;
   }
-}
 
-@Pipe({
-  name: 'sumsheets',
-})
-export class SumSheetsPipe implements PipeTransform {
-  transform(value: {
+  sumSheets(sheets: {
     [key: string]: Connection[] | NetworkNode['sheets'][string];
   }) {
-    return Object.values(value).reduce(
+    return Object.values(sheets).reduce(
       (total, conns) =>
         total + ('length' in conns ? conns.length : conns.connections.length),
       0

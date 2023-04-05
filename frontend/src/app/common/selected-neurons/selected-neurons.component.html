@@ -1,8 +1,9 @@
+<h1>Selected neurons</h1>
 <mozaik-collapsible
   class="node"
   *ngFor="let node of nodeData; trackBy: trackById"
 >
-  <h1
+  <h2
     slot="header"
     class="node-anchor"
     [class.hovered]="(hoveredNode$ | async)?.id === node.node.id"
@@ -11,9 +12,9 @@
     (click)="$event.shiftKey ? handleSelect($event, node.node) : null"
   >
     Neuron #{{ node.node.id }}
-  </h1>
+  </h2>
   <mozaik-collapsible class="positions">
-    <h2 slot="header">Positions</h2>
+    <h3 slot="header">Positions</h3>
     <table>
       <tbody>
         <tr *ngFor="let sheet of node.node.sheets | keyvalue">
@@ -27,12 +28,14 @@
     </table>
   </mozaik-collapsible>
   <mozaik-collapsible class="outgoing">
-    <h2 slot="header">Outgoing ({{ node.node.sheets | sumsheets }})</h2>
+    <h3 slot="header">
+      Outgoing ({{ sumSheets | purefn : node.node.sheets }})
+    </h3>
     <ng-container *ngFor="let sheet of node.node.sheets | keyvalue">
       <mozaik-collapsible class="sheet" *ngIf="sheet.value.connections.length">
-        <h3 slot="header">
+        <h4 slot="header">
           {{ sheet.key }} ({{ sheet.value.connections.length }})
-        </h3>
+        </h4>
         <table>
           <thead>
             <tr>
@@ -62,10 +65,10 @@
     </ng-container>
   </mozaik-collapsible>
   <mozaik-collapsible class="incoming">
-    <h2 slot="header">Incoming ({{ node.in | sumsheets }})</h2>
+    <h3 slot="header">Incoming ({{ sumSheets | purefn : node.in }})</h3>
     <ng-container *ngFor="let sheet of node.in | keyvalue">
       <mozaik-collapsible class="sheet" *ngIf="sheet.value.length">
-        <h3 slot="header">{{ sheet.key }} ({{ sheet.value.length }})</h3>
+        <h4 slot="header">{{ sheet.key }} ({{ sheet.value.length }})</h4>
         <table>
           <thead>
             <tr>

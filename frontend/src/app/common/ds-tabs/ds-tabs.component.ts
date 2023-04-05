@@ -11,16 +11,11 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
-  combineLatest,
   combineLatestWith,
   delay,
   filter,
-  from,
   map,
-  Observable,
   pipe,
-  startWith,
-  switchMap,
   take,
   takeUntil,
   tap,
@@ -62,7 +57,10 @@ export class DsTabsComponent
 
   viewing$ = this.store
     .select(routerSelectors.selectRouteParam('viewing'))
-    .pipe(this.paramToAds);
+    .pipe(
+      this.paramToAds,
+      tap((ads) => console.log(ads[0].stimulus))
+    );
   ready$ = this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
     this.paramToAds,
     combineLatestWith(this.viewing$),
@@ -114,10 +112,10 @@ export class DsTabsComponent
       });
   }
 
-  private async preloadPage(ds: AdsIdentifier): Promise<Type<DsPage>> {
+  private async preloadPage(ds: AdsIdentifier): Promise<Type<DsPage<Ads>>> {
     switch (ds) {
       case AdsIdentifier.Connections:
-        // case AdsIdentifier.PerNeuronValue:
+      case AdsIdentifier.PerNeuronValue:
         await import('../../ds-pages/model-page/model-page.module');
         return import('../../ds-pages/model-page/model-page.component').then(
           (x) => x.ModelPageComponent
@@ -136,6 +134,7 @@ export class DsTabsComponent
     const comp = await this.preloadPage(ds.identifier);
     const compref = container.createComponent(comp);
     compref.instance.ads = ds;
+    console.log(ds);
     return compref;
   }
 

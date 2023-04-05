@@ -1,5 +1,8 @@
 :host {
-  padding: 10px;
+  padding: 10px 10px 0;
+  display: flex;
+  height: calc(100vh - 50px);
+  flex-direction: column;
 }
 .config {
   padding: 10px;
@@ -9,4 +12,8 @@ header {
   display: flex;
   width: 100%;
   padding-top: 5px;
+  flex-shrink: 0;
+}
+mozaik-multiview {
+  min-height: 0;
 }

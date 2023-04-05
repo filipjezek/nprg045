@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Ads, AdsIdentifier } from '../store/reducers/ads.reducer';
+import { Ads } from '../store/reducers/ads.reducer';
 import { HttpService } from './http.service';
 
 @Injectable({
@@ -19,15 +19,17 @@ export class AdsService {
 
   public loadSpecificAds(
     path: string,
-    identifier: AdsIdentifier,
-    alg: string,
-    tags: string[]
+    ads: Ads
   ): Observable<Omit<Ads, 'index'>> {
-    let params = new HttpParams()
-      .append('path', path)
-      .append('identifier', identifier)
-      .append('algorithm', alg)
-      .appendAll({ tags });
+    let params = new HttpParams().append('path', path).appendAll({
+      tags: ads.tags,
+      stimulus: JSON.stringify(ads.stimulus),
+      algorithm: ads.algorithm,
+      valueName: ads.valueName,
+      identifier: ads.identifier,
+      neuron: ads.neuron,
+      sheet: ads.sheet,
+    });
     return this.http.get<Omit<Ads, 'index'>>('analysis_ds', params);
   }
 }

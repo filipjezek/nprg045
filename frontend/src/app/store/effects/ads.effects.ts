@@ -99,23 +99,16 @@ export class AdsEffects {
           ),
           withLatestFrom(this.store.select((x) => x.ads.allAds[index])),
           switchMap(([path, thumb]) =>
-            this.adsS
-              .loadSpecificAds(
-                path,
-                thumb.identifier,
-                thumb.algorithm,
-                thumb.tags
-              )
-              .pipe(
-                map((ads) => {
-                  return specificAdsLoaded({ ads: { ...ads, index } });
-                }),
-                catchError((err: HttpErrorResponse) => {
-                  console.log(err);
-                  this.toastS.add(new Toast('Failed to load data structures'));
-                  return of(apiError({ error: err }));
-                })
-              )
+            this.adsS.loadSpecificAds(path, thumb).pipe(
+              map((ads) => {
+                return specificAdsLoaded({ ads: { ...ads, index } });
+              }),
+              catchError((err: HttpErrorResponse) => {
+                console.log(err);
+                this.toastS.add(new Toast('Failed to load data structures'));
+                return of(apiError({ error: err }));
+              })
+            )
           )
         )
       )

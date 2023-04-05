@@ -46,7 +46,7 @@ def get_ads_list(path_to_datastore: str) -> List[Ads]:
     ))
 
 
-def get_per_neuron_value(path_to_datastore: str, alg: str, tags: List[str], **kwargs) -> List[SerializablePerNeuronValue]:
+def get_per_neuron_value(path_to_datastore: str, alg: str, **kwargs) -> List[SerializablePerNeuronValue]:
     datastore = load_datastore(path_to_datastore)
     ads = cast(Any, datastore.get_analysis_result(
         identifier=AdsIdentifier.PerNeuronValue.value,

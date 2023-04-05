@@ -2,38 +2,27 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
-  combineLatest,
+  Observable,
   debounceTime,
   distinctUntilChanged,
   filter,
   map,
-  Observable,
-  of,
   shareReplay,
   startWith,
-  switchMap,
   takeUntil,
   tap,
 } from 'rxjs';
 import { Unsubscribing } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
 import { selectNodes } from 'src/app/store/actions/model.actions';
-import {
-  AdsIdentifier,
-  PerNeuronValue,
-} from 'src/app/store/reducers/ads.reducer';
+import { PerNeuronValue } from 'src/app/store/reducers/ads.reducer';
 import { State } from 'src/app/store/reducers';
-import {
-  selectAvailableValueNames,
-  selectStimulus,
-} from 'src/app/store/selectors/ads.selectors';
-import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
   PNVData,
 } from './network-graph/network-graph.component';
-import { DsPage } from '../ds-page';
+import { DsPage, DsPageConstructor } from '../ds-page';
 
 @Component({
   selector: 'mozaik-model-page',
@@ -41,7 +30,7 @@ import { DsPage } from '../ds-page';
   styleUrls: ['./model-page.component.scss'],
 })
 export class ModelPageComponent
-  extends Unsubscribing(DsPage)
+  extends Unsubscribing(DsPage as DsPageConstructor<PerNeuronValue>)
   implements OnInit, AfterViewInit
 {
   edges: RadioOption[] = [
@@ -58,60 +47,22 @@ export class ModelPageComponent
   });
 
   model$ = this.store.select((x) => x.model.currentModel);
-  displayedPnv$ = this.store.select(routerSelectors.selectRouteData).pipe(
-    map((data) => data['ads'] as AdsIdentifier),
-    switchMap((identifier) =>
-      identifier !== AdsIdentifier.PerNeuronValue
-        ? of(null)
-        : combineLatest([
-            this.store.select((x) => x.ads.selectedAds as PerNeuronValue[]),
-            this.store.select(selectStimulus),
-            this.store.select(routerSelectors.selectQueryParam('valueName')),
-          ]).pipe(
-            map(([ads, stimulus, valueName]) =>
-              ads.filter(
-                (a) =>
-                  (a.stimulus === null || a.stimulus === stimulus) &&
-                  a.valueName === valueName
-              )
-            )
-          )
-    )
+  pnvData$: Observable<PNVData> = this.fullAds$.pipe(
+    map((ds) => {
+      if (!ds) return ds as any;
+      const values = new Map<number, number>();
+      ds.ids.forEach((id, i) => values.set(id, ds.values[i]));
+      return { period: ds.period, unit: ds.unit, values };
+    })
   );
-  pnvData$: Observable<Record<string, PNVData>> = combineLatest([
-    this.displayedPnv$,
-    this.model$,
-  ]).pipe(
-    map(([ads, model]) => {
-      if (!ads || !model) return null;
-      const separated: Record<string, PNVData> = {};
-      for (const sheet in model.sheetNodes) {
-        const sheetRelated = ads.filter((a) => a.sheet === sheet || !a.sheet);
-        const values = new Map<number, number>();
-        sheetRelated.forEach((a) =>
-          a.ids.forEach((id, i) => values.set(id, a.values[i]))
-        );
-        separated[sheet] = {
-          values,
-          period: sheetRelated[0]?.period,
-          unit:
-            sheetRelated[0]?.unit === 'dimensionless'
-              ? ''
-              : sheetRelated[0]?.unit,
-        };
-      }
-      return separated;
-    }),
-    shareReplay(1)
-  );
-  pnvRange$ = this.displayedPnv$.pipe(
+  pnvRange$ = this.fullAds$.pipe(
     filter((x) => !!x),
-    map((pnvs) => {
-      const period = pnvs[0]?.period;
+    map((pnv) => {
+      const period = pnv?.period;
       if (period === null || period === undefined) {
         return {
-          min: Math.min(...pnvs.flatMap((a) => a.values)),
-          max: Math.max(...pnvs.flatMap((a) => a.values)),
+          min: Math.min(...pnv.values),
+          max: Math.max(...pnv.values),
         };
       }
       return { min: 0, max: period };
@@ -138,14 +89,12 @@ export class ModelPageComponent
     )
   );
 
-  pnvValueNames$ = this.store.select(selectAvailableValueNames);
-
   constructor(
-    private store: Store<State>,
+    store: Store<State>,
     private fb: FormBuilder,
     private gEventS: GlobalEventService
   ) {
-    super();
+    super(store);
   }
 
   ngOnInit(): void {}
