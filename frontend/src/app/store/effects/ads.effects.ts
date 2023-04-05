@@ -68,7 +68,7 @@ export class AdsEffects {
       this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
         map((p) => (p ? p.split(',') : [])),
         pairwise(),
-        filter(([first, second]) => first.length < second.length),
+        filter(([first, second]) => first.length > second.length),
         tap(([first, second]) => {
           const diff: string[] = difference(first, second);
           diff.forEach((index) => {
