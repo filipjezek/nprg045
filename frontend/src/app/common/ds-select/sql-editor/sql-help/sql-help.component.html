@@ -43,8 +43,9 @@
     <h2>Special functions</h2>
     <ul>
       <li>
-        <code><span class="fn">MAKE_LINK</span>(value)</code> accepts index of a
-        data structure and is displayed as a clickable link in the result table.
+        <code><span class="fn">MAKE_LINK</span>(value)</code> accepts an index
+        of a data structure and is displayed as a clickable link in the result
+        table.
       </li>
       <li>
         <code><span class="fn">JSON_STRINGIFY</span>(value)</code> converts
@@ -69,7 +70,6 @@
 <span class="comment">
 -- returns: [
 --   &#123;a: &#123;foo: <span class="string">'bar'</span>&#125;&#125;,
---   &#123;a: &#123;foo: <span class="string">'bar'</span>&#125;&#125;,
 -- ]</span>
 </pre>
           <pre class="example"><span class="comment"
@@ -88,8 +88,8 @@
       </li>
       <li>
         <code><span class="fn">SUBTRACT</span>(minuend, subtrahend)</code>
-        removes from minuend properties with the same name and value both in
-        minuend and subtrahend.
+        removes from minuend the properties which share the same name and value
+        both in minuend and subtrahend.
         <mozaik-collapsible class="examples">
           <header slot="header">Examples</header>
           <pre class="example">
