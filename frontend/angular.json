@@ -28,7 +28,14 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "allowedCommonJsDependencies": ["d3-lasso"],
+            "allowedCommonJsDependencies": [
+              "d3-lasso",
+              "robust-point-in-polygon",
+              "nearley",
+              "alasql",
+              "json-stable-stringify"
+            ],
+
             "scripts": []
           },
           "configurations": {
@@ -36,8 +43,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "1.5mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
