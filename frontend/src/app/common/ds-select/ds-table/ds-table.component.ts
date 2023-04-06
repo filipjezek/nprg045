@@ -29,7 +29,7 @@ enum ColType {
   styleUrls: ['./ds-table.component.scss'],
 })
 export class DsTableComponent implements OnInit {
-  @Input() rowHeight: number = 45;
+  @Input() rowHeight: number = 47;
   @Input() get src(): Record<string, any>[] {
     return this._src;
   }

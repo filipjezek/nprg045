@@ -7,36 +7,36 @@
       formControlName="edges"
     ></mozaik-button-radio>
   </p>
-  <p class="label pnv" formGroupName="pnv" *ngIf="fullAds$ | async">
+  <p class="label pnv" formGroupName="pnv" *ngIf="pnvData$ | async">
     Filter PerNeuronValue
     <label
       ><span class="text">From</span>
       <mozaik-range
         formControlName="from"
-        [min]="(pnvRange$ | async)?.min"
-        [max]="(pnvRange$ | async)?.max"
+        [min]="(pnvExtent$ | async)?.min"
+        [max]="(pnvExtent$ | async)?.max"
       ></mozaik-range>
     </label>
     <label
       ><span class="text">To</span>
       <mozaik-range
         formControlName="to"
-        [min]="(pnvRange$ | async)?.min"
-        [max]="(pnvRange$ | async)?.max"
+        [min]="(pnvExtent$ | async)?.min"
+        [max]="(pnvExtent$ | async)?.max"
       ></mozaik-range>
     </label>
   </p>
 </form>
 <mozaik-scale
   *ngIf="fullAds$ | async"
-  [extent]="pnvRange$ | async"
+  [extent]="pnvExtent$ | async"
   [periodic]="!!(fullAds$ | async)?.period"
   [unit]="(fullAds$ | async)?.unit"
 ></mozaik-scale>
 <mozaik-network-graph
   [sheetName]="ads.sheet"
   [pnv]="pnvData$ | async"
-  [pnvExtent]="pnvRange$ | async"
+  [pnvExtent]="pnvExtent$ | async"
   [pnvFilter]="pnvFilter$ | async"
   [nodes]="(model$ | async)?.sheetNodes[ads.sheet]"
   [edgeDir]="optionsForm.value.edges"

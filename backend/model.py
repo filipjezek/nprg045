@@ -48,7 +48,7 @@ def get_model(path_to_datastore: str) -> JsonSerializableModel:
     sheets = __get_serializable_sheets(datastore)
     serializable: JsonSerializableModel = {
         'sheets': sheets,
-        'connections': __get_serializable_connections_meta(datastore)
+        'connections': get_serializable_connections_meta(datastore)
     }
 
     return serializable
@@ -82,7 +82,7 @@ class __MozaikConnection:
     delays: List[Tuple[int, int, float]]  # (src index, tgt index, value)
 
 
-def __get_serializable_connections_meta(datastore: DataStore) -> List[Connections]:
+def get_serializable_connections_meta(datastore: DataStore) -> List[Connections]:
     connections: List[__MozaikConnection] = cast(
         Any, datastore.get_analysis_result(identifier='Connections'))
     return [{

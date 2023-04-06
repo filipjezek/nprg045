@@ -57,7 +57,8 @@ export class ScaleComponent implements AfterViewInit, OnChanges {
   }
 
   handleMouseLeave(e: MouseEvent) {
-    if ((e.target as HTMLElement).matches('svg')) {
+    const reltgt = e.relatedTarget as HTMLElement;
+    if (!this.container.nativeElement.querySelector('svg').contains(reltgt)) {
       this.hoveredValue = null;
     }
   }

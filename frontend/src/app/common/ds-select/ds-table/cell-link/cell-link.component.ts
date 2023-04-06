@@ -62,7 +62,7 @@ export class CellLinkComponent implements OnInit, DSCell<LinkWrapper> {
           this.router.navigate([
             'datastore',
             path,
-            'ds',
+            'inspect',
             addTabToParams(this.value.index, params, false),
           ]);
         });

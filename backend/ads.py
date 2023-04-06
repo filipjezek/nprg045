@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List, TypedDict, cast, Any, Dict
-from .model import load_datastore
+from .model import load_datastore, get_serializable_connections_meta
 import math
 import quantities
 import ast
@@ -39,11 +39,33 @@ def get_ads_list(path_to_datastore: str) -> List[Ads]:
     order = ['identifier', 'algorithm', 'stimulus',
              'valueName', 'sheet', 'neuron']
     datastore = load_datastore(path_to_datastore)
-    return list(sorted(
-        (__get_ads_base(ads) for ads in datastore.analysis_results),
-        key=lambda d: tuple(str(d[key]) if key ==
-                            'stimulus' else d[key] or '' for key in order)
+    ads_list = list(sorted(
+        (__get_ads_base(ads) for ads in datastore.analysis_results
+         if ads.identifier != AdsIdentifier.Connections.value),
+        key=lambda d: tuple(
+            str(d[key]) if key == 'stimulus' else d[key]
+            if d[key] else ''
+            for key in order
+        )
     ))
+
+    conn_meta = get_serializable_connections_meta(datastore)
+    ads_list.extend(sorted(
+        (cast(Ads, {
+            'algorithm': 'connection storage',
+            'identifier': AdsIdentifier.Connections.value,
+            'tags': None,
+            'neuron': None,
+            'sheet': conn['src'],
+            'stimulus': None,
+            'period': None,
+            'unit': None,
+            'valueName': None
+        }) for conn in conn_meta if conn['src'] == conn['target']),
+        key=lambda d: tuple(d['sheet'])
+    ))
+
+    return ads_list
 
 
 def get_per_neuron_value(path_to_datastore: str, alg: str, **kwargs) -> List[SerializablePerNeuronValue]:
@@ -66,10 +88,14 @@ def __get_ads_base(ads: Any) -> Ads:
         'algorithm': ads.analysis_algorithm,
         'identifier': ads.identifier,
         'tags': list(sorted(ads.tags)),
-        'neuron': int(ads.neuron) if ads.neuron else None,
+        'neuron': safe_check(ads, 'neuron') and int(ads.neuron),
         'sheet': ads.sheet_name,
         'stimulus': ads.stimulus_id and ast.literal_eval(ads.stimulus_id),
-        'period': float(ads.period) if ads.period else None,
-        'unit': '' if ads.value_units is None or ads.value_units is quantities.unitquantity.Dimensionless else ads.value_units.dimensionality.unicode,
-        'valueName': ads.value_name,
+        'period': safe_check(ads, 'period') and float(ads.period),
+        'unit': '' if not safe_check(ads, 'value_units') or ads.value_units is quantities.unitquantity.Dimensionless else ads.value_units.dimensionality.unicode,
+        'valueName': safe_check(ads, 'value_name'),
     })
+
+
+def safe_check(obj, prop):
+    return getattr(obj, prop, None)

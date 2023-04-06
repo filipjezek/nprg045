@@ -11,6 +11,7 @@ import {
   delayWhen,
   pairwise,
   tap,
+  mergeMap,
 } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -102,7 +103,7 @@ export class AdsEffects {
   loadSpecificAds$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadSpecificAds),
-      switchMap(({ path, index }) =>
+      mergeMap(({ path, index }) =>
         of(path).pipe(
           delayWhen(() =>
             this.store

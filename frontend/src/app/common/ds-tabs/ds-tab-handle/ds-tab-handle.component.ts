@@ -43,7 +43,7 @@ export class DsTabHandleComponent implements OnInit {
     this.params$
       .pipe(withLatestFrom(this.path$), take(1))
       .subscribe(([params, path]) => {
-        this.router.navigate(['datastore', path, 'ds', params]);
+        this.router.navigate(['datastore', path, 'inspect', params]);
       });
   }
   closeTab() {
@@ -61,7 +61,7 @@ export class DsTabHandleComponent implements OnInit {
         if (params['viewing'].length == 0 && params['ready'].length > 0) {
           params['viewing'] = [params['ready'][0]];
         }
-        this.router.navigate(['datastore', path, 'ds', params]);
+        this.router.navigate(['datastore', path, 'inspect', params]);
       });
   }
 }

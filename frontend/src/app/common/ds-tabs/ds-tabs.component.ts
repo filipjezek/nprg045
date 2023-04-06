@@ -13,15 +13,16 @@ import { Store } from '@ngrx/store';
 import {
   combineLatestWith,
   delay,
+  distinctUntilChanged,
   filter,
   map,
   pipe,
+  shareReplay,
   take,
   takeUntil,
-  tap,
   withLatestFrom,
 } from 'rxjs';
-import { DsPage } from 'src/app/ds-pages/ds-page';
+import { DsPage } from 'src/app/ds-pages/common/ds-page';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { State } from 'src/app/store/reducers';
 import { Ads, AdsIdentifier } from 'src/app/store/reducers/ads.reducer';
@@ -57,8 +58,9 @@ export class DsTabsComponent
 
   viewing$ = this.store
     .select(routerSelectors.selectRouteParam('viewing'))
-    .pipe(this.paramToAds);
+    .pipe(distinctUntilChanged(), this.paramToAds, shareReplay(1));
   ready$ = this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
+    distinctUntilChanged(),
     this.paramToAds,
     combineLatestWith(this.viewing$),
     map(([ready, viewing]) => {
@@ -74,7 +76,8 @@ export class DsTabsComponent
         ds: subtract(ds, inter) as Partial<Ads> & { index: number },
         viewing: viewing.includes(ds),
       }));
-    })
+    }),
+    shareReplay(1)
   );
   ads$ = this.store.select((x) => x.ads.allAds);
 
@@ -102,6 +105,7 @@ export class DsTabsComponent
       )
       .subscribe(([containers, ads]) => {
         containers.forEach(async (container, i) => {
+          if (container.length) return;
           const ds = ads[i];
           await this.createComponent(ds, container);
           this.changeDetector.markForCheck();
@@ -131,7 +135,6 @@ export class DsTabsComponent
     const comp = await this.preloadPage(ds.identifier);
     const compref = container.createComponent(comp);
     compref.instance.ads = ds;
-    console.log(ds);
     return compref;
   }
 
@@ -155,13 +158,22 @@ export class DsTabsComponent
   commitReoderedTabs() {
     this.store
       .select(routerSelectors.selectRouteParams)
-      .pipe(take(1))
-      .subscribe((params) => {
+      .pipe(withLatestFrom(this.viewing$), take(1))
+      .subscribe(([params, viewing]) => {
         const reordered = { ...params };
         delete reordered['path'];
         reordered['ready'] = this.reorderedTabs;
 
-        this.router.navigate(['datastore', params['path'], 'ds', reordered]);
+        reordered['viewing'] = this.reorderedTabs.filter((x) =>
+          viewing.find((v) => v.index == x)
+        );
+
+        this.router.navigate([
+          'datastore',
+          params['path'],
+          'inspect',
+          reordered,
+        ]);
       });
   }
 }

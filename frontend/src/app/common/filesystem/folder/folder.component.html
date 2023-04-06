@@ -24,7 +24,7 @@
 </header>
 <div class="content" @folder *ngIf="!isString(info) && info.open">
   <mozaik-datastore
-    [link]="['datastore', extContext + info.name, 'model']"
+    [link]="['datastore', extContext + info.name, 'inspect']"
     *ngIf="info.datastore"
     name="."
   ></mozaik-datastore>
@@ -47,7 +47,7 @@
           (extContext + info.name == '/' ? '' : extContext + info.name) +
             '/' +
             cast(item).name,
-          'model'
+          'inspect'
         ]"
         [name]="cast(item).name"
       ></mozaik-datastore>

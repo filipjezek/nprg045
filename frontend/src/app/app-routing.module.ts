@@ -8,7 +8,7 @@ const routes: Routes = [
     path: 'datastore/:path',
     children: [
       {
-        path: 'ds',
+        path: 'inspect',
         component: DsTabsComponent,
       },
     ],

@@ -3,26 +3,41 @@ import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
   Observable,
+  auditTime,
   debounceTime,
   distinctUntilChanged,
   filter,
   map,
   shareReplay,
   startWith,
+  take,
   takeUntil,
   tap,
 } from 'rxjs';
 import { Unsubscribing } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
 import { selectNodes } from 'src/app/store/actions/model.actions';
-import { PerNeuronValue } from 'src/app/store/reducers/ads.reducer';
+import {
+  AdsIdentifier,
+  PerNeuronValue,
+} from 'src/app/store/reducers/ads.reducer';
 import { State } from 'src/app/store/reducers';
 import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
   PNVData,
 } from './network-graph/network-graph.component';
-import { DsPage, DsPageConstructor } from '../ds-page';
+import { DsPage, DsPageConstructor } from '../common/ds-page';
+import { TabState } from 'src/app/store/reducers/inspector.reducer';
+import { setTabState } from 'src/app/store/actions/inspector.actions';
+
+export interface ModelTabState extends TabState {
+  edges: EdgeDirection;
+  pnv: {
+    from: number;
+    to: number;
+  };
+}
 
 @Component({
   selector: 'mozaik-model-page',
@@ -30,7 +45,9 @@ import { DsPage, DsPageConstructor } from '../ds-page';
   styleUrls: ['./model-page.component.scss'],
 })
 export class ModelPageComponent
-  extends Unsubscribing(DsPage as DsPageConstructor<PerNeuronValue>)
+  extends Unsubscribing(
+    DsPage as DsPageConstructor<PerNeuronValue, ModelTabState>
+  )
   implements OnInit, AfterViewInit
 {
   edges: RadioOption[] = [
@@ -49,14 +66,15 @@ export class ModelPageComponent
   model$ = this.store.select((x) => x.model.currentModel);
   pnvData$: Observable<PNVData> = this.fullAds$.pipe(
     map((ds) => {
-      if (!ds) return ds as any;
+      if (ds?.identifier !== AdsIdentifier.PerNeuronValue) return null;
       const values = new Map<number, number>();
       ds.ids.forEach((id, i) => values.set(id, ds.values[i]));
       return { period: ds.period, unit: ds.unit, values };
-    })
+    }),
+    shareReplay(1)
   );
-  pnvRange$ = this.fullAds$.pipe(
-    filter((x) => !!x),
+  pnvExtent$ = this.fullAds$.pipe(
+    filter((x) => x?.identifier === AdsIdentifier.PerNeuronValue),
     map((pnv) => {
       const period = pnv?.period;
       if (period === null || period === undefined) {
@@ -67,15 +85,16 @@ export class ModelPageComponent
       }
       return { min: 0, max: period };
     }),
-    distinctUntilChanged(
-      (prev, curr) => prev.min == curr.min && prev.max == curr.max
-    ),
     tap((range) => {
       const fromCtrl = this.optionsForm.get(['pnv', 'from']);
       const toCtrl = this.optionsForm.get(['pnv', 'to']);
       setTimeout(() => {
-        fromCtrl.setValue(range.min);
-        toCtrl.setValue(range.max);
+        if (fromCtrl.value < range.min) {
+          fromCtrl.setValue(range.min);
+        }
+        if (toCtrl.value > range.max) {
+          toCtrl.setValue(range.max);
+        }
       });
     }),
     shareReplay(1)
@@ -97,7 +116,25 @@ export class ModelPageComponent
     super(store);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    super.ngOnInit();
+    this.optionsForm.valueChanges
+      .pipe(debounceTime(100), takeUntil(this.onDestroy$))
+      .subscribe((val) => {
+        this.store.dispatch(
+          setTabState({ index: this.ads.index, state: val as ModelTabState })
+        );
+      });
+    this.tabState$
+      .pipe(
+        filter((x) => !!x),
+        take(1),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe((state) =>
+        this.optionsForm.setValue(state, { emitEvent: false })
+      );
+  }
 
   ngAfterViewInit(): void {
     this.gEventS.escapePressed
@@ -105,5 +142,31 @@ export class ModelPageComponent
       .subscribe(() => {
         this.store.dispatch(selectNodes({ nodes: [] }));
       });
+  }
+
+  protected override initTabState(): void {
+    if (this.ads.identifier === AdsIdentifier.PerNeuronValue) {
+      this.pnvExtent$.pipe(take(1)).subscribe((extent) =>
+        this.store.dispatch(
+          setTabState({
+            index: this.ads.index,
+            state: {
+              edges: EdgeDirection.outgoing,
+              pnv: { from: extent.min, to: extent.max },
+            } as ModelTabState,
+          })
+        )
+      );
+    } else {
+      this.store.dispatch(
+        setTabState({
+          index: this.ads.index,
+          state: {
+            edges: EdgeDirection.outgoing,
+            pnv: { from: 0, to: 0 },
+          } as ModelTabState,
+        })
+      );
+    }
   }
 }

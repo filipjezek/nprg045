@@ -5,8 +5,8 @@ export const closeTab = createAction(
   '[ds inspector] close tab',
   props<{ index: number }>()
 );
-export const initTab = createAction(
-  '[ds page] init tab',
+export const setTabState = createAction(
+  '[ds page] set tab state',
   props<{ index: number; state: TabState }>()
 );
 export const toggleDsInfo = createAction(

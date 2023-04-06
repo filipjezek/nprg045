@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DsPage } from '../ds-page';
+import { DsPage } from '../common/ds-page';
 import { Ads } from 'src/app/store/reducers/ads.reducer';
 import { Store } from '@ngrx/store';
 import { State } from 'src/app/store/reducers';

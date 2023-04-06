@@ -1,5 +1,9 @@
 import { createReducer, on } from '@ngrx/store';
-import { closeTab, initTab, toggleDsInfo } from '../actions/inspector.actions';
+import {
+  closeTab,
+  setTabState,
+  toggleDsInfo,
+} from '../actions/inspector.actions';
 
 export const inspectorFeatureKey = 'inspector';
 
@@ -20,7 +24,7 @@ export const initialState: State = {
 
 export const reducer = createReducer(
   initialState,
-  on(initTab, (state, a) => ({
+  on(setTabState, (state, a) => ({
     ...state,
     tabs: {
       ...state.tabs,

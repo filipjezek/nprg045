@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { switchMap, catchError, map, tap } from 'rxjs/operators';
+import { switchMap, catchError, map, tap, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { State } from '../reducers';
@@ -25,7 +25,7 @@ export class FilesystemEffects {
     this.actions$.pipe(
       ofType(loadRecursiveFilesystem),
       tap(() => this.store.dispatch(loadingOverlayIncrement())),
-      switchMap(({ path }) =>
+      mergeMap(({ path }) =>
         this.fsService.loadRecursiveFilesystem(path).pipe(
           map((fs) => filesystemLoaded({ fs, path })),
           catchError((err: HttpErrorResponse) => {
@@ -41,7 +41,7 @@ export class FilesystemEffects {
   loadDirectory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadDirectory),
-      switchMap(({ path }) =>
+      mergeMap(({ path }) =>
         this.fsService.loadDirectory(path).pipe(
           map((fs) => filesystemLoaded({ fs, path })),
           catchError((err: HttpErrorResponse) => {
