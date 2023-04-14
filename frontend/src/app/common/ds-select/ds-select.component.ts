@@ -143,7 +143,6 @@ FROM
     data.forEach((row) => {
       if (row[col]?.[diffMeta] !== undefined) {
         row[col] = subtract(row[col], subtrahends.get(row[col][diffMeta]));
-        delete row[col][diffMeta];
       }
     });
   }

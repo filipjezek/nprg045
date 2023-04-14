@@ -7,13 +7,15 @@
 <ng-template #table>
   <div class="table">
     <div class="row header">
-      <mozaik-multiview [(ratios)]="colSizes">
-        <mozaik-multiview-partition
-          *ngFor="let item of colSchema | keyvaluenosort"
-        >
-          <mozaik-cell-header [key]="item.key"></mozaik-cell-header>
-        </mozaik-multiview-partition>
-      </mozaik-multiview>
+      <ng-container mozaikDsRow>
+        <mozaik-multiview [(ratios)]="colSizes">
+          <mozaik-multiview-partition
+            *ngFor="let item of colSchema | keyvaluenosort"
+          >
+            <mozaik-cell-header [key]="item.key"></mozaik-cell-header>
+          </mozaik-multiview-partition>
+        </mozaik-multiview>
+      </ng-container>
     </div>
     <div class="table-body">
       <ng-container *ngFor="let row of src; index as i">
@@ -25,23 +27,27 @@
             i < page * pageSizeControl.value
           "
         >
-          <mozaik-multiview [(ratios)]="colSizes">
-            <mozaik-multiview-partition
-              *ngFor="let item of colSchema | keyvaluenosort"
-            >
-              <ng-container *ngIf="isEmpty | purefn : row[item.key]; else cell"
-                ><mozaik-cell-empty></mozaik-cell-empty>
-              </ng-container>
-              <ng-template #cell>
-                <ng-template
-                  *ngComponentOutlet="
-                    cellTypes[item.value];
-                    injector: getInjector | purefn : row[item.key]
-                  "
-                ></ng-template>
-              </ng-template>
-            </mozaik-multiview-partition>
-          </mozaik-multiview>
+          <ng-container mozaikDsRow #rowRef="DsRow">
+            <mozaik-multiview [(ratios)]="colSizes">
+              <mozaik-multiview-partition
+                *ngFor="let item of colSchema | keyvaluenosort"
+              >
+                <ng-container
+                  *ngIf="isEmpty | purefn : row[item.key]; else cell"
+                  ><mozaik-cell-empty></mozaik-cell-empty>
+                </ng-container>
+                <ng-template #cell>
+                  <ng-template
+                    *ngComponentOutlet="
+                      cellTypes[item.value];
+                      injector: getInjector
+                        | purefn : row[item.key] : rowRef.injector
+                    "
+                  ></ng-template>
+                </ng-template>
+              </mozaik-multiview-partition>
+            </mozaik-multiview>
+          </ng-container>
         </div>
       </ng-container>
     </div>

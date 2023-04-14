@@ -45,6 +45,7 @@ import { ModelEffects } from './store/effects/model.effects';
 import { DsTabsComponent } from './common/ds-tabs/ds-tabs.component';
 import { DsTabHandleComponent } from './common/ds-tabs/ds-tab-handle/ds-tab-handle.component';
 import { SelectedNeuronsComponent } from './common/selected-neurons/selected-neurons.component';
+import { DsRowDirective } from './common/ds-select/ds-table/ds-row.directive';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -76,6 +77,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     DsTabsComponent,
     DsTabHandleComponent,
     SelectedNeuronsComponent,
+    DsRowDirective,
   ],
   imports: [
     BrowserModule,

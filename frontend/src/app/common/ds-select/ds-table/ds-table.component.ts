@@ -67,7 +67,7 @@ export class DsTableComponent implements OnInit {
     [ColType.string]: CellGenericComponent,
   };
 
-  clampRowsControl = new FormControl<boolean>(false);
+  clampRowsControl = new FormControl<boolean>(true);
   pageSizeControl = new FormControl<number>(20, { updateOn: 'blur' });
   page = 1;
 
@@ -117,9 +117,10 @@ export class DsTableComponent implements OnInit {
     return Math.ceil(num);
   }
 
-  getInjector(value: any) {
+  getInjector(value: any, parent: Injector) {
     return Injector.create({
       providers: [{ provide: DSCELL_VAL, useValue: value }],
+      parent,
     });
   }
 

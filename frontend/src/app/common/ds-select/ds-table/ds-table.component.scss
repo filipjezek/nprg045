@@ -19,32 +19,22 @@
   padding: 10px;
 }
 
+.row {
+  padding: 0 10px;
+  position: relative;
+}
 .header {
   font-weight: bold;
   color: var(--secondary-dark-text);
   background-color: var(--secondary-dark);
   position: sticky;
   top: 0;
-}
-.row {
-  padding: 0 10px;
+  z-index: 1;
 }
 
 .table-body {
   .row:nth-child(even) {
     background-color: #eee;
-  }
-
-  .row ::ng-deep {
-    mozaik-cell-generic,
-    mozaik-cell-object,
-    mozaik-cell-list,
-    mozaik-cell-link,
-    mozaik-cell-keyvalue,
-    mozaik-cell-empty {
-      margin: auto 0;
-      overflow-y: auto;
-    }
   }
 }
 
@@ -62,5 +52,17 @@
       width: 50px;
       font-size: 1.1em;
     }
+  }
+}
+
+.row ::ng-deep {
+  mozaik-cell-generic,
+  mozaik-cell-object,
+  mozaik-cell-list,
+  mozaik-cell-link,
+  mozaik-cell-keyvalue,
+  mozaik-cell-empty {
+    margin: auto 0;
+    overflow-y: auto;
   }
 }
