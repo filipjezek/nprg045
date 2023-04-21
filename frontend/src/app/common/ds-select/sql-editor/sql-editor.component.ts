@@ -101,7 +101,7 @@ export class SqlEditorComponent implements OnInit, AfterViewInit {
         }),
         EditorView.theme({
           '&': {
-            height: '120px',
+            height: '210px',
             resize: 'vertical',
             overflow: 'hidden',
             minHeight: '120px',

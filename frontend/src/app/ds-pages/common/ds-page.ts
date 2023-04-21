@@ -28,7 +28,7 @@ export class DsPage<T extends Ads = Ads, U extends TabState = TabState>
       .subscribe(([path, selected]) => {
         if (
           ds.identifier === AdsIdentifier.Connections ||
-          selected.find((s) => s.index == ds.index)
+          selected.some((s) => s.index == ds.index)
         )
           return;
         this.store.dispatch(loadSpecificAds({ path, index: ds.index }));

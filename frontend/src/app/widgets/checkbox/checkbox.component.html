@@ -1,5 +1,11 @@
-<label (mousedown)="changeState()">
+<ng-template #content>
   <ng-content></ng-content>
+</ng-template>
+
+<label (mousedown)="changeState()">
+  <ng-container *ngIf="labelPosition == 'left'">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+  </ng-container>
   <div
     [tabindex]="tabindex"
     [@splash]="checkboxState"
@@ -13,4 +19,7 @@
       (change)="onChange(value)"
     />
   </div>
+  <ng-container *ngIf="labelPosition == 'right'">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+  </ng-container>
 </label>

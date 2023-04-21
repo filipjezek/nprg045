@@ -9,10 +9,12 @@
     <div class="row header">
       <ng-container mozaikDsRow>
         <mozaik-multiview [(ratios)]="colSizes">
-          <mozaik-multiview-partition
-            *ngFor="let item of colSchema | keyvaluenosort"
-          >
-            <mozaik-cell-header [key]="item.key"></mozaik-cell-header>
+          <mozaik-multiview-partition *ngFor="let key of keys">
+            <mozaik-cell-header
+              [key]="key"
+              [type]="colSchema[key]"
+              [distinctValues]="enumValues[key]"
+            ></mozaik-cell-header>
           </mozaik-multiview-partition>
         </mozaik-multiview>
       </ng-container>
@@ -29,19 +31,15 @@
         >
           <ng-container mozaikDsRow #rowRef="DsRow">
             <mozaik-multiview [(ratios)]="colSizes">
-              <mozaik-multiview-partition
-                *ngFor="let item of colSchema | keyvaluenosort"
-              >
-                <ng-container
-                  *ngIf="isEmpty | purefn : row[item.key]; else cell"
+              <mozaik-multiview-partition *ngFor="let key of keys; index as i">
+                <ng-container *ngIf="isEmpty | purefn : row[i]; else cell"
                   ><mozaik-cell-empty></mozaik-cell-empty>
                 </ng-container>
                 <ng-template #cell>
                   <ng-template
                     *ngComponentOutlet="
-                      cellTypes[item.value];
-                      injector: getInjector
-                        | purefn : row[item.key] : rowRef.injector
+                      cellTypes[colSchema[key]];
+                      injector: getInjector | purefn : row[i] : rowRef.injector
                     "
                   ></ng-template>
                 </ng-template>

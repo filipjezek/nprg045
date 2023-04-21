@@ -1,6 +1,13 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  Injector,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { isEqual } from 'lodash-es';
+import { isEqual, uniqWith } from 'lodash-es';
 import { isPrimitive } from 'src/app/utils/is-primitive';
 import { LinkWrapper } from '../sql/user-sql-functions/make-link';
 import {
@@ -13,7 +20,7 @@ import { CellLinkComponent } from './cell-link/cell-link.component';
 import { CellListComponent } from './cell-list/cell-list.component';
 import { CellObjectComponent } from './cell-object/cell-object.component';
 
-enum ColType {
+export enum ColType {
   string,
   number,
   object,
@@ -28,31 +35,10 @@ enum ColType {
   templateUrl: './ds-table.component.html',
   styleUrls: ['./ds-table.component.scss'],
 })
-export class DsTableComponent implements OnInit {
+export class DsTableComponent implements OnInit, OnChanges {
   @Input() rowHeight: number = 47;
-  @Input() get src(): Record<string, any>[] {
-    return this._src;
-  }
-  set src(val) {
-    if (!val || !val.length) {
-      this._src = val;
-      this.colSchema = {};
-      this.colSizes = [];
-      return;
-    }
-    const keys = Object.keys(val[0]);
-    const schema = this.getSchema(keys, val);
-    if (!isEqual(schema, this.colSchema)) {
-      const length = keys.length;
-      this.colSizes = Array(length).fill(100 / length);
-      this.colSchema = schema;
-      this.page = 1;
-    } else if (val.length != this._src.length) {
-      this.page = 1;
-    }
-    this._src = val;
-  }
-  private _src: Record<string, any>[] = [];
+  @Input() src: any[][] = [];
+  @Input() keys: string[] = [];
 
   colSizes: number[] = [];
   colSchema: Record<string, ColType>;
@@ -66,6 +52,7 @@ export class DsTableComponent implements OnInit {
     [ColType.object]: CellObjectComponent,
     [ColType.string]: CellGenericComponent,
   };
+  enumValues: Record<string, any[]>;
 
   clampRowsControl = new FormControl<boolean>(true);
   pageSizeControl = new FormControl<number>(20, { updateOn: 'blur' });
@@ -73,44 +60,65 @@ export class DsTableComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('src' in changes) {
+      const change = changes['src'];
+      if (!change.currentValue?.length) {
+        this.colSchema = {};
+        this.colSizes = [];
+        return;
+      }
+      if (change.currentValue === change.previousValue) return;
 
-  private getColType(value: any) {
-    switch (typeof value) {
-      case 'boolean':
-        return ColType.boolean;
-      case 'number':
-        return ColType.number;
-      case 'string':
-        return ColType.string;
-      default:
-        break;
+      this.computeEnumValues(change.currentValue);
+      const schema = this.getSchema(this.keys, this.enumValues);
+      if (!isEqual(schema, this.colSchema)) {
+        const length = this.keys.length;
+        this.colSizes = Array(length).fill(100 / length);
+        this.colSchema = schema;
+        this.page = 1;
+      } else if (change.currentValue.length != change.previousValue.length) {
+        this.page = 1;
+      }
     }
-    if (value instanceof Array) {
-      return ColType.array;
-    }
-    if (value instanceof LinkWrapper) {
-      return ColType.link;
-    }
-    if (Object.values(value).every((val) => isPrimitive(val))) {
-      return ColType.keyvalue;
-    }
-    return ColType.object;
   }
 
-  private getSchema(keys: string[], values: Record<string, any>[]) {
-    const notFound = new Set(keys);
+  ngOnInit(): void {}
+
+  private getSchema(keys: string[], distinctValues: Record<string, any[]>) {
     const schema: Record<string, ColType> = {};
-    for (let i = 0; i < values.length && notFound.size; ++i) {
-      notFound.forEach((key) => {
-        if (values[i][key] !== null && values[i][key] !== undefined) {
-          schema[key] = this.getColType(values[i][key]);
-          notFound.delete(key);
+    keys.forEach((key) => {
+      if (!distinctValues[key]) return;
+      for (const val of distinctValues[key]) {
+        if (val !== null && val !== undefined) {
+          schema[key] = getColType(val);
+          return;
         }
-      });
-    }
-    notFound.forEach((key) => (schema[key] = ColType.object));
+      }
+      schema[key] = ColType.object;
+    });
     return schema;
+  }
+
+  private computeEnumValues(values: any[][]) {
+    this.enumValues = {};
+    if (!values.length) return;
+
+    this.keys.forEach((key, i) => {
+      this.enumValues[key] = uniqWith(
+        values.map((row) => row[i]),
+        isEqual
+      );
+      if (
+        typeof this.enumValues[key].find(
+          (x) => x !== null && x !== undefined
+        ) == 'number'
+      ) {
+        this.enumValues[key].sort((a, b) => a - b);
+      } else {
+        this.enumValues[key].sort();
+      }
+    });
   }
 
   ceil(num: number) {
@@ -133,4 +141,30 @@ export class DsTableComponent implements OnInit {
       isEqual(val, {})
     );
   }
+}
+
+export function getColType(value: any) {
+  switch (typeof value) {
+    case 'boolean':
+      return ColType.boolean;
+    case 'number':
+      return ColType.number;
+    case 'string':
+      return ColType.string;
+    default:
+      break;
+  }
+  if (value instanceof Array) {
+    return ColType.array;
+  }
+  if (value instanceof LinkWrapper) {
+    return ColType.link;
+  }
+  if (value === null) {
+    return ColType.object;
+  }
+  if (Object.values(value).every((val) => isPrimitive(val))) {
+    return ColType.keyvalue;
+  }
+  return ColType.object;
 }

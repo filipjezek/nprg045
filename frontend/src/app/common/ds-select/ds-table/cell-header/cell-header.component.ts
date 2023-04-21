@@ -5,12 +5,22 @@ import {
   OnInit,
 } from '@angular/core';
 import {
+  faFilter,
   faSort,
   faSortDown,
   faSortUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { merge, take } from 'rxjs';
-import { ColSortService } from '../col-sort.service';
+import { DialogService } from 'src/app/services/dialog.service';
+import { ColType } from '../ds-table.component';
+import { FilterDialogComponent } from '../filters/filter-dialog/filter-dialog.component';
+import { State } from 'src/app/store/reducers';
+import { selectOrderColumn } from 'src/app/store/selectors/navigator.selectors';
+import { Store } from '@ngrx/store';
+import {
+  addCondition,
+  sortByColumn,
+} from 'src/app/store/actions/navigator.actions';
 
 @Component({
   selector: 'mozaik-cell-header',
@@ -19,25 +29,49 @@ import { ColSortService } from '../col-sort.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CellHeaderComponent implements OnInit {
-  sort$ = merge(
-    this.colSortS.sortChangedFromCode$,
-    this.colSortS.sortChangedFromTemplate$
-  );
+  ColType = ColType;
+
+  sort$ = this.store.select(selectOrderColumn);
   @Input() key: string;
+  @Input() type: ColType;
+
+  @Input() distinctValues: any[];
 
   faSort = faSort;
   faSortUp = faSortUp;
   faSortDown = faSortDown;
+  faFilter = faFilter;
 
-  constructor(private colSortS: ColSortService) {}
+  constructor(private store: Store<State>, private dialogS: DialogService) {}
 
   ngOnInit(): void {}
 
   sortData() {
     this.sort$.pipe(take(1)).subscribe((sort) => {
-      this.colSortS.setSortColumn(
-        { key: this.key, asc: sort?.key == this.key ? !sort?.asc : true },
-        true
+      this.store.dispatch(
+        sortByColumn({
+          key: this.key,
+          asc: sort?.key == this.key ? !sort?.asc : true,
+        })
+      );
+    });
+  }
+
+  filterData() {
+    const ref = this.dialogS.openUnattached(FilterDialogComponent);
+    ref.type = this.type;
+    ref.distinctValues = this.distinctValues;
+    ref.key = this.key;
+    ref.attach();
+
+    ref.addEventListener('close', () => this.dialogS.close());
+    ref.addEventListener('value', (e) => {
+      this.dialogS.close();
+      this.store.dispatch(
+        addCondition({
+          condition: (e as CustomEvent<string>).detail,
+          key: this.key,
+        })
       );
     });
   }

@@ -83,6 +83,7 @@ export class CheckboxComponent
   checkboxState: 'unchecking' | 'checking' | 'checked' | 'unchecked';
 
   @Input() disabled = false;
+  @Input() labelPosition: 'left' | 'right' = 'left';
   @Input() tabindex = 0;
   @Input() get value(): boolean {
     return this.control.value;

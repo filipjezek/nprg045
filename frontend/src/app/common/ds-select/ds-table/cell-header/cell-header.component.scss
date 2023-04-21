@@ -1,11 +1,15 @@
 :host {
   overflow-x: auto;
+  display: flex;
+  align-items: center;
+  margin: auto 0;
 
   fa-icon {
     margin-right: 8px;
+    transition: opacity 0.1s;
 
     &.unsorted {
-      visibility: hidden;
+      opacity: 0.2;
     }
   }
 
@@ -20,8 +24,21 @@
         text-decoration: underline;
       }
       .unsorted {
-        visibility: visible;
+        opacity: 1;
       }
+    }
+  }
+
+  .filter {
+    padding: 12px 5px;
+    cursor: pointer;
+
+    fa-icon {
+      margin-right: 0px;
+    }
+
+    &:not(:hover) fa-icon {
+      opacity: 0.2;
     }
   }
 }

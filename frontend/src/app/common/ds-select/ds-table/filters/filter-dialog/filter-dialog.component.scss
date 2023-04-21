@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  padding: 10px;
+  background-color: var(--background);
+  width: 400px;
+  box-shadow: 0 0 3px #00000078;
+
+  &.wide {
+    width: 800px;
+  }
+
+  h1 {
+    font-size: 1em;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 18px;
+
+    button {
+      border: 0;
+      background-color: transparent;
+      font-size: 1em;
+      cursor: pointer;
+      color: #5e5e5e;
+      margin-right: 10px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    mozaik-button {
+      width: 75px;
+    }
+  }
+}
+
+.columns {
+  display: flex;
+  align-items: center;
+
+  & > * {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}

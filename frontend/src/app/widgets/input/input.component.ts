@@ -25,7 +25,7 @@ export class InputComponent implements OnInit, ControlValueAccessor {
   private onTouchedCb: () => void;
   private onChangeCb: (value: any) => void;
 
-  @Input() placeholder: string;
+  @Input() placeholder = '';
   @Input() type = 'text';
   @Input() autocomplete = 'off';
   @Input() get value(): any {

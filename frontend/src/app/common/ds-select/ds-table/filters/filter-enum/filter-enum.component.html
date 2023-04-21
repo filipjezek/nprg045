@@ -1,0 +1,16 @@
+<form [formGroup]="form" (focusout)="onTouched()">
+  <p>{{ key + path }}</p>
+  <mozaik-select [items]="mustOptions" formControlName="must"></mozaik-select>
+  <p>be one of</p>
+  <div class="options" formArrayName="values">
+    <div class="flex-container">
+      <mozaik-checkbox
+        [formControlName]="i"
+        *ngFor="let item of values; index as i"
+        labelPosition="right"
+      >
+        {{ item ?? "NULL" }}
+      </mozaik-checkbox>
+    </div>
+  </div>
+</form>

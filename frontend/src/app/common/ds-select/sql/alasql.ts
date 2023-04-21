@@ -9,6 +9,7 @@ import * as stableStringify from 'json-stable-stringify';
 export const ALASQL = new InjectionToken<typeof alasql>('alasql', {
   factory: () => {
     addUserFunctions();
+    alasql.options.modifier = 'MATRIX';
     return alasql;
   },
 });

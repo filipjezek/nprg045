@@ -1,0 +1,14 @@
+<form [formGroup]="form" (focusout)="onTouched()">
+  <p>{{ key + path }}</p>
+  <mozaik-select [items]="mustOptions" formControlName="must"></mozaik-select>
+  <mozaik-select [items]="options" formControlName="op"></mozaik-select>
+  <mozaik-input
+    formControlName="right"
+    type="text"
+    placeholder="text"
+  ></mozaik-input>
+  <mozaik-select
+    [items]="caseOptions"
+    formControlName="caseSensitive"
+  ></mozaik-select>
+</form>

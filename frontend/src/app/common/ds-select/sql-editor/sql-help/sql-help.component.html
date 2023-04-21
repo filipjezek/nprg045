@@ -10,6 +10,11 @@
       <a href="https://github.com/AlaSQL/alasql/wiki/JSON">JS object queries</a
       >, as well as
       <a href="https://github.com/AlaSQL/alasql/wiki/GRAPH">graph queries</a>.
+      It is possible to
+      <a href="https://github.com/AlaSQL/alasql/wiki/User-Defined-Functions"
+        >define custom functions</a
+      >
+      in the editor.
     </p>
     <p>
       Also see known
@@ -26,9 +31,9 @@
       <a href="https://github.com/AlaSQL/alasql/wiki/IndexedDB">IndexedDB</a>).
     </p>
     <p>
-      Please note that equality comparison of JSON objects and arrays is wildly
-      unpredictable, so a better option is to compare
-      <code class="fn">JSON_STRINGIFY</code>-ied values
+      Please note that deep equality comparison of JSON objects and arrays
+      requires the <code>===</code> operator. If you want to group by JSON, use
+      <code class="fn">JSON_STRINGIFY</code>.
     </p>
   </section>
   <section class="editor">

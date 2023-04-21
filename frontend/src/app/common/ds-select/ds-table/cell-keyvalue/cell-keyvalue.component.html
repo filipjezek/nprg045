@@ -13,11 +13,11 @@
     [style.left.px]="popupLeft"
     [style.width.px]="popupWidth"
   >
-    <mozaik-property-bag [value]="value"></mozaik-property-bag>
+    <mozaik-property-bag [bag]="value"></mozaik-property-bag>
   </div>
   <div class="arrow" [style.left.px]="popupLeft + popupWidth"></div>
 </ng-template>
 
 <ng-template #keyval>
-  <mozaik-property-bag [value]="value"></mozaik-property-bag>
+  <mozaik-property-bag [bag]="value"></mozaik-property-bag>
 </ng-template>

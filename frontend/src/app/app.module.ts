@@ -46,10 +46,16 @@ import { DsTabsComponent } from './common/ds-tabs/ds-tabs.component';
 import { DsTabHandleComponent } from './common/ds-tabs/ds-tab-handle/ds-tab-handle.component';
 import { SelectedNeuronsComponent } from './common/selected-neurons/selected-neurons.component';
 import { DsRowDirective } from './common/ds-select/ds-table/ds-row.directive';
+import { FilterDialogComponent } from './common/ds-select/ds-table/filters/filter-dialog/filter-dialog.component';
+import { FilterNumberComponent } from './common/ds-select/ds-table/filters/filter-number/filter-number.component';
+import { FilterStringComponent } from './common/ds-select/ds-table/filters/filter-string/filter-string.component';
+import { FilterEnumComponent } from './common/ds-select/ds-table/filters/filter-enum/filter-enum.component';
+import { FilterArrayComponent } from './common/ds-select/ds-table/filters/filter-array/filter-array.component';
+import { FilterSwitchComponent } from './common/ds-select/ds-table/filters/filter-dialog/filter-switch/filter-switch.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
-})[] = [NetworkTrackerComponent, SqlHelpComponent];
+})[] = [NetworkTrackerComponent, SqlHelpComponent, FilterDialogComponent];
 
 @NgModule({
   declarations: [
@@ -78,6 +84,12 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     DsTabHandleComponent,
     SelectedNeuronsComponent,
     DsRowDirective,
+    FilterDialogComponent,
+    FilterNumberComponent,
+    FilterStringComponent,
+    FilterEnumComponent,
+    FilterArrayComponent,
+    FilterSwitchComponent,
   ],
   imports: [
     BrowserModule,

@@ -134,7 +134,7 @@ export const reducer = createReducer(
         : (nodes as NetworkNode[]);
     if (
       nodes.length == 1 &&
-      state.selected.find((n) => n.id == normalized[0].id)
+      state.selected.some((n) => n.id == normalized[0].id)
     ) {
       return { ...state, selected: [] };
     }
@@ -147,7 +147,7 @@ export const reducer = createReducer(
         : (nodes as NetworkNode[]);
     if (
       nodes.length == 1 &&
-      state.selected.find((n) => n.id == normalized[0].id)
+      state.selected.some((n) => n.id == normalized[0].id)
     ) {
       return {
         ...state,

@@ -1,8 +1,27 @@
-<div
-  class="item"
-  *ngFor="let item of value | keyvalue"
-  [style.border-color]="colorFromString | purefn : item.key"
->
-  <span class="key">{{ item.key }}:</span
-  ><span class="value">{{ item.value | json }}</span>
-</div>
+<ng-container *ngIf="hasControl; else plain">
+  <label
+    mozaikKeyboardClick
+    class="item"
+    *ngFor="let item of bag | keyvalue"
+    [style.border-color]="colorFromString | purefn : item.key"
+    (click)="onTouchedCb()"
+  >
+    <input
+      type="radio"
+      [formControl]="control"
+      [value]="item.key"
+      (change)="onChangeCb(control.value)"
+    />
+    <span class="key">{{ item.key }}</span>
+  </label>
+</ng-container>
+<ng-template #plain>
+  <div
+    class="item"
+    *ngFor="let item of bag | keyvalue"
+    [style.border-color]="colorFromString | purefn : item.key"
+  >
+    <span class="key">{{ item.key }}:</span
+    ><span class="value">{{ item.value | json }}</span>
+  </div>
+</ng-template>

@@ -1,4 +1,12 @@
-<div class="sort" (click)="sortData()">
+<div
+  class="filter"
+  title="filter column"
+  (click)="filterData()"
+  *ngIf="type != ColType.link"
+>
+  <fa-icon [icon]="faFilter"></fa-icon>
+</div>
+<div class="sort" (click)="sortData()" title="sort data">
   <ng-container *ngIf="(sort$ | async)?.key == key; else unsorted">
     <fa-icon
       [icon]="faSortUp"

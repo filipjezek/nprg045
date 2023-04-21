@@ -1,0 +1,53 @@
+<ng-container
+  *ngIf="
+    type == ColType.object &&
+      distinctValues?.length == 1 &&
+      (distinctValues[0] === null || distinctValues[0] === undefined);
+    else canBeFiltered
+  "
+>
+  <div class="empty">Nothing to filter</div>
+</ng-container>
+<ng-template #canBeFiltered>
+  <div
+    class="filter"
+    *ngIf="
+      type != ColType.object &&
+        type != ColType.array &&
+        type != ColType.keyvalue &&
+        distinctValues?.length &&
+        distinctValues.length < 9;
+      else nonEnum
+    "
+  >
+    <mozaik-filter-enum
+      [formControl]="control"
+      [key]="key"
+      [path]="path"
+      [values]="distinctValues"
+    ></mozaik-filter-enum>
+  </div>
+  <ng-template #nonEnum>
+    <div class="filter" [ngSwitch]="type">
+      <mozaik-filter-number
+        [formControl]="control"
+        *ngSwitchCase="ColType.number"
+        [key]="key"
+        [path]="path"
+      ></mozaik-filter-number>
+      <mozaik-filter-string
+        [formControl]="control"
+        *ngSwitchCase="ColType.string"
+        [key]="key"
+        [path]="path"
+      ></mozaik-filter-string>
+      <mozaik-filter-array
+        [formControl]="control"
+        *ngSwitchCase="ColType.array"
+        [key]="key"
+        [path]="path"
+      ></mozaik-filter-array>
+      <p *ngSwitchDefault></p>
+    </div>
+  </ng-template>
+</ng-template>

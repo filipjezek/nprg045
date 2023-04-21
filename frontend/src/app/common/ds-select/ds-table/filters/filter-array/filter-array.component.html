@@ -1,0 +1,27 @@
+<form [formGroup]="form" (focusout)="onTouched()">
+  <p>{{ key + path }}</p>
+  <div class="row">
+    <mozaik-select [items]="mustOptions" formControlName="must"></mozaik-select>
+    <p>contain</p>
+    <mozaik-select [items]="typeOptions" formControlName="type"></mozaik-select>
+  </div>
+  <ng-container [ngSwitch]="form.value.type">
+    <mozaik-input
+      placeholder="item"
+      formControlName="item"
+      type="number"
+      *ngSwitchCase="'number'"
+    ></mozaik-input>
+    <mozaik-input
+      placeholder="item"
+      formControlName="item"
+      type="text"
+      *ngSwitchCase="'string'"
+    ></mozaik-input>
+    <mozaik-select
+      formControlName="item"
+      [items]="boolOptions"
+      *ngSwitchCase="'boolean'"
+    ></mozaik-select>
+  </ng-container>
+</form>

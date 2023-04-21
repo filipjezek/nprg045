@@ -1,0 +1,16 @@
+<label *ngIf="label" [for]="id">{{ label }}</label>
+<select
+  [id]="id"
+  (click)="onTouched()"
+  (change)="onChange(value)"
+  [formControl]="control"
+  [attr.aria-label]="label ? null : placeholder"
+  [style.width.px]="width"
+>
+  <option *ngIf="placeholder" value="" selected disabled hidden>
+    {{ placeholder }}
+  </option>
+  <option *ngFor="let item of items" [value]="item.value">
+    {{ item.label }}
+  </option>
+</select>

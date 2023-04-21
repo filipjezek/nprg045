@@ -1,0 +1,20 @@
+<form [formGroup]="form" (focusout)="onTouched()">
+  <p>{{ key + path }} must be</p>
+  <mozaik-select [items]="options" formControlName="op"></mozaik-select>
+  <div class="row">
+    <mozaik-input
+      formControlName="right1"
+      type="number"
+      [placeholder]="form.value.op == 'BETWEEN' ? 'number 1' : 'number'"
+    ></mozaik-input>
+    <ng-container *ngIf="form.value.op == 'BETWEEN'">
+      and
+      <mozaik-input
+        type="number"
+        formControlName="right2"
+        placeholder="number 2"
+        *ngIf="form.value.op == 'BETWEEN'"
+      ></mozaik-input>
+    </ng-container>
+  </div>
+</form>
