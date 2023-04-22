@@ -1,7 +1,9 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -20,6 +22,9 @@ export interface DragEvent {
 export class MultiviewPartitionComponent implements OnInit {
   @ViewChild('content') public content: TemplateRef<any>;
   @Input() data: any;
+  @Output() visible = new EventEmitter<boolean>();
+
+  public static minSize = 5;
 
   constructor() {}
 

@@ -1,19 +1,60 @@
 <mozaik-header></mozaik-header>
-<mozaik-multiview [ratios]="[100, 0, 0]">
-  <mozaik-multiview-partition>
+<mozaik-multiview [(ratios)]="ratios" #multiview>
+  <mozaik-multiview-partition (visible)="navigatorVisible = $event">
+    <mozaik-multiview-toggle
+      [style.right.px]="0"
+      (click)="
+        openPartition(1, 'left');
+        inspectorVisible = true;
+        navigatorVisible = false
+      "
+      *ngIf="!inspectorVisible"
+    >
+      Inspector
+    </mozaik-multiview-toggle>
     <mozaik-ds-select></mozaik-ds-select>
   </mozaik-multiview-partition>
-  <mozaik-multiview-partition>
+
+  <mozaik-multiview-partition (visible)="inspectorVisible = $event">
+    <mozaik-multiview-toggle
+      [style.left.px]="0"
+      (click)="
+        openPartition(0, 'right');
+        inspectorVisible = false;
+        navigatorVisible = true
+      "
+      *ngIf="!navigatorVisible"
+    >
+      Navigator
+    </mozaik-multiview-toggle>
+    <mozaik-multiview-toggle
+      [style.right.px]="0"
+      (click)="openPartition(2, 'left', 400); neuronsVisible = true"
+      *ngIf="!neuronsVisible; else neuronsVisibleToggle"
+    >
+      Selected neurons
+    </mozaik-multiview-toggle>
+    <ng-template #neuronsVisibleToggle>
+      <mozaik-multiview-toggle
+        [style.right.px]="0"
+        (click)="openPartition(1, 'right'); neuronsVisible = false"
+      >
+        Hide neurons
+      </mozaik-multiview-toggle>
+    </ng-template>
+
     <router-outlet *ngIf="!(modelLoading$ | async)"></router-outlet>
     <mozaik-model-loading
       *ngIf="modelLoading$ | async"
       [progress]="modelLoading$ | async"
     ></mozaik-model-loading>
   </mozaik-multiview-partition>
-  <mozaik-multiview-partition>
+
+  <mozaik-multiview-partition (visible)="neuronsVisible = $event">
     <mozaik-selected-neurons></mozaik-selected-neurons>
   </mozaik-multiview-partition>
 </mozaik-multiview>
+
 <mozaik-loading-overlay
   @fade
   *ngIf="showLoadingOverlay$ | async"

@@ -1,4 +1,10 @@
-import { Component, Input, OnInit, forwardRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+  forwardRef,
+} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -27,7 +33,7 @@ import { SQLBuilder } from '../../../sql/sql-builder';
       multi: true,
     },
   ],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterEnumComponent
   extends FilterBase

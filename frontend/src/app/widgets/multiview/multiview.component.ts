@@ -10,6 +10,8 @@ import {
   OnInit,
   Output,
   QueryList,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
 import { MultiviewPartitionComponent } from './multiview-partition/multiview-partition.component';
 import {
@@ -22,6 +24,7 @@ import {
   startWith,
   takeUntil,
   tap,
+  withLatestFrom,
 } from 'rxjs';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { groupBy } from 'src/app/utils/group-by';
@@ -156,21 +159,61 @@ export class MultiviewComponent
       initialFirstSize;
 
     this.gEventS.mouseMove
-      .pipe(takeUntil(this.gEventS.mouseReleased))
-      .subscribe((e) => {
+      .pipe(
+        withLatestFrom(this.partitions$),
+        takeUntil(this.gEventS.mouseReleased)
+      )
+      .subscribe(([e, columns]) => {
         e.preventDefault();
         let firstSize =
           initialFirstSize + (this.vertical ? e.y - initE.y : e.x - initE.x);
+        const min = MultiviewPartitionComponent.minSize;
+
         if (this.relativeRatios) {
-          firstSize = Math.max(0, Math.min(firstSize, totalSize));
+          firstSize = Math.max(min, Math.min(firstSize, totalSize - min));
+          this.notifyVisibilityChanges(index, columns, firstSize, totalSize);
           this.ratios[index - 1] = totalPct * (firstSize / totalSize);
           this.ratios[index] = totalPct - this.ratios[index - 1];
         } else {
-          firstSize = Math.max(0, firstSize);
+          firstSize = Math.max(min, firstSize);
+          this.notifyVisibilityChanges(index, columns, firstSize, totalSize);
           this.ratios[index - 1] = firstSize;
         }
+
         this.ratiosChange.emit([...this.ratios]);
         this.changeDetector.markForCheck();
       });
+  }
+
+  private notifyVisibilityChanges(
+    index: number,
+    columns: MultiviewPartitionComponent[][],
+    firstSize: number,
+    totalSize: number
+  ) {
+    const min = 2 * MultiviewPartitionComponent.minSize;
+    let initialFirstSize = this.ratios[index];
+    if (this.relativeRatios) {
+      initialFirstSize =
+        (this.ratios[index - 1] * totalSize) /
+        (this.ratios[index] + this.ratios[index - 1]);
+    }
+    if (firstSize >= min && initialFirstSize < min) {
+      console.log(index - 1, 'visible');
+      columns[index - 1].forEach((col) => col.visible.emit(true));
+    } else if (firstSize < min && initialFirstSize >= min) {
+      console.log(index - 1, 'not visible');
+      columns[index - 1].forEach((col) => col.visible.emit(false));
+    }
+    if (totalSize - firstSize >= min && totalSize - initialFirstSize < min) {
+      console.log(index, 'visible');
+      columns[index].forEach((col) => col.visible.emit(true));
+    } else if (
+      totalSize - firstSize < min &&
+      totalSize - initialFirstSize >= min
+    ) {
+      console.log(index, 'not visible');
+      columns[index].forEach((col) => col.visible.emit(false));
+    }
   }
 }

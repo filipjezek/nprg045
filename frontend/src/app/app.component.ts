@@ -1,5 +1,5 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
 import { auditTime } from 'rxjs';
@@ -8,6 +8,8 @@ import { NetworkTrackerComponent } from './common/network-tracker/network-tracke
 import { DialogService } from './services/dialog.service';
 import { loadDirectory } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
+import { MultiviewComponent } from './widgets/multiview/multiview.component';
+import { MultiviewPartitionComponent } from './widgets/multiview/multiview-partition/multiview-partition.component';
 
 @Component({
   selector: 'mozaik-root',
@@ -46,7 +48,16 @@ export class AppComponent implements OnInit {
   showNetworkButton$ = this.store.select((x) => x.net.requests.length > 0);
   modelLoading$ = this.store.select((x) => x.model.loading);
 
+  @ViewChild('multiview', { read: ElementRef })
+  private multiview: ElementRef<HTMLElement>;
+
   faSatelliteDish = faSatelliteDish;
+  ratios = [100, 0, 0];
+  minPartitionWidth = MultiviewPartitionComponent.minSize;
+
+  navigatorVisible = true;
+  inspectorVisible = false;
+  neuronsVisible = false;
 
   constructor(private store: Store<State>, private dialogS: DialogService) {}
 
@@ -59,5 +70,20 @@ export class AppComponent implements OnInit {
       zIndex: 11,
     });
     ref.addEventListener('close', () => this.dialogS.close());
+  }
+
+  openPartition(index: number, direction: 'left' | 'right', limitPx?: number) {
+    const newRatios = [...this.ratios];
+    const other = index + (direction == 'left' ? -1 : 1);
+    const total = newRatios[index] + newRatios[other];
+    const maxPct =
+      limitPx === undefined
+        ? total
+        : (limitPx / this.multiview.nativeElement.clientWidth) * 100;
+
+    newRatios[index] = Math.min(total, maxPct);
+    newRatios[other] = total - newRatios[index];
+
+    this.ratios = newRatios;
   }
 }

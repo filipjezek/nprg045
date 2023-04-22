@@ -14,6 +14,7 @@ import { ViewChild } from '@angular/core';
 import { TemplateRef } from '@angular/core';
 import { ViewRef } from '@angular/core';
 import { AfterViewInit } from '@angular/core';
+import { MultiviewPartitionComponent } from 'src/app/widgets/multiview/multiview-partition/multiview-partition.component';
 
 @Component({
   selector: 'mozaik-cell-keyvalue',
@@ -50,12 +51,21 @@ export class CellKeyvalueComponent
   }
 
   showPopup() {
-    this.popupLeft = this.el.nativeElement.offsetLeft;
-    this.popupWidth = this.el.nativeElement.clientWidth;
+    this.popupLeft =
+      this.el.nativeElement.getBoundingClientRect().left -
+      this.getRowHTMLElement().getBoundingClientRect().left -
+      MultiviewPartitionComponent.minSize / 2;
+    this.popupWidth =
+      this.el.nativeElement.clientWidth + MultiviewPartitionComponent.minSize;
     this.row.viewContainer.insert(this.popupViewRef);
   }
 
   hidePopup() {
     this.row.viewContainer.detach();
+  }
+
+  private getRowHTMLElement() {
+    let el: Node = this.row.viewContainer.element.nativeElement;
+    return el instanceof HTMLElement ? el : el.parentElement;
   }
 }

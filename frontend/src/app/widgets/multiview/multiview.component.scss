@@ -7,20 +7,21 @@
     flex-basis: 100%;
     display: flex;
     align-items: stretch;
-    min-width: 0;
-    min-height: 0;
+    min-width: 5px;
+    min-height: 5px;
 
     .handle {
-      flex-basis: 3px;
+      flex-basis: 5px;
       flex-shrink: 0;
       background-color: #0000002e;
-      padding: 0 1px;
+      padding: 0 2px;
       background-clip: content-box;
     }
     .content {
       flex-basis: 100%;
       display: flex;
       align-items: stretch;
+      position: relative;
     }
   }
 

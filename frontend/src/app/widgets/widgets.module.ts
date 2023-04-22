@@ -26,6 +26,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
 import { DraggableDirective } from './directives/draggable.directive';
 import { PropertyBagComponent } from './property-bag/property-bag.component';
 import { SelectComponent } from './select/select.component';
+import { MultiviewToggleComponent } from './multiview/multiview-toggle/multiview-toggle.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { SelectComponent } from './select/select.component';
     DraggableDirective,
     PropertyBagComponent,
     SelectComponent,
+    MultiviewToggleComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FontAwesomeModule],
   exports: [
@@ -73,6 +75,7 @@ import { SelectComponent } from './select/select.component';
     DraggableDirective,
     PropertyBagComponent,
     SelectComponent,
+    MultiviewToggleComponent,
   ],
 })
 export class WidgetsModule {}
