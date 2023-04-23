@@ -44,10 +44,6 @@
     </ng-template>
 
     <router-outlet *ngIf="!(modelLoading$ | async)"></router-outlet>
-    <mozaik-model-loading
-      *ngIf="modelLoading$ | async"
-      [progress]="modelLoading$ | async"
-    ></mozaik-model-loading>
   </mozaik-multiview-partition>
 
   <mozaik-multiview-partition (visible)="neuronsVisible = $event">
@@ -55,6 +51,10 @@
   </mozaik-multiview-partition>
 </mozaik-multiview>
 
+<mozaik-model-loading
+  [progress]="modelLoading$ | async"
+  *ngIf="modelLoading$ | async"
+></mozaik-model-loading>
 <mozaik-loading-overlay
   @fade
   *ngIf="showLoadingOverlay$ | async"
