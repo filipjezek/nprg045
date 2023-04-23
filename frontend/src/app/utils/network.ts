@@ -21,6 +21,7 @@ export function getIncomingConnections(
   sheet: string,
   all: NetworkNode[]
 ): Connection[] {
+  if (selected.size == 0) return [];
   return all.flatMap(
     (n) =>
       n.sheets[sheet]?.connections
