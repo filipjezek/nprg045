@@ -10,15 +10,19 @@
       font-size: 1.2em;
     }
 
+    &.contains-selection ::ng-deep .node {
+      stroke-opacity: 0.3;
+    }
+    &:not(.contains-selection) ::ng-deep .node.pnv {
+      stroke-opacity: 1;
+    }
+
     ::ng-deep {
       svg {
         width: 100%;
         box-shadow: 0 0 2px #00000078;
         background-color: white;
 
-        .event-capturer {
-          fill: transparent;
-        }
         .lasso {
           path {
             stroke: rgb(80, 80, 80);
@@ -58,7 +62,7 @@
           &.hovered,
           &.selected,
           &.possible,
-          &.pnv {
+          &.neighbor {
             stroke-opacity: 1;
           }
           &.not-possible {

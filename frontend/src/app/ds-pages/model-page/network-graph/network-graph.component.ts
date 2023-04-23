@@ -80,7 +80,7 @@ export class NetworkGraphComponent
   @Input() sheetName: string;
   @Input() allNodes: NetworkNode[];
 
-  private selectedNodes$ = this.store.select((x) => x.model.selected);
+  selectedNodes$ = this.store.select((x) => x.model.selected);
   private recomputeSelected$ = new Subject<void>();
 
   @Input() edgeDir: EdgeDirection;
