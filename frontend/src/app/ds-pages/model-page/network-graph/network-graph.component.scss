@@ -79,6 +79,9 @@
           &.incoming.outgoing {
             stroke: #9c27b0;
           }
+          &.hidden {
+            display: none;
+          }
         }
         .arrowhead {
           stroke: none;

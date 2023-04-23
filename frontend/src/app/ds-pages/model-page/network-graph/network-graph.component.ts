@@ -96,6 +96,7 @@ export class NetworkGraphComponent
 
   hoveredEdge: Connection;
   hoveredNode$ = this.store.select((x) => x.model.hovered);
+  hoveredNodeVisible = false;
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
   filteredPnv = 0;
 
@@ -126,7 +127,7 @@ export class NetworkGraphComponent
     if (changes['pnv'] || changes['edgeDir']) {
       this.recomputeSelected$.next();
     } else if (changes['pnvFilter']) {
-      this.pnvFeature.filterPnv();
+      this.pnvFeature.filterEdges();
     }
   }
 
@@ -139,6 +140,7 @@ export class NetworkGraphComponent
         takeUntil(this.onDestroy$)
       )
       .subscribe(([prev, curr]) => {
+        this.hoveredNodeVisible = false;
         if (prev) {
           this.circles.select('.hovered').classed('hovered', false);
         }
@@ -146,6 +148,8 @@ export class NetworkGraphComponent
           const tgt = this.circles
             .select(`[data-id="${curr.id}"]`)
             .classed('hovered', true);
+          if (tgt.empty()) return;
+          this.hoveredNodeVisible = true;
           const bboxNode = (tgt.node() as HTMLElement).getBoundingClientRect();
           this.tooltipPos = {
             ...this.recalcTooltipPos(bboxNode.left, bboxNode.top),
