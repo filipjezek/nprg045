@@ -13,6 +13,7 @@ import {
   take,
   takeUntil,
   tap,
+  withLatestFrom,
 } from 'rxjs';
 import { Unsubscribing } from 'src/app/mixins/unsubscribing.mixin';
 import { GlobalEventService } from 'src/app/services/global-event.service';
@@ -25,17 +26,19 @@ import { State } from 'src/app/store/reducers';
 import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
+  Extent,
   PNVData,
 } from './network-graph/network-graph.component';
 import { DsPage, DsPageConstructor } from '../common/ds-page';
 import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
+import { isEqual } from 'lodash-es';
 
 export interface ModelTabState extends TabState {
   edges: EdgeDirection;
   pnv: {
-    from: number;
-    to: number;
+    min: number;
+    max: number;
   };
 }
 
@@ -57,9 +60,9 @@ export class ModelPageComponent
   ];
   optionsForm = this.fb.nonNullable.group({
     edges: EdgeDirection.outgoing,
-    pnv: this.fb.group({
-      from: this.fb.control<number>(null),
-      to: this.fb.control<number>(null),
+    pnv: this.fb.nonNullable.group({
+      min: 0,
+      max: 0,
     }),
   });
 
@@ -86,8 +89,8 @@ export class ModelPageComponent
       return { min: 0, max: period };
     }),
     tap((range) => {
-      const fromCtrl = this.optionsForm.get(['pnv', 'from']);
-      const toCtrl = this.optionsForm.get(['pnv', 'to']);
+      const fromCtrl = this.optionsForm.get(['pnv', 'min'] as const);
+      const toCtrl = this.optionsForm.get(['pnv', 'max'] as const);
       setTimeout(() => {
         if (fromCtrl.value < range.min) {
           fromCtrl.setValue(range.min);
@@ -102,9 +105,9 @@ export class ModelPageComponent
   pnvFilter$ = this.optionsForm.valueChanges.pipe(
     debounceTime(100),
     startWith(this.optionsForm.value),
-    map((form) => form.pnv as { from: number; to: number }),
+    map((form) => form.pnv as Required<Extent>),
     distinctUntilChanged(
-      (prev, curr) => prev?.from === curr?.from && prev?.to === curr?.to
+      (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
     )
   );
 
@@ -119,8 +122,13 @@ export class ModelPageComponent
   ngOnInit(): void {
     super.ngOnInit();
     this.optionsForm.valueChanges
-      .pipe(debounceTime(100), takeUntil(this.onDestroy$))
-      .subscribe((val) => {
+      .pipe(
+        debounceTime(100),
+        withLatestFrom(this.tabState$),
+        filter(([val, state]) => !isEqual(val, state)),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe(([val]) => {
         this.store.dispatch(
           setTabState({ index: this.ads.index, state: val as ModelTabState })
         );
@@ -131,9 +139,7 @@ export class ModelPageComponent
         take(1),
         takeUntil(this.onDestroy$)
       )
-      .subscribe((state) =>
-        this.optionsForm.setValue(state, { emitEvent: false })
-      );
+      .subscribe((state) => this.optionsForm.setValue(state));
   }
 
   ngAfterViewInit(): void {
@@ -152,7 +158,7 @@ export class ModelPageComponent
             index: this.ads.index,
             state: {
               edges: EdgeDirection.outgoing,
-              pnv: { from: extent.min, to: extent.max },
+              pnv: { ...extent },
             } as ModelTabState,
           })
         )
@@ -163,7 +169,7 @@ export class ModelPageComponent
           index: this.ads.index,
           state: {
             edges: EdgeDirection.outgoing,
-            pnv: { from: 0, to: 0 },
+            pnv: { min: 0, max: 0 },
           } as ModelTabState,
         })
       );

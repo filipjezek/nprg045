@@ -16,6 +16,9 @@
         box-shadow: 0 0 2px #00000078;
         background-color: white;
 
+        .event-capturer {
+          fill: transparent;
+        }
         .lasso {
           path {
             stroke: rgb(80, 80, 80);

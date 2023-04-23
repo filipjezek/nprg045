@@ -12,7 +12,7 @@
     <label
       ><span class="text">From</span>
       <mozaik-range
-        formControlName="from"
+        formControlName="min"
         [min]="(pnvExtent$ | async)?.min"
         [max]="(pnvExtent$ | async)?.max"
       ></mozaik-range>
@@ -20,7 +20,7 @@
     <label
       ><span class="text">To</span>
       <mozaik-range
-        formControlName="to"
+        formControlName="max"
         [min]="(pnvExtent$ | async)?.min"
         [max]="(pnvExtent$ | async)?.max"
       ></mozaik-range>
@@ -36,7 +36,6 @@
 <mozaik-network-graph
   [sheetName]="ads.sheet"
   [pnv]="pnvData$ | async"
-  [pnvExtent]="pnvExtent$ | async"
   [pnvFilter]="pnvFilter$ | async"
   [nodes]="(model$ | async)?.sheetNodes[ads.sheet]"
   [edgeDir]="optionsForm.value.edges"
