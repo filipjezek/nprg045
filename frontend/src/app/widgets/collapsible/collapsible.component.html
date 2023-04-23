@@ -1,4 +1,4 @@
-<header [class.open]="open" (click)="open = !open">
+<header [class.open]="open" (click)="open = !open; openChange.emit(open)">
   <fa-icon [icon]="faChevronRight" class="folder-marker"></fa-icon
   ><ng-content select="[slot=header]"></ng-content>
 </header>

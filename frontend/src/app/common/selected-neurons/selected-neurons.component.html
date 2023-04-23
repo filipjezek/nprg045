@@ -1,7 +1,7 @@
 <h1>Selected neurons</h1>
 <mozaik-collapsible
   class="node"
-  *ngFor="let node of nodeData; trackBy: trackById"
+  *ngFor="let node of nodeData; trackBy: trackById; index as i"
 >
   <h2
     slot="header"
@@ -64,9 +64,12 @@
       </mozaik-collapsible>
     </ng-container>
   </mozaik-collapsible>
-  <mozaik-collapsible class="incoming">
+  <mozaik-collapsible
+    class="incoming"
+    (openChange)="loadIncomingConnections(i)"
+  >
     <h3 slot="header">Incoming ({{ sumSheets | purefn : node.in }})</h3>
-    <ng-container *ngFor="let sheet of node.in | keyvalue">
+    <ng-container *ngFor="let sheet of node.in || {} | keyvalue">
       <mozaik-collapsible class="sheet" *ngIf="sheet.value.length">
         <h4 slot="header">{{ sheet.key }} ({{ sheet.value.length }})</h4>
         <table>

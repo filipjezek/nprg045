@@ -3,7 +3,9 @@ import { Store } from '@ngrx/store';
 import {
   combineLatest,
   distinctUntilChanged,
+  pairwise,
   shareReplay,
+  take,
   takeUntil,
 } from 'rxjs';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
@@ -36,15 +38,12 @@ export class SelectedNeuronsComponent
   }
 
   ngOnInit(): void {
-    combineLatest([
-      this.allNodes$.pipe(distinctUntilChanged()),
-      this.selectedNodes$.pipe(distinctUntilChanged()),
-    ])
-      .pipe(takeUntil(this.onDestroy$))
-      .subscribe(([all, selected]) => {
-        this.nodeData = selected.map((n) => ({
+    this.selectedNodes$
+      .pipe(distinctUntilChanged(), pairwise(), takeUntil(this.onDestroy$))
+      .subscribe(([old, curr]) => {
+        this.nodeData = curr.map((n) => ({
           node: n,
-          in: getAllIncomingConnections(n, all),
+          in: null,
         }));
       });
   }
@@ -72,10 +71,22 @@ export class SelectedNeuronsComponent
   sumSheets(sheets: {
     [key: string]: Connection[] | NetworkNode['sheets'][string];
   }) {
+    if (!sheets) return 'pending';
     return Object.values(sheets).reduce(
       (total, conns) =>
         total + ('length' in conns ? conns.length : conns.connections.length),
       0
     );
+  }
+
+  loadIncomingConnections(index: number) {
+    if (this.nodeData[index].in === null) {
+      let all: NetworkNode[];
+      this.allNodes$.pipe(take(1)).subscribe((nodes) => (all = nodes));
+      this.nodeData[index].in = getAllIncomingConnections(
+        this.nodeData[index].node,
+        all
+      );
+    }
   }
 }

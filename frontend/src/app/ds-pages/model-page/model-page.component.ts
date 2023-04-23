@@ -3,7 +3,6 @@ import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
   Observable,
-  auditTime,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -102,14 +101,7 @@ export class ModelPageComponent
     }),
     shareReplay(1)
   );
-  pnvFilter$ = this.optionsForm.valueChanges.pipe(
-    debounceTime(100),
-    startWith(this.optionsForm.value),
-    map((form) => form.pnv as Required<Extent>),
-    distinctUntilChanged(
-      (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
-    )
-  );
+  pnvFilter$: Observable<Extent>;
 
   constructor(
     store: Store<State>,
@@ -139,7 +131,18 @@ export class ModelPageComponent
         take(1),
         takeUntil(this.onDestroy$)
       )
-      .subscribe((state) => this.optionsForm.setValue(state));
+      .subscribe((state) => {
+        this.optionsForm.setValue(state);
+      });
+    this.pnvFilter$ = this.optionsForm.valueChanges.pipe(
+      debounceTime(100),
+      startWith(this.optionsForm.value),
+      map((form) => form.pnv as Required<Extent>),
+      distinctUntilChanged(
+        (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
+      ),
+      shareReplay(1)
+    );
   }
 
   ngAfterViewInit(): void {

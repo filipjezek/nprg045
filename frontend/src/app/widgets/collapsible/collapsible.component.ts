@@ -1,5 +1,5 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { dialogClose, dialogOpen } from 'src/app/animations';
 
@@ -15,6 +15,7 @@ import { dialogClose, dialogOpen } from 'src/app/animations';
   ],
 })
 export class CollapsibleComponent implements OnInit {
+  @Output() openChange = new EventEmitter<boolean>();
   @Input() open = false;
   faChevronRight = faChevronRight;
 

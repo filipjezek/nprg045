@@ -29,8 +29,8 @@
 </form>
 <mozaik-scale
   *ngIf="fullAds$ | async"
-  [extent]="pnvExtent$ | async"
-  [periodic]="!!(fullAds$ | async)?.period"
+  [extent]="pnvFilter$ | async"
+  [period]="(fullAds$ | async)?.period"
   [unit]="(fullAds$ | async)?.unit"
 ></mozaik-scale>
 <mozaik-network-graph

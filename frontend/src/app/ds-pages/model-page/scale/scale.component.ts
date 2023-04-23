@@ -21,7 +21,7 @@ import { Directional } from '../network-graph/network-graph.component';
 export class ScaleComponent implements AfterViewInit, OnChanges {
   @Input() extent: { min: number; max: number };
   @Input() unit: string;
-  @Input() periodic: boolean;
+  @Input() period: number;
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
   hoveredValue: number = null;
@@ -35,7 +35,7 @@ export class ScaleComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      (changes['extent'] || changes['periodicity']) &&
+      (changes['extent'] || changes['period']) &&
       this.container?.nativeElement
     ) {
       this.drawScale();
@@ -44,13 +44,16 @@ export class ScaleComponent implements AfterViewInit, OnChanges {
 
   private drawScale() {
     this.container.nativeElement.innerHTML = '';
+    const hasPeriod = this.period !== undefined && this.period !== null;
     this.container.nativeElement.appendChild(
       Legend(
         d3
           .scaleSequential(
-            this.periodic ? d3.interpolateRainbow : d3.interpolateWarm
+            hasPeriod ? d3.interpolateRainbow : d3.interpolateWarm
           )
-          .domain([this.extent.min, this.extent.max]),
+          .domain(
+            hasPeriod ? [0, this.period] : [this.extent.min, this.extent.max]
+          ),
         { title: this.unit }
       )
     );

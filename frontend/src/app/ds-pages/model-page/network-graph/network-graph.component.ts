@@ -114,6 +114,9 @@ export class NetworkGraphComponent
     this.initZoom();
     this.lasso = new LassoFeature(this.svg, this.store);
     this.pnvFeature = new PNVFeature(this.circles, this.nodes, this.edges);
+    if (this.pnv) {
+      this.pnvFeature.setData(this.pnv, this.pnvFilter);
+    }
     this.redraw();
     this.subscribeSelection();
   }
