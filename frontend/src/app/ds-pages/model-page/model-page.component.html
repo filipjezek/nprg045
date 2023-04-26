@@ -13,16 +13,16 @@
       ><span class="text">From</span>
       <mozaik-range
         formControlName="min"
-        [min]="(pnvExtent$ | async)?.min"
-        [max]="(pnvExtent$ | async)?.max"
+        [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
+        [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
       ></mozaik-range>
     </label>
     <label
       ><span class="text">To</span>
       <mozaik-range
         formControlName="max"
-        [min]="(pnvExtent$ | async)?.min"
-        [max]="(pnvExtent$ | async)?.max"
+        [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
+        [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
       ></mozaik-range>
     </label>
   </p>

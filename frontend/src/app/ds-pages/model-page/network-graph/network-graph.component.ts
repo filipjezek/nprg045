@@ -92,20 +92,18 @@ export class NetworkGraphComponent
   private svg: SVGRef;
   private lasso: LassoFeature;
   private zoom: ZoomFeature;
-  private pnvFeature: PNVFeature;
+  pnvFeature: PNVFeature;
 
   hoveredEdge: Connection;
   hoveredNode$ = this.store.select((x) => x.model.hovered);
   hoveredNodeVisible = false;
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
-  filteredPnv = 0;
 
   constructor(private store: Store<State>) {
     super();
   }
 
   ngOnInit(): void {
-    this.filteredPnv = this.pnv?.values.size;
     this.subscribeHoveredNode();
   }
 
