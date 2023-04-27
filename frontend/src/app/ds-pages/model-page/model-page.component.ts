@@ -192,11 +192,9 @@ export class ModelPageComponent
       .toExponential()
       .split('e')
       .map((n) => +n);
-    console.log(mantissa);
     mantissa =
       Math[dir == 'down' ? 'floor' : 'ceil'](mantissa * mantissaPrecision) /
       mantissaPrecision;
-    console.log(mantissa);
     return mantissa * Math.pow(10, exponent);
   }
 }

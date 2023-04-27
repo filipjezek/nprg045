@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -99,7 +100,10 @@ export class NetworkGraphComponent
   hoveredNodeVisible = false;
   tooltipPos: Partial<Directional<string>> = { left: '0px', top: '0px' };
 
-  constructor(private store: Store<State>) {
+  constructor(
+    private store: Store<State>,
+    private changeDetector: ChangeDetectorRef
+  ) {
     super();
   }
 
@@ -116,6 +120,10 @@ export class NetworkGraphComponent
       this.pnvFeature.setData(this.pnv, this.pnvFilter);
     }
     this.redraw();
+    if (this.pnv) {
+      this.pnvFeature.filterPnv();
+      this.changeDetector.markForCheck();
+    }
     this.subscribeSelection();
   }
 
