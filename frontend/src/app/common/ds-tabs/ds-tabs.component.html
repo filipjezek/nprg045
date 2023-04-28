@@ -1,4 +1,23 @@
-<div class="config"></div>
+<div class="settings">
+  <div class="main">
+    <mozaik-checkbox
+      [formControl]="sharedControlsCtrl"
+      *ngIf="(viewing$ | async).length > 1"
+      >Shared controls</mozaik-checkbox
+    >
+    <mozaik-select
+      *ngIf="(viewing$ | async).length > 1"
+      [items]="groupingOptions"
+      label="Group by"
+      [formControl]="groupingCtrl"
+    ></mozaik-select>
+  </div>
+  <div class="shared" *ngIf="sharedControlsCtrl.value">
+    <ng-container *ngFor="let item of firstOfType$ | async">
+      <ng-container *ngTemplateOutlet="item"></ng-container>
+    </ng-container>
+  </div>
+</div>
 <header>
   <mozaik-ds-tab-handle
     #handle
@@ -12,11 +31,13 @@
     (drop)="commitReoderedTabs()"
   ></mozaik-ds-tab-handle>
 </header>
-<mozaik-multiview>
+<mozaik-multiview
+  [secondaryAxisGroup]="grouperFactory | purefn : groupingCtrl.value"
+>
   <ng-container
     *ngFor="let ds of viewing$ | async; index as i; trackBy: trackByDsIndex"
   >
-    <mozaik-multiview-partition>
+    <mozaik-multiview-partition [data]="ds">
       <ng-template #tabContent></ng-template>
     </mozaik-multiview-partition>
   </ng-container>

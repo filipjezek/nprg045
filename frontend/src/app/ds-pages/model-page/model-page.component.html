@@ -1,32 +1,39 @@
-<mozaik-ds-info [ds]="ads"></mozaik-ds-info>
-<form [formGroup]="optionsForm">
-  <p class="label">
-    Displayed edges
-    <mozaik-button-radio
-      [options]="edges"
-      formControlName="edges"
-    ></mozaik-button-radio>
-  </p>
-  <p class="label pnv" formGroupName="pnv" *ngIf="pnvData$ | async">
-    Filter PerNeuronValue
-    <label
-      ><span class="text">From</span>
-      <mozaik-range
-        formControlName="min"
-        [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
-        [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
-      ></mozaik-range>
-    </label>
-    <label
-      ><span class="text">To</span>
-      <mozaik-range
-        formControlName="max"
-        [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
-        [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
-      ></mozaik-range>
-    </label>
-  </p>
-</form>
+<mozaik-ds-info [index]="ads.index"></mozaik-ds-info>
+<ng-template #controls>
+  <form [formGroup]="optionsForm">
+    <p class="label">
+      Displayed edges
+      <mozaik-button-radio
+        [options]="edges"
+        formControlName="edges"
+      ></mozaik-button-radio>
+    </p>
+    <p class="label pnv" formGroupName="pnv" *ngIf="pnvData$ | async">
+      Filter PerNeuronValue
+      <label
+        ><span class="text">From</span>
+        <mozaik-range
+          formControlName="min"
+          [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
+          [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
+        ></mozaik-range>
+      </label>
+      <label
+        ><span class="text">To</span>
+        <mozaik-range
+          formControlName="max"
+          [min]="roundFloat | purefn : (pnvExtent$ | async)?.min : 'down'"
+          [max]="roundFloat | purefn : (pnvExtent$ | async)?.max : 'up'"
+        ></mozaik-range>
+      </label>
+    </p>
+  </form>
+</ng-template>
+
+<ng-container *ngIf="!(sharedControls$ | async)">
+  <ng-container *ngTemplateOutlet="controls"></ng-container>
+</ng-container>
+
 <mozaik-scale
   *ngIf="fullAds$ | async"
   [extent]="pnvFilter$ | async"

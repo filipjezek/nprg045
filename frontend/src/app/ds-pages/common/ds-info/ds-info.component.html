@@ -1,8 +1,8 @@
-<div class="prop">
+<div class="prop" *ngIf="ds.algorithm">
   <span class="key">Algorithm</span>
   <span class="value">{{ ds.algorithm }}</span>
 </div>
-<div class="prop">
+<div class="prop" *ngIf="ds.identifier">
   <span class="key">Identifier</span>
   <span class="value">{{ ds.identifier }}</span>
 </div>

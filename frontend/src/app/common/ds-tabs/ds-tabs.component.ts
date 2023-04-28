@@ -8,16 +8,18 @@ import {
   AfterViewInit,
   Type,
   ChangeDetectorRef,
+  OnInit,
+  TemplateRef,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
+  Observable,
   combineLatestWith,
   delay,
-  distinctUntilChanged,
   filter,
   map,
-  pipe,
   shareReplay,
+  startWith,
   take,
   takeUntil,
   withLatestFrom,
@@ -27,12 +29,17 @@ import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { State } from 'src/app/store/reducers';
 import { Ads, AdsIdentifier } from 'src/app/store/reducers/ads.reducer';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
-import {
-  AggregationStage,
-  makeIntersection,
-} from '../ds-select/sql/user-sql-functions/make-intersection';
 import { subtract } from '../ds-select/sql/user-sql-functions/subtract';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
+import {
+  selectCommonReadyProps,
+  selectReady,
+  selectViewing,
+} from 'src/app/store/selectors/inspector.selectors';
+import { FormControl } from '@angular/forms';
+import { toggleSharedControls } from 'src/app/store/actions/inspector.actions';
+import { Labelled } from 'src/app/widgets/select/select.component';
+import { GroupingFn } from 'src/app/widgets/multiview/multiview.component';
 
 @Component({
   selector: 'mozaik-ds-tabs',
@@ -42,51 +49,41 @@ import { Router } from '@angular/router';
 })
 export class DsTabsComponent
   extends UnsubscribingComponent
-  implements AfterViewInit
+  implements AfterViewInit, OnInit
 {
-  private paramToAds = pipe(
-    map<string, number[]>((param) =>
-      param ? param.split(',').map((n) => +n) : []
-    ),
-    withLatestFrom(
-      this.store.select((x) => x.ads.allAds).pipe(filter((x) => !!x?.length))
-    ),
-    map(([indices, ads]) => indices.map((i) => ads[i]))
-  );
   @ViewChildren('tabContent', { read: ViewContainerRef })
   private viewContainerRefs: QueryList<ViewContainerRef>;
 
-  viewing$ = this.store
-    .select(routerSelectors.selectRouteParam('viewing'))
-    .pipe(distinctUntilChanged(), this.paramToAds, shareReplay(1));
-  ready$ = this.store.select(routerSelectors.selectRouteParam('ready')).pipe(
-    distinctUntilChanged(),
-    this.paramToAds,
-    combineLatestWith(this.viewing$),
-    map(([ready, viewing]) => {
+  viewing$ = this.store.select(selectViewing);
+  ready$ = this.store.select(selectReady).pipe(
+    combineLatestWith(this.viewing$, this.store.select(selectCommonReadyProps)),
+    map(([ready, viewing, commonReady]) => {
       if (!ready.length) return [];
-
-      let inter = makeIntersection(ready[0], null, AggregationStage.init);
-      delete inter.index;
-      for (let i = 1; i < ready.length; ++i) {
-        inter = makeIntersection(ready[i], inter, AggregationStage.step);
-      }
+      if (commonReady) delete commonReady.index;
 
       return ready.map((ds) => ({
-        ds: subtract(ds, inter) as Partial<Ads> & { index: number },
+        ds: subtract(ds, commonReady) as Partial<Ads> & { index: number },
         viewing: viewing.includes(ds),
       }));
     }),
     shareReplay(1)
   );
-  ads$ = this.store.select((x) => x.ads.allAds);
+  sharedControlsCtrl = new FormControl(false);
+  groupingCtrl = new FormControl('index');
+  firstOfType$: Observable<TemplateRef<any>[]>;
 
-  /**
-   * ds.index mapped to corresponding component
-   */
-  tabs: Record<number, ComponentRef<any>> = {};
+  groupingOptions: Labelled<string>[] = [
+    { label: 'index', value: 'index' },
+    { label: 'sheet', value: 'sheet' },
+    { label: 'algorithm', value: 'algorithm' },
+    { label: 'stimulus', value: 'stimulus' },
+    { label: 'neuron', value: 'neuron' },
+    { label: 'value name', value: 'valueName' },
+    { label: 'identifier', value: 'identifier' },
+  ];
 
   private reorderedTabs: number[];
+  private compRefs: Map<ViewContainerRef, ComponentRef<DsPage>> = new Map();
 
   constructor(
     private store: Store<State>,
@@ -107,10 +104,34 @@ export class DsTabsComponent
         containers.forEach(async (container, i) => {
           if (container.length) return;
           const ds = ads[i];
-          await this.createComponent(ds, container);
+          this.compRefs.set(
+            container,
+            await this.createComponent(ds, container)
+          );
           this.changeDetector.markForCheck();
         });
       });
+
+    this.firstOfType$ = this.createFirstOfType();
+  }
+
+  ngOnInit(): void {
+    this.store
+      .select((x) => x.inspector.sharedControls)
+      .pipe(
+        filter((shared) => shared != this.sharedControlsCtrl.value),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe((shared) => {
+        this.sharedControlsCtrl.setValue(shared);
+      });
+    this.sharedControlsCtrl.valueChanges
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((val) =>
+        this.store.dispatch(toggleSharedControls({ shared: val }))
+      );
+
+    this.subscribeGrouping();
   }
 
   private async preloadPage(ds: AdsIdentifier): Promise<Type<DsPage<Ads>>> {
@@ -175,5 +196,58 @@ export class DsTabsComponent
           reordered,
         ]);
       });
+  }
+
+  createFirstOfType() {
+    return (
+      this.viewContainerRefs.changes as Observable<QueryList<ViewContainerRef>>
+    ).pipe(
+      delay(0),
+      startWith(this.viewContainerRefs),
+      delay(0),
+      map((refs) => {
+        const newMap = new Map<ViewContainerRef, ComponentRef<DsPage>>();
+        const components = refs.map((r) => {
+          newMap.set(r, this.compRefs.get(r));
+          return this.compRefs.get(r).instance;
+        });
+        this.compRefs = newMap;
+        const identifierSet = new Set<AdsIdentifier>();
+        return components
+          .filter((c) => {
+            const res = !identifierSet.has(c.ads.identifier);
+            identifierSet.add(c.ads.identifier);
+            return res;
+          })
+          .map((c) => c.controls);
+      })
+    );
+  }
+
+  private subscribeGrouping() {
+    this.store
+      .select(routerSelectors.selectRouteParam('groupby'))
+      .pipe(take(1))
+      .subscribe((groupby) => {
+        if (this.groupingCtrl.value != groupby && groupby) {
+          this.groupingCtrl.setValue(groupby);
+        }
+      });
+
+    this.groupingCtrl.valueChanges
+      .pipe(
+        startWith(this.groupingCtrl.value),
+        withLatestFrom(this.store.select(routerSelectors.selectRouteParams)),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe(([val, params]) => {
+        const grouped: Params = { ...params, groupby: val };
+        delete grouped['path'];
+        this.router.navigate(['datastore', params['path'], 'inspect', grouped]);
+      });
+  }
+
+  grouperFactory(key: string): GroupingFn {
+    return (part) => part.data[key];
   }
 }

@@ -1,6 +1,6 @@
 <div
   class="tab"
-  (click)="viewTab()"
+  (click)="viewTab($event.shiftKey)"
   (auxclick)="$event.button == 1 ? closeTab() : null"
   [class.viewing]="viewing"
   [title]="ds | json"

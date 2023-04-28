@@ -3,6 +3,7 @@ import {
   closeTab,
   setTabState,
   toggleDsInfo,
+  toggleSharedControls,
 } from '../actions/inspector.actions';
 
 export const inspectorFeatureKey = 'inspector';
@@ -15,11 +16,13 @@ export interface State {
    */
   tabs: Record<number, TabState>;
   dsInfoCollapsed: boolean;
+  sharedControls: boolean;
 }
 
 export const initialState: State = {
   tabs: {},
   dsInfoCollapsed: true,
+  sharedControls: false,
 };
 
 export const reducer = createReducer(
@@ -28,7 +31,7 @@ export const reducer = createReducer(
     ...state,
     tabs: {
       ...state.tabs,
-      [a.index]: a.state,
+      [a.index]: { ...state.tabs[a.index], ...a.state },
     },
   })),
   on(closeTab, (state, { index }) => {
@@ -39,5 +42,9 @@ export const reducer = createReducer(
   on(toggleDsInfo, (state, { collapsed }) => ({
     ...state,
     dsInfoCollapsed: collapsed,
+  })),
+  on(toggleSharedControls, (state, { shared }) => ({
+    ...state,
+    sharedControls: shared,
   }))
 );

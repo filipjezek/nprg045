@@ -7,9 +7,13 @@ export const closeTab = createAction(
 );
 export const setTabState = createAction(
   '[ds page] set tab state',
-  props<{ index: number; state: TabState }>()
+  props<{ index: number; state: Partial<TabState> }>()
 );
 export const toggleDsInfo = createAction(
   '[ds page] toggle ds info',
   props<{ collapsed: boolean }>()
+);
+export const toggleSharedControls = createAction(
+  '[ds page] toggle shared controls',
+  props<{ shared: boolean }>()
 );

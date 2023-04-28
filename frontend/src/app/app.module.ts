@@ -52,6 +52,7 @@ import { FilterStringComponent } from './common/ds-select/ds-table/filters/filte
 import { FilterEnumComponent } from './common/ds-select/ds-table/filters/filter-enum/filter-enum.component';
 import { FilterArrayComponent } from './common/ds-select/ds-table/filters/filter-array/filter-array.component';
 import { FilterSwitchComponent } from './common/ds-select/ds-table/filters/filter-dialog/filter-switch/filter-switch.component';
+import { InspectorEffects } from './store/effects/inspector.effects';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -103,7 +104,12 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
         strictActionTypeUniqueness: true,
       },
     }),
-    EffectsModule.forRoot([FilesystemEffects, AdsEffects, ModelEffects]),
+    EffectsModule.forRoot([
+      FilesystemEffects,
+      AdsEffects,
+      ModelEffects,
+      InspectorEffects,
+    ]),
     // for performance reasons many safe checks are disabled (store model is huge and freezing it
     // takes a long time), also some objects will not be displayed in devtools
     StoreDevtoolsModule.instrument({

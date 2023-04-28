@@ -48,11 +48,11 @@ export class SelectComponent
   private onTouchedCb: () => void;
   private onChangeCb: (v: string | number) => void;
 
-  id: number;
+  id: string;
 
   constructor() {
     super();
-    this.id = ++SelectComponent.instanceCount;
+    this.id = 'mozaik-select-' + ++SelectComponent.instanceCount;
   }
 
   ngOnInit() {}

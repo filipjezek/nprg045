@@ -1,4 +1,10 @@
-import { Injectable, Input, OnInit } from '@angular/core';
+import {
+  Injectable,
+  Input,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { Ads, AdsIdentifier } from '../../store/reducers/ads.reducer';
 import { isEqual } from 'lodash-es';
 import { Store } from '@ngrx/store';
@@ -12,10 +18,12 @@ import { setTabState } from 'src/app/store/actions/inspector.actions';
 export type DsPageConstructor<T extends Ads, U extends TabState> = new (
   store: Store<State>
 ) => DsPage<T, U>;
+
 @Injectable()
 export class DsPage<T extends Ads = Ads, U extends TabState = TabState>
   implements OnInit
 {
+  public controls: TemplateRef<any>;
   @Input() public set ads(ds: Ads) {
     if (isEqual(ds, this._ads)) return;
     this._ads = ds;
@@ -42,10 +50,12 @@ export class DsPage<T extends Ads = Ads, U extends TabState = TabState>
   public fullAds$ = this.store
     .select((x) => x.ads.selectedAds)
     .pipe(map((all) => all.find((ds) => ds.index == this.ads.index) as T));
-
   public tabState$ = this.store
     .select((x) => x.inspector.tabs)
     .pipe(map((all) => all[this.ads.index] as U));
+  protected sharedControls$ = this.store.select(
+    (x) => x.inspector.sharedControls
+  );
 
   constructor(protected store: Store<State>) {}
 

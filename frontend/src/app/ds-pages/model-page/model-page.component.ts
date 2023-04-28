@@ -1,8 +1,15 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import {
   Observable,
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -32,6 +39,7 @@ import { DsPage, DsPageConstructor } from '../common/ds-page';
 import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
 import { isEqual } from 'lodash-es';
+import { selectSameTypeViewing } from 'src/app/store/selectors/inspector.selectors';
 
 export interface ModelTabState extends TabState {
   edges: EdgeDirection;
@@ -52,6 +60,8 @@ export class ModelPageComponent
   )
   implements OnInit, AfterViewInit
 {
+  @ViewChild('controls') public controls: TemplateRef<any>;
+
   edges: RadioOption[] = [
     { label: 'Incoming', value: EdgeDirection.incoming },
     { label: 'Outgoing', value: EdgeDirection.outgoing },
@@ -75,32 +85,7 @@ export class ModelPageComponent
     }),
     shareReplay(1)
   );
-  pnvExtent$ = this.fullAds$.pipe(
-    filter((x) => x?.identifier === AdsIdentifier.PerNeuronValue),
-    map((pnv) => {
-      const period = pnv?.period;
-      if (period === null || period === undefined) {
-        return {
-          min: Math.min(...pnv.values),
-          max: Math.max(...pnv.values),
-        };
-      }
-      return { min: 0, max: period };
-    }),
-    tap((range) => {
-      const fromCtrl = this.optionsForm.get(['pnv', 'min'] as const);
-      const toCtrl = this.optionsForm.get(['pnv', 'max'] as const);
-      setTimeout(() => {
-        if (fromCtrl.value < range.min) {
-          fromCtrl.setValue(range.min);
-        }
-        if (toCtrl.value > range.max) {
-          toCtrl.setValue(range.max);
-        }
-      });
-    }),
-    shareReplay(1)
-  );
+  pnvExtent$: Observable<Extent>;
   pnvFilter$: Observable<Extent>;
 
   constructor(
@@ -112,37 +97,10 @@ export class ModelPageComponent
   }
 
   ngOnInit(): void {
+    this.pnvExtent$ = this.createExtent();
     super.ngOnInit();
-    this.optionsForm.valueChanges
-      .pipe(
-        debounceTime(100),
-        withLatestFrom(this.tabState$),
-        filter(([val, state]) => !isEqual(val, state)),
-        takeUntil(this.onDestroy$)
-      )
-      .subscribe(([val]) => {
-        this.store.dispatch(
-          setTabState({ index: this.ads.index, state: val as ModelTabState })
-        );
-      });
-    this.tabState$
-      .pipe(
-        filter((x) => !!x),
-        take(1),
-        takeUntil(this.onDestroy$)
-      )
-      .subscribe((state) => {
-        this.optionsForm.setValue(state);
-      });
-    this.pnvFilter$ = this.optionsForm.valueChanges.pipe(
-      debounceTime(100),
-      startWith(this.optionsForm.value),
-      map((form) => form.pnv as Required<Extent>),
-      distinctUntilChanged(
-        (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
-      ),
-      shareReplay(1)
-    );
+    this.subscribeForm();
+    this.pnvFilter$ = this.createFilter();
   }
 
   ngAfterViewInit(): void {
@@ -155,17 +113,25 @@ export class ModelPageComponent
 
   protected override initTabState(): void {
     if (this.ads.identifier === AdsIdentifier.PerNeuronValue) {
-      this.pnvExtent$.pipe(take(1)).subscribe((extent) =>
-        this.store.dispatch(
-          setTabState({
-            index: this.ads.index,
-            state: {
-              edges: EdgeDirection.outgoing,
-              pnv: { ...extent },
-            } as ModelTabState,
-          })
+      this.pnvExtent$
+        .pipe(
+          take(1),
+          withLatestFrom(
+            this.sharedControls$,
+            this.store.select(selectSameTypeViewing(this.ads.index))
+          )
         )
-      );
+        .subscribe(([extent, shared, all]) => {
+          this.store.dispatch(
+            setTabState({
+              index: this.ads.index,
+              state: {
+                edges: EdgeDirection.outgoing,
+                pnv: { ...extent },
+              } as ModelTabState,
+            })
+          );
+        });
     } else {
       this.store.dispatch(
         setTabState({
@@ -196,5 +162,109 @@ export class ModelPageComponent
       Math[dir == 'down' ? 'floor' : 'ceil'](mantissa * mantissaPrecision) /
       mantissaPrecision;
     return mantissa * Math.pow(10, exponent);
+  }
+
+  private subscribeForm() {
+    this.tabState$
+      .pipe(
+        filter((x) => !!x),
+        take(1),
+        takeUntil(this.onDestroy$)
+      )
+      .subscribe(() => {
+        this.tabState$
+          .pipe(
+            filter((state) => !isEqual(state, this.optionsForm.value)),
+            takeUntil(this.onDestroy$)
+          )
+          .subscribe((state) => {
+            this.optionsForm.setValue(state);
+          });
+        this.optionsForm.valueChanges
+          .pipe(
+            debounceTime(100),
+            withLatestFrom(
+              this.sharedControls$,
+              this.store.select(selectSameTypeViewing(this.ads.index))
+            ),
+            takeUntil(this.onDestroy$)
+          )
+          .subscribe(([val, shared, all]) => {
+            if (shared && all[0].index == this.ads.index) {
+              all.forEach((ds) =>
+                this.store.dispatch(
+                  setTabState({
+                    index: ds.index,
+                    state: val as ModelTabState,
+                  })
+                )
+              );
+            } else {
+              this.store.dispatch(
+                setTabState({
+                  index: this.ads.index,
+                  state: val as ModelTabState,
+                })
+              );
+            }
+          });
+      });
+  }
+  private createFilter() {
+    return this.optionsForm.valueChanges.pipe(
+      debounceTime(100),
+      startWith(this.optionsForm.value),
+      map((form) => form.pnv as Required<Extent>),
+      distinctUntilChanged(
+        (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
+      ),
+      shareReplay(1)
+    );
+  }
+  private createExtent() {
+    return combineLatest([
+      this.fullAds$.pipe(
+        filter((x) => x?.identifier === AdsIdentifier.PerNeuronValue)
+      ),
+      this.sharedControls$,
+      this.store.select(selectSameTypeViewing(this.ads.index)),
+    ]).pipe(
+      map(([pnv, shared, all]) => {
+        const period = (shared ? all[0] : pnv)?.period;
+        if (period === null || period === undefined) {
+          return shared && pnv === all[0]
+            ? {
+                min: Math.min(
+                  ...(all as PerNeuronValue[]).map((ds) =>
+                    Math.min(...ds.values)
+                  )
+                ),
+                max: Math.max(
+                  ...(all as PerNeuronValue[]).map((ds) =>
+                    Math.max(...ds.values)
+                  )
+                ),
+              }
+            : {
+                min: Math.min(...pnv.values),
+                max: Math.max(...pnv.values),
+              };
+        }
+        return { min: 0, max: period };
+      }),
+      tap((range) => {
+        const fromCtrl = this.optionsForm.get(['pnv', 'min'] as const);
+        const toCtrl = this.optionsForm.get(['pnv', 'max'] as const);
+        setTimeout(() => {
+          if (fromCtrl.value < range.min) {
+            fromCtrl.setValue(range.min);
+          }
+          if (toCtrl.value > range.max) {
+            toCtrl.setValue(range.max);
+          }
+        });
+      }),
+      shareReplay(1)
+    );
   }
 }

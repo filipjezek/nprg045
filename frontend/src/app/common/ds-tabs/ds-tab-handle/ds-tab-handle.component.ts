@@ -16,17 +16,16 @@ export class DsTabHandleComponent implements OnInit {
   @Input() viewing: boolean;
   @Input() ignoreClick = false;
 
+  /**
+   * parsed and without `path`
+   */
   params$ = this.store.select(routerSelectors.selectRouteParams).pipe(
     map((params) => {
       const ready: string[] = params['ready'] ? params['ready'].split(',') : [];
       let viewing: string[] = params['viewing']
         ? params['viewing'].split(',')
         : [];
-      const strIndex = this.ds.index + '';
 
-      if (!viewing.includes(strIndex)) {
-        viewing = [strIndex];
-      }
       const copy: Params = { ...params, ready, viewing };
       delete copy['path'];
       return copy;
@@ -38,11 +37,26 @@ export class DsTabHandleComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  viewTab() {
+  viewTab(multi: boolean) {
     if (this.ignoreClick) return;
     this.params$
       .pipe(withLatestFrom(this.path$), take(1))
       .subscribe(([params, path]) => {
+        const strIndex = this.ds.index + '';
+        let viewing: string[] = params['viewing'];
+        const i = viewing.indexOf(strIndex);
+        if (multi) {
+          if (i == -1) {
+            this.insertTab(params['ready'], viewing, strIndex);
+          } else {
+            viewing.splice(i, 1);
+          }
+        } else {
+          viewing = [strIndex];
+        }
+
+        params['viewing'] = viewing;
+
         this.router.navigate(['datastore', path, 'inspect', params]);
       });
   }
@@ -63,5 +77,15 @@ export class DsTabHandleComponent implements OnInit {
         }
         this.router.navigate(['datastore', path, 'inspect', params]);
       });
+  }
+
+  private insertTab(ready: string[], viewing: string[], item: string) {
+    for (let i = 0, j = 0; i < ready.length; i++) {
+      if (ready[i] == viewing[j]) j++;
+      if (ready[i] == item) {
+        viewing.splice(j, 0, item);
+        return;
+      }
+    }
   }
 }
