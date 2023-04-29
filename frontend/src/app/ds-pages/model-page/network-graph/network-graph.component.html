@@ -9,7 +9,7 @@
   <h2>
     {{ sheetName }}
     <span class="count"
-      >(<span class="filtered" *ngIf="pnv && pnvFeature"
+      >(<span class="filtered" *ngIf="pnv?.values && pnvFeature"
         >{{ pnvFeature.pnvLength }} / </span
       >{{ nodes.length }} nodes)</span
     >

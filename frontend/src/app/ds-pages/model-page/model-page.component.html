@@ -1,11 +1,27 @@
 <mozaik-ds-info [index]="ads.index"></mozaik-ds-info>
 <ng-template #controls>
   <form [formGroup]="optionsForm">
-    <p class="label">
+    <p class="label" *ngIf="optionsForm.value.visualization == 'histogram'">
+      Approximate bins
+      <mozaik-range
+        formControlName="thresholds"
+        [min]="1"
+        [max]="100"
+        [step]="1"
+      ></mozaik-range>
+    </p>
+    <p class="label" *ngIf="optionsForm.value.visualization == 'scatterplot'">
       Displayed edges
       <mozaik-button-radio
         [options]="edges"
         formControlName="edges"
+      ></mozaik-button-radio>
+    </p>
+    <p class="label">
+      Visualization type
+      <mozaik-button-radio
+        [options]="visualizations"
+        formControlName="visualization"
       ></mozaik-button-radio>
     </p>
     <p class="label pnv" formGroupName="pnv" *ngIf="pnvData$ | async">
@@ -34,17 +50,28 @@
   <ng-container *ngTemplateOutlet="controls"></ng-container>
 </ng-container>
 
-<mozaik-scale
-  *ngIf="fullAds$ | async"
-  [extent]="pnvFilter$ | async"
-  [period]="(fullAds$ | async)?.period"
-  [unit]="(fullAds$ | async)?.unit"
-></mozaik-scale>
-<mozaik-network-graph
-  [sheetName]="ads.sheet"
-  [pnv]="pnvData$ | async"
-  [pnvFilter]="pnvFilter$ | async"
-  [nodes]="(model$ | async)?.sheetNodes[ads.sheet]"
-  [edgeDir]="optionsForm.value.edges"
-  [allNodes]="(model$ | async)?.nodes"
-></mozaik-network-graph>
+<ng-container
+  *ngIf="optionsForm.value.visualization == 'scatterplot'; else histogram"
+>
+  <mozaik-scale
+    *ngIf="fullAds$ | async"
+    [extent]="pnvFilter$ | async"
+    [period]="(fullAds$ | async)?.period"
+    [unit]="(fullAds$ | async)?.unit"
+  ></mozaik-scale>
+  <mozaik-network-graph
+    [sheetName]="ads.sheet"
+    [pnv]="pnvData$ | async"
+    [pnvFilter]="pnvFilter$ | async"
+    [nodes]="(model$ | async)?.sheetNodes[ads.sheet]"
+    [edgeDir]="optionsForm.value.edges"
+    [allNodes]="(model$ | async)?.nodes"
+  ></mozaik-network-graph>
+</ng-container>
+<ng-template #histogram>
+  <mozaik-histogram
+    [pnv]="histogramData$ | async"
+    [extent]="pnvFilter$ | async"
+    [thresholds]="thresholds$ | async"
+  ></mozaik-histogram>
+</ng-template>

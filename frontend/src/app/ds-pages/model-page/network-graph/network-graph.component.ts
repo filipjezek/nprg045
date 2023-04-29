@@ -122,8 +122,9 @@ export class NetworkGraphComponent
     this.redraw();
     if (this.pnv) {
       this.pnvFeature.filterPnv();
-      this.changeDetector.markForCheck();
+      this.pnvFeature.filterEdges();
     }
+    this.changeDetector.markForCheck();
     this.subscribeSelection();
   }
 
@@ -131,7 +132,7 @@ export class NetworkGraphComponent
     if ((changes['pnv'] || changes['pnvFilter']) && this.svg) {
       this.pnvFeature.setData(this.pnv, this.pnvFilter);
       this.redraw();
-      if (!changes['edgeDir']) if (this.pnv) this.pnvFeature.filterPnv();
+      if (!changes['edgeDir'] && this.pnv) this.pnvFeature.filterPnv();
     }
     if (changes['pnv'] || changes['edgeDir']) {
       this.recomputeSelected$.next();

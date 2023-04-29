@@ -10,10 +10,14 @@ import { Store } from '@ngrx/store';
 import {
   Observable,
   combineLatest,
-  debounceTime,
+  debounce,
   distinctUntilChanged,
   filter,
+  first,
+  interval,
   map,
+  of,
+  pairwise,
   shareReplay,
   startWith,
   take,
@@ -40,6 +44,10 @@ import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
 import { isEqual } from 'lodash-es';
 import { selectSameTypeViewing } from 'src/app/store/selectors/inspector.selectors';
+import { HistogramData } from './histogram/histogram.component';
+import * as d3 from 'd3';
+
+type PNVVisualization = 'scatterplot' | 'histogram';
 
 export interface ModelTabState extends TabState {
   edges: EdgeDirection;
@@ -47,6 +55,8 @@ export interface ModelTabState extends TabState {
     min: number;
     max: number;
   };
+  visualization: PNVVisualization;
+  thresholds: number;
 }
 
 @Component({
@@ -67,12 +77,18 @@ export class ModelPageComponent
     { label: 'Outgoing', value: EdgeDirection.outgoing },
     { label: 'All', value: EdgeDirection.all },
   ];
+  visualizations: RadioOption[] = [
+    { label: 'Scatterplot', value: 'scatterplot' },
+    { label: 'Histogram', value: 'histogram' },
+  ];
   optionsForm = this.fb.nonNullable.group({
     edges: EdgeDirection.outgoing,
     pnv: this.fb.nonNullable.group({
       min: 0,
       max: 0,
     }),
+    visualization: 'histogram',
+    thresholds: 1,
   });
 
   model$ = this.store.select((x) => x.model.currentModel);
@@ -83,10 +99,13 @@ export class ModelPageComponent
       ds.ids.forEach((id, i) => values.set(id, ds.values[i]));
       return { period: ds.period, unit: ds.unit, values };
     }),
+    takeUntil(this.onDestroy$),
     shareReplay(1)
   );
   pnvExtent$: Observable<Extent>;
   pnvFilter$: Observable<Extent>;
+  thresholds$: Observable<number>;
+  histogramData$: Observable<HistogramData>;
 
   constructor(
     store: Store<State>,
@@ -101,6 +120,8 @@ export class ModelPageComponent
     super.ngOnInit();
     this.subscribeForm();
     this.pnvFilter$ = this.createFilter();
+    this.histogramData$ = this.createHistogramData();
+    this.thresholds$ = this.createThresholds();
   }
 
   ngAfterViewInit(): void {
@@ -113,25 +134,20 @@ export class ModelPageComponent
 
   protected override initTabState(): void {
     if (this.ads.identifier === AdsIdentifier.PerNeuronValue) {
-      this.pnvExtent$
-        .pipe(
-          take(1),
-          withLatestFrom(
-            this.sharedControls$,
-            this.store.select(selectSameTypeViewing(this.ads.index))
-          )
-        )
-        .subscribe(([extent, shared, all]) => {
-          this.store.dispatch(
-            setTabState({
-              index: this.ads.index,
-              state: {
-                edges: EdgeDirection.outgoing,
-                pnv: { ...extent },
-              } as ModelTabState,
-            })
-          );
-        });
+      this.pnvExtent$.pipe(take(1)).subscribe((extent) => {
+        this.store.dispatch(
+          setTabState({
+            index: this.ads.index,
+            state: {
+              edges: EdgeDirection.outgoing,
+              pnv: { ...extent },
+              visualization: 'histogram',
+              // thresholds can be set correctly only when we receive full pnv data, which is too late to init tab state
+              thresholds: 1,
+            } as ModelTabState,
+          })
+        );
+      });
     } else {
       this.store.dispatch(
         setTabState({
@@ -139,6 +155,8 @@ export class ModelPageComponent
           state: {
             edges: EdgeDirection.outgoing,
             pnv: { min: 0, max: 0 },
+            visualization: 'scatterplot',
+            thresholds: 1,
           } as ModelTabState,
         })
       );
@@ -182,7 +200,16 @@ export class ModelPageComponent
           });
         this.optionsForm.valueChanges
           .pipe(
-            debounceTime(100),
+            startWith(this.optionsForm.value),
+            pairwise(),
+            debounce(([one, two]) =>
+              one.pnv.max == two.pnv.max &&
+              one.pnv.min == two.pnv.min &&
+              one.thresholds == two.thresholds
+                ? of(1)
+                : interval(100)
+            ),
+            map(([one, two]) => two),
             withLatestFrom(
               this.sharedControls$,
               this.store.select(selectSameTypeViewing(this.ads.index))
@@ -211,14 +238,12 @@ export class ModelPageComponent
       });
   }
   private createFilter() {
-    return this.optionsForm.valueChanges.pipe(
-      debounceTime(100),
-      startWith(this.optionsForm.value),
-      map((form) => form.pnv as Required<Extent>),
+    return this.tabState$.pipe(
+      filter((x) => !!x),
+      map((state) => state.pnv as Required<Extent>),
       distinctUntilChanged(
         (prev, curr) => prev?.min === curr?.min && prev?.max === curr?.max
-      ),
-      shareReplay(1)
+      )
     );
   }
   private createExtent() {
@@ -264,7 +289,49 @@ export class ModelPageComponent
           }
         });
       }),
+      takeUntil(this.onDestroy$),
       shareReplay(1)
+    );
+  }
+  private createHistogramData() {
+    return combineLatest([this.fullAds$, this.pnvFilter$]).pipe(
+      map(([ds, filter]: [PerNeuronValue, Extent]) => {
+        let values = ds.values.filter(
+          (x) => x >= filter.min && x <= filter.max
+        );
+        if (ds.period) {
+          values = values.map((x) => x % ds.period);
+        }
+        return {
+          values,
+          period: ds.period,
+          unit: ds.unit,
+        };
+      }),
+      takeUntil(this.onDestroy$),
+      shareReplay(1)
+    );
+  }
+  private createThresholds() {
+    this.tabState$
+      .pipe(
+        first((ds) => !!ds),
+        withLatestFrom(this.fullAds$)
+      )
+      .subscribe(([state, ds]) => {
+        if (state.thresholds == 1) {
+          this.store.dispatch(
+            setTabState({
+              index: ds.index,
+              state: { thresholds: d3.thresholdSturges(ds.values) },
+            })
+          );
+        }
+      });
+    return this.tabState$.pipe(
+      filter((x) => !!x),
+      map((x) => x.thresholds),
+      distinctUntilChanged()
     );
   }
 }

@@ -66,6 +66,7 @@ export class DsTabsComponent
         viewing: viewing.includes(ds),
       }));
     }),
+    takeUntil(this.onDestroy$),
     shareReplay(1)
   );
   sharedControlsCtrl = new FormControl(false);

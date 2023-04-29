@@ -8,6 +8,7 @@ import { NetworkGraphComponent } from './network-graph/network-graph.component';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { ScaleComponent } from './scale/scale.component';
 import { DsPagesCommonModule } from '../common/ds-pages-common.module';
+import { HistogramComponent } from './histogram/histogram.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { DsPagesCommonModule } from '../common/ds-pages-common.module';
     NetworkGraphComponent,
     TooltipComponent,
     ScaleComponent,
+    HistogramComponent,
   ],
   imports: [
     CommonModule,

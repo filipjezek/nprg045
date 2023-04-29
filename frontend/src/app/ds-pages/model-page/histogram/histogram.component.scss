@@ -1,0 +1,38 @@
+:host {
+  display: block;
+
+  .container {
+    max-width: 700px;
+    margin: auto;
+    position: relative;
+
+    ::ng-deep {
+      svg {
+        width: 100%;
+        box-shadow: 0 0 2px #00000078;
+        background-color: white;
+      }
+    }
+
+    mozaik-tooltip {
+      position: absolute;
+      font-size: 0.7em;
+      min-width: 100px;
+      animation: fade 0.1s ease-out 1s backwards;
+
+      h1 {
+        font-size: 1.1em;
+        margin: 3px 0;
+      }
+
+      table {
+        color: #333;
+        width: 100%;
+
+        td:last-child {
+          text-align: right;
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatestWith, map, retry, shareReplay, skip, tap } from 'rxjs';
+import {
+  combineLatestWith,
+  map,
+  retry,
+  shareReplay,
+  skip,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { State } from 'src/app/store/reducers/';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 import alasql from 'alasql';
@@ -14,6 +22,7 @@ import { ALASQL } from './sql/alasql';
 import { Ads } from 'src/app/store/reducers/ads.reducer';
 import { SQLBuilder } from './sql/sql-builder';
 import { changeQuery } from 'src/app/store/actions/navigator.actions';
+import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 
 type dataToDiff = { [diffMeta]?: number }[][];
 
@@ -22,7 +31,10 @@ type dataToDiff = { [diffMeta]?: number }[][];
   templateUrl: './ds-select.component.html',
   styleUrls: ['./ds-select.component.scss'],
 })
-export class DsSelectComponent implements OnInit, OnDestroy {
+export class DsSelectComponent
+  extends UnsubscribingComponent
+  implements OnInit, OnDestroy
+{
   query$ = this.store.select((x) => x.navigator.query);
 
   ads$ = this.store.select((x) => x.ads.allAds);
@@ -34,7 +46,9 @@ export class DsSelectComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<State>,
     @Inject(ALASQL) private sql: typeof alasql
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {}
 
@@ -119,6 +133,7 @@ export class DsSelectComponent implements OnInit, OnDestroy {
         },
       }),
       tap(() => (this.error = '')),
+      takeUntil(this.onDestroy$),
       shareReplay(1)
     );
   }
@@ -153,6 +168,7 @@ export class DsSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    super.ngOnDestroy();
     this.sql(`DROP TABLE data`);
   }
 }

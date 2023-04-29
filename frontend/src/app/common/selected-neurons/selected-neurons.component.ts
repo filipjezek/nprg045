@@ -29,7 +29,9 @@ export class SelectedNeuronsComponent
 {
   selectedNodes$ = this.store.select((x) => x.model.selected);
   allNodes$ = this.store.select((x) => x.model.currentModel?.nodes || []);
-  hoveredNode$ = this.store.select((x) => x.model.hovered).pipe(shareReplay(1));
+  hoveredNode$ = this.store
+    .select((x) => x.model.hovered)
+    .pipe(takeUntil(this.onDestroy$), shareReplay(1));
 
   nodeData: { node: NetworkNode; in: { [key: string]: Connection[] } }[];
 
