@@ -87,7 +87,7 @@ export class ModelPageComponent
       min: 0,
       max: 0,
     }),
-    visualization: 'histogram',
+    visualization: 'scatterplot',
     thresholds: 1,
   });
 
@@ -141,7 +141,7 @@ export class ModelPageComponent
             state: {
               edges: EdgeDirection.outgoing,
               pnv: { ...extent },
-              visualization: 'histogram',
+              visualization: 'scatterplot',
               // thresholds can be set correctly only when we receive full pnv data, which is too late to init tab state
               thresholds: 1,
             } as ModelTabState,
