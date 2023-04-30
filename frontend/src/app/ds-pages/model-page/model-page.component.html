@@ -17,7 +17,7 @@
         formControlName="edges"
       ></mozaik-button-radio>
     </p>
-    <p class="label">
+    <p class="label" *ngIf="pnvData$ | async">
       Visualization type
       <mozaik-button-radio
         [options]="visualizations"
