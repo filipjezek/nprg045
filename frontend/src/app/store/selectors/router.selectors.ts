@@ -1,7 +1,7 @@
-import { getSelectors } from '@ngrx/router-store';
+import { getRouterSelectors } from '@ngrx/router-store';
 import { createSelector } from '@ngrx/store';
 
-export const routerSelectors = getSelectors();
+export const routerSelectors = getRouterSelectors();
 
 export const selectUrlAfterDatastore = createSelector(
   routerSelectors.selectUrl,
