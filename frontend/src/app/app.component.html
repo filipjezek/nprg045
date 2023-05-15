@@ -1,6 +1,7 @@
 <mozaik-header></mozaik-header>
 <mozaik-multiview [(ratios)]="ratios" #multiview>
   <mozaik-multiview-partition (visible)="navigatorVisible = $event">
+    <mozaik-ds-select></mozaik-ds-select>
     <mozaik-multiview-toggle
       [style.right.px]="0"
       (click)="
@@ -12,7 +13,6 @@
     >
       Inspector
     </mozaik-multiview-toggle>
-    <mozaik-ds-select></mozaik-ds-select>
   </mozaik-multiview-partition>
 
   <mozaik-multiview-partition (visible)="inspectorVisible = $event">
