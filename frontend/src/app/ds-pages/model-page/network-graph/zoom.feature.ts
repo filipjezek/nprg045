@@ -2,6 +2,22 @@ import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 import { Directional, AnySelection } from './network-graph.component';
 import * as d3 from 'd3';
 import { SVGRef } from '../../../utils/svg-ref';
+import { Injectable } from '@angular/core';
+
+/**
+ * factory method to allow dependency injection and improve testability
+ */
+@Injectable()
+export class ZoomFeatureFactory {
+  public createZoomFeature(
+    nodes: NetworkNode[],
+    sheetName: string,
+    svg: SVGRef,
+    zoomCallback?: (t: d3.ZoomTransform) => void
+  ) {
+    return new ZoomFeature(nodes, sheetName, svg, zoomCallback);
+  }
+}
 
 export class ZoomFeature {
   private scales: {

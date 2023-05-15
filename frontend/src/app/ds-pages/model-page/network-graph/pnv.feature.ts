@@ -1,6 +1,21 @@
 import * as d3 from 'd3';
 import { AnySelection, Extent, PNVData } from './network-graph.component';
 import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
+import { Injectable } from '@angular/core';
+
+/**
+ * factory method to allow dependency injection and improve testability
+ */
+@Injectable()
+export class PNVFeatureFactory {
+  public createPNVFeature(
+    circles: AnySelection,
+    nodes: NetworkNode[],
+    edges: AnySelection
+  ) {
+    return new PNVFeature(circles, nodes, edges);
+  }
+}
 
 export class PNVFeature {
   private pnvScale: {

@@ -4,6 +4,17 @@ import { addSelectedNodes } from 'src/app/store/actions/model.actions';
 import { State } from 'src/app/store/reducers';
 import { SVGRef } from 'src/app/utils/svg-ref';
 import { AnySelection } from './network-graph.component';
+import { Injectable } from '@angular/core';
+
+/**
+ * factory method to allow dependency injection and improve testability
+ */
+@Injectable()
+export class LassoFeatureFactory {
+  public createLassoFeature(svg: SVGRef, store: Store<State>) {
+    return new LassoFeature(svg, store);
+  }
+}
 
 export class LassoFeature {
   private lasso: d3Lasso.Lasso;

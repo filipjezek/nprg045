@@ -35,9 +35,9 @@ import {
   getOutgoingConnections,
 } from 'src/app/utils/network';
 import { SVGRef } from 'src/app/utils/svg-ref';
-import { ZoomFeature } from './zoom.feature';
-import { LassoFeature } from './lasso.feature';
-import { PNVFeature } from './pnv.feature';
+import { ZoomFeature, ZoomFeatureFactory } from './zoom.feature';
+import { LassoFeature, LassoFeatureFactory } from './lasso.feature';
+import { PNVFeature, PNVFeatureFactory } from './pnv.feature';
 
 export type AnySelection = d3.Selection<any, any, any, any>;
 
@@ -102,7 +102,10 @@ export class NetworkGraphComponent
 
   constructor(
     private store: Store<State>,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private zoomFactory: ZoomFeatureFactory,
+    private pnvFactory: PNVFeatureFactory,
+    private lassoFactory: LassoFeatureFactory
   ) {
     super();
   }
@@ -114,8 +117,12 @@ export class NetworkGraphComponent
   ngAfterViewInit(): void {
     this.initSvg();
     this.initZoom();
-    this.lasso = new LassoFeature(this.svg, this.store);
-    this.pnvFeature = new PNVFeature(this.circles, this.nodes, this.edges);
+    this.lasso = this.lassoFactory.createLassoFeature(this.svg, this.store);
+    this.pnvFeature = this.pnvFactory.createPNVFeature(
+      this.circles,
+      this.nodes,
+      this.edges
+    );
     if (this.pnv) {
       this.pnvFeature.setData(this.pnv, this.pnvFilter);
     }
@@ -234,12 +241,17 @@ export class NetworkGraphComponent
   }
 
   private initZoom() {
-    this.zoom = new ZoomFeature(this.nodes, this.sheetName, this.svg, (t) => {
-      this.circles
-        .attr('transform', t.toString())
-        .attr('stroke-width', 7 / t.k);
-      this.edges.attr('stroke-width', 2 / t.k);
-    });
+    this.zoom = this.zoomFactory.createZoomFeature(
+      this.nodes,
+      this.sheetName,
+      this.svg,
+      (t) => {
+        this.circles
+          .attr('transform', t.toString())
+          .attr('stroke-width', 7 / t.k);
+        this.edges.attr('stroke-width', 2 / t.k);
+      }
+    );
   }
 
   private updateEdges(selected: NetworkNode[]) {
