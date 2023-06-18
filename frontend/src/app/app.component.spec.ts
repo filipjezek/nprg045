@@ -48,7 +48,7 @@ class MultiviewPartitionStub {
 })
 class MultiviewToggleStub {}
 
-fdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let el: HTMLElement;
