@@ -17,7 +17,6 @@ describe('NetworkGraphComponent', () => {
     component = fixture.componentInstance;
     component.nodes = [];
     component.allNodes = [];
-    component.selectedNodes = [];
     fixture.detectChanges();
   });
 

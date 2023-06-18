@@ -2,8 +2,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { State } from '../store/reducers';
-import { StoreStub } from '../testing/store.stub';
+import { State } from '../../store/reducers';
+import { StoreStub } from '../../testing/store.stub';
 
 import { ModelPageComponent } from './model-page.component';
 

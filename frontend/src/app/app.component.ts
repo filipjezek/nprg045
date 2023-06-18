@@ -8,7 +8,6 @@ import { NetworkTrackerComponent } from './common/network-tracker/network-tracke
 import { DialogService } from './services/dialog.service';
 import { loadDirectory } from './store/actions/filesystem.actions';
 import { State } from './store/reducers';
-import { MultiviewComponent } from './widgets/multiview/multiview.component';
 import { MultiviewPartitionComponent } from './widgets/multiview/multiview-partition/multiview-partition.component';
 
 @Component({
