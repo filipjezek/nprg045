@@ -7,7 +7,9 @@ import { Injectable } from '@angular/core';
 /**
  * factory method to allow dependency injection and improve testability
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ZoomFeatureFactory {
   public createZoomFeature(
     nodes: NetworkNode[],

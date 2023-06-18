@@ -6,7 +6,9 @@ import { Injectable } from '@angular/core';
 /**
  * factory method to allow dependency injection and improve testability
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class PNVFeatureFactory {
   public createPNVFeature(
     circles: AnySelection,

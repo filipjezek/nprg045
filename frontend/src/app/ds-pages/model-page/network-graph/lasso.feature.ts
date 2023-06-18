@@ -9,7 +9,9 @@ import { Injectable } from '@angular/core';
 /**
  * factory method to allow dependency injection and improve testability
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class LassoFeatureFactory {
   public createLassoFeature(svg: SVGRef, store: Store<State>) {
     return new LassoFeature(svg, store);
