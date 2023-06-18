@@ -1,5 +1,5 @@
 import { DialectOptions, expandPhrases, sql } from 'sql-formatter';
-import alasql from 'alasql';
+import * as alasql from 'alasql';
 
 export const alasqlFunctions = Array.from(
   new Set([

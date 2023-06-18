@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 import { State } from 'src/app/store/reducers/';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
-import alasql from 'alasql';
+import * as alasql from 'alasql';
 import { subtract } from './sql/user-sql-functions/subtract';
 import {
   AggregationStage,

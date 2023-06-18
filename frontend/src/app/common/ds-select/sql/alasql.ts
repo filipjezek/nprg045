@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import alasql from 'alasql';
+import * as alasql from 'alasql';
 import { makeDiff } from './user-sql-functions/make-diff';
 import { makeIntersection } from './user-sql-functions/make-intersection';
 import { makeLink } from './user-sql-functions/make-link';

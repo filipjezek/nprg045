@@ -1,4 +1,4 @@
-import alasql from 'alasql';
+import * as alasql from 'alasql';
 import { isPrimitive } from 'src/app/utils/is-primitive';
 import { formatDialect } from 'sql-formatter';
 import { alasqlDialect } from './sql-dialect';
