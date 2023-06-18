@@ -26,7 +26,7 @@ export class ButtonRadioComponent implements OnInit, ControlValueAccessor {
   @Input() options: RadioOption[] = [];
   @Input() name = 'button-radio';
 
-  control = new FormControl<string>(undefined);
+  control = new FormControl();
   private disabled = false;
   private onTouchedCb: () => void;
   private onChangeCb: (val: string) => void;

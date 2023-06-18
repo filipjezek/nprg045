@@ -1,8 +1,8 @@
 <label
-  vidretrKeyboardClick
+  mozaikKeyboardClick
   tabindex="0"
   *ngFor="let opt of options"
-  [class.selected]="opt.value == value"
+  [class.selected]="opt.value === value"
 >
   <input
     type="radio"
