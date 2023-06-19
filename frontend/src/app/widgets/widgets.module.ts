@@ -18,7 +18,6 @@ import { CollapsibleComponent } from './collapsible/collapsible.component';
 import { MultiviewComponent } from './multiview/multiview.component';
 import { MultiviewPartitionComponent } from './multiview/multiview-partition/multiview-partition.component';
 import { PurefnPipe } from './pipes/purefn.pipe';
-import { KeyValueNoSortPipe } from './pipes/keyvaluenosort.pipe';
 import { PaginationComponent } from './pagination/pagination.component';
 import { InputComponent } from './input/input.component';
 import { ButtonComponent } from './button/button.component';
@@ -43,7 +42,6 @@ import { MultiviewToggleComponent } from './multiview/multiview-toggle/multiview
     MultiviewComponent,
     MultiviewPartitionComponent,
     PurefnPipe,
-    KeyValueNoSortPipe,
     PaginationComponent,
     InputComponent,
     ButtonComponent,
@@ -67,7 +65,6 @@ import { MultiviewToggleComponent } from './multiview/multiview-toggle/multiview
     MultiviewComponent,
     MultiviewPartitionComponent,
     PurefnPipe,
-    KeyValueNoSortPipe,
     PaginationComponent,
     InputComponent,
     ButtonComponent,

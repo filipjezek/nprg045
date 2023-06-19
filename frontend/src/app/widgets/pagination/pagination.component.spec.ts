@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { RouterLinkStub } from 'src/app/testing/routerlink.stub';
 import { By } from '@angular/platform-browser';
 
-fdescribe('PaginationComponent', () => {
+describe('PaginationComponent', () => {
   let component: PaginationComponent;
   let fixture: ComponentFixture<PaginationComponent>;
   let currPage: number;
