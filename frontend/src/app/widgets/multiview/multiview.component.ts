@@ -10,8 +10,6 @@ import {
   OnInit,
   Output,
   QueryList,
-  TemplateRef,
-  ViewContainerRef,
 } from '@angular/core';
 import { MultiviewPartitionComponent } from './multiview-partition/multiview-partition.component';
 import {
@@ -33,7 +31,7 @@ import { GlobalEventService } from 'src/app/services/global-event.service';
 export type OrderingFn = (
   a: MultiviewPartitionComponent,
   b: MultiviewPartitionComponent
-) => -1 | 0 | 1;
+) => number;
 export type GroupingFn = (
   partition: MultiviewPartitionComponent,
   index: number
@@ -199,20 +197,16 @@ export class MultiviewComponent
         (this.ratios[index] + this.ratios[index - 1]);
     }
     if (firstSize >= min && initialFirstSize < min) {
-      console.log(index - 1, 'visible');
       columns[index - 1].forEach((col) => col.visible.emit(true));
     } else if (firstSize < min && initialFirstSize >= min) {
-      console.log(index - 1, 'not visible');
       columns[index - 1].forEach((col) => col.visible.emit(false));
     }
     if (totalSize - firstSize >= min && totalSize - initialFirstSize < min) {
-      console.log(index, 'visible');
       columns[index].forEach((col) => col.visible.emit(true));
     } else if (
       totalSize - firstSize < min &&
       totalSize - initialFirstSize >= min
     ) {
-      console.log(index, 'not visible');
       columns[index].forEach((col) => col.visible.emit(false));
     }
   }

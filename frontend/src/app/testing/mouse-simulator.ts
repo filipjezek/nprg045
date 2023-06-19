@@ -1,4 +1,4 @@
-import { ComponentFixture, tick } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
 import { GlobalEventServiceStub } from './global-event.service.stub';
 
 export class MouseSimulator {
@@ -14,7 +14,6 @@ export class MouseSimulator {
     el.dispatchEvent(e);
     this.gEventS.subj.next({ type, event: e });
     this.fixture?.detectChanges();
-    // tick(1000);
     return this;
   }
 

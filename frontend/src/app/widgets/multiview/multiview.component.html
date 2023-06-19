@@ -4,10 +4,6 @@
   *ngFor="let col of partitions$ | async; index as i; count as size"
 >
   <div class="handle" (mousedown)="startDrag($event, i)" *ngIf="i > 0"></div>
-  <!-- <ng-container
-    [ngTemplateOutlet]="col[0].toggle"
-    (click)="log()"
-  ></ng-container> -->
 
   <div class="content">
     <ng-container
@@ -17,6 +13,6 @@
     </ng-container>
   </div>
 </div>
-<div class="group" *ngIf="!relativeRatios">
+<div class="group" *ngIf="!relativeRatios" style="flex-basis: 0">
   <div class="handle" (mousedown)="startDrag($event, ratios.length)"></div>
 </div>
