@@ -56,14 +56,14 @@ export class ToastService {
         ref.style.color = 'black';
     }
     this.doc.body.appendChild(ref);
-    ref.addEventListener('click', () => {
-      clearTimeout(this.toastTimeout);
-      this.changeToast();
-    });
     await promiseTimeout();
     ref.style.opacity = '1';
     ref.style.bottom = '10%';
     this.toastTimeout = setTimeout(() => this.changeToast(), 6000);
+    ref.addEventListener('click', () => {
+      clearTimeout(this.toastTimeout);
+      this.changeToast();
+    });
   }
 
   private async hide() {
