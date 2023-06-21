@@ -11,7 +11,6 @@ import {
   hoverNode,
   selectNodes,
 } from 'src/app/store/actions/model.actions';
-import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 
 @Component({
   template: `<ng-content></ng-content>`,
@@ -19,7 +18,7 @@ import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 })
 class CollapsibleStub {}
 
-fdescribe('SelectedNeuronsComponent', () => {
+describe('SelectedNeuronsComponent', () => {
   let component: SelectedNeuronsComponent;
   let fixture: ComponentFixture<SelectedNeuronsComponent>;
   let store: StoreStub<State>;

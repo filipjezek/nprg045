@@ -8,7 +8,7 @@ import {
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { faBan } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
-import { combineLatest, interval, map } from 'rxjs';
+import { combineLatest, interval, map, startWith } from 'rxjs';
 import { dialogClose, dialogOpen } from 'src/app/animations';
 import { Dialog } from 'src/app/dialog';
 import { requestCancel } from 'src/app/store/actions/network.actions';
@@ -42,7 +42,10 @@ export class NetworkTrackerComponent extends Dialog implements OnInit {
 
   requests$ = combineLatest([
     this.store.select((x) => x.net.requests),
-    interval(100).pipe(map(() => Date.now())),
+    interval(100).pipe(
+      startWith(null),
+      map(() => Date.now())
+    ),
   ]).pipe(
     map(([requests, now]) =>
       requests.map((req) => ({ ...req, duration: now - req.start }))
