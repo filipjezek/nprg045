@@ -134,9 +134,10 @@ export class ModelService {
     return concat(
       ...m.sheets.map(({ label }) => {
         const reporter = new Subject<Action>();
-        reporter
+        const sub = reporter
           .pipe(auditTime(this.progressThrottle))
           .subscribe((a) => this.store.dispatch(a));
+
         return this.http
           .consumeStream('model/positions', {
             params: pathParam.append('sheet', label),
@@ -166,7 +167,10 @@ export class ModelService {
               return network;
             }),
             last(),
-            tap(() => reporter.complete())
+            tap(() => {
+              sub.unsubscribe();
+              reporter.complete();
+            })
           );
       })
     );
@@ -180,7 +184,7 @@ export class ModelService {
     return concat(
       ...m.connections.map(({ src, target }) => {
         const reporter = new Subject<Action>();
-        reporter
+        const sub = reporter
           .pipe(auditTime(this.progressThrottle))
           .subscribe((a) => this.store.dispatch(a));
 
@@ -211,7 +215,10 @@ export class ModelService {
               return network;
             }),
             last(),
-            tap(() => reporter.complete())
+            tap(() => {
+              sub.unsubscribe();
+              reporter.complete();
+            })
           );
       })
     );
