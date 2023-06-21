@@ -39,14 +39,7 @@ export class DialogService {
     private store: Store<State>,
     @Inject(DOCUMENT) private doc: Document
   ) {
-    merge(
-      globalS.escapePressed,
-      globalS.documentClicked.pipe(
-        filter(
-          (e) => !!(e.target as HTMLElement).tagName.match(/^mozaik-overlay$/i)
-        )
-      )
-    )
+    merge(globalS.escapePressed, globalS.overlayClicked)
       .pipe(
         filter(
           () =>

@@ -5,7 +5,7 @@ import {
   getOutgoingConnections,
 } from './network';
 
-fdescribe('network utils', () => {
+describe('network utils', () => {
   const network: NetworkNode[] = [
     {
       id: 0,
