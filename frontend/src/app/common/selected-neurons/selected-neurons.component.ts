@@ -41,8 +41,8 @@ export class SelectedNeuronsComponent
 
   ngOnInit(): void {
     this.selectedNodes$
-      .pipe(distinctUntilChanged(), pairwise(), takeUntil(this.onDestroy$))
-      .subscribe(([old, curr]) => {
+      .pipe(distinctUntilChanged(), takeUntil(this.onDestroy$))
+      .subscribe((curr) => {
         this.nodeData = curr.map((n) => ({
           node: n,
           in: null,
