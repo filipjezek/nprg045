@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { StoreStub } from 'src/app/testing/store.stub';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 
-fdescribe('DsTabHandleComponent', () => {
+describe('DsTabHandleComponent', () => {
   let component: DsTabHandleComponent;
   let fixture: ComponentFixture<DsTabHandleComponent>;
   let el: HTMLElement;

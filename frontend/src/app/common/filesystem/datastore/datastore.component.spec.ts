@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DatastoreComponent } from './datastore.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('DatastoreComponent', () => {
   let component: DatastoreComponent;
@@ -9,6 +10,7 @@ describe('DatastoreComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [DatastoreComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 

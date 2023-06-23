@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FilesystemComponent } from './filesystem.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('FilesystemComponent', () => {
   let component: FilesystemComponent;
@@ -9,6 +10,7 @@ describe('FilesystemComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [FilesystemComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
