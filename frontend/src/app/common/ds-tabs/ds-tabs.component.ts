@@ -22,6 +22,7 @@ import {
   startWith,
   take,
   takeUntil,
+  tap,
   withLatestFrom,
 } from 'rxjs';
 import { DsPage } from 'src/app/ds-pages/common/ds-page';
@@ -31,11 +32,7 @@ import { Ads, AdsIdentifier } from 'src/app/store/reducers/ads.reducer';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
 import { subtract } from '../ds-select/sql/user-sql-functions/subtract';
 import { Params, Router } from '@angular/router';
-import {
-  selectCommonReadyProps,
-  selectReady,
-  selectViewing,
-} from 'src/app/store/selectors/inspector.selectors';
+import { inspectorSelectors } from 'src/app/store/selectors/inspector.selectors';
 import { FormControl } from '@angular/forms';
 import { toggleSharedControls } from 'src/app/store/actions/inspector.actions';
 import { Labelled } from 'src/app/widgets/select/select.component';
@@ -54,9 +51,12 @@ export class DsTabsComponent
   @ViewChildren('tabContent', { read: ViewContainerRef })
   private viewContainerRefs: QueryList<ViewContainerRef>;
 
-  viewing$ = this.store.select(selectViewing);
-  ready$ = this.store.select(selectReady).pipe(
-    combineLatestWith(this.viewing$, this.store.select(selectCommonReadyProps)),
+  viewing$ = this.store.select(inspectorSelectors.selectViewing);
+  ready$ = this.store.select(inspectorSelectors.selectReady).pipe(
+    combineLatestWith(
+      this.viewing$,
+      this.store.select(inspectorSelectors.selectCommonReadyProps)
+    ),
     map(([ready, viewing, commonReady]) => {
       if (!ready.length) return [];
       if (commonReady) delete commonReady.index;

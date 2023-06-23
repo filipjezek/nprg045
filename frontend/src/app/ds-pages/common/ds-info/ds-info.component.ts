@@ -8,7 +8,7 @@ import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 import { toggleDsInfo } from 'src/app/store/actions/inspector.actions';
 import { State } from 'src/app/store/reducers';
 import { Ads } from 'src/app/store/reducers/ads.reducer';
-import { selectCommonViewingProps } from 'src/app/store/selectors/inspector.selectors';
+import { inspectorSelectors } from 'src/app/store/selectors/inspector.selectors';
 
 @Component({
   selector: 'mozaik-ds-info',
@@ -40,7 +40,7 @@ export class DsInfoComponent extends UnsubscribingComponent implements OnInit {
       .subscribe((c) => (this.collapsed = c));
 
     combineLatest([
-      this.store.select(selectCommonViewingProps),
+      this.store.select(inspectorSelectors.selectCommonViewingProps),
       this.indexSubj,
       this.store.select((x) => x.ads.allAds),
     ])

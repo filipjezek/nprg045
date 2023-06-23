@@ -5,4 +5,5 @@ import { Subject } from 'rxjs';
 @Injectable()
 export class RouterStub {
   public events = new Subject<RouterEvent>();
+  public navigate = jasmine.createSpy('router.navigate');
 }

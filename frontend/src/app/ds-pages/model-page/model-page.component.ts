@@ -43,7 +43,7 @@ import { DsPage, DsPageConstructor } from '../common/ds-page';
 import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
 import { isEqual } from 'lodash-es';
-import { selectSameTypeViewing } from 'src/app/store/selectors/inspector.selectors';
+import { inspectorSelectors } from 'src/app/store/selectors/inspector.selectors';
 import { HistogramData } from './histogram/histogram.component';
 import * as d3 from 'd3';
 
@@ -212,7 +212,9 @@ export class ModelPageComponent
             map(([one, two]) => two),
             withLatestFrom(
               this.sharedControls$,
-              this.store.select(selectSameTypeViewing(this.ads.index))
+              this.store.select(
+                inspectorSelectors.selectSameTypeViewing(this.ads.index)
+              )
             ),
             takeUntil(this.onDestroy$)
           )
@@ -252,7 +254,9 @@ export class ModelPageComponent
         filter((x) => x?.identifier === AdsIdentifier.PerNeuronValue)
       ),
       this.sharedControls$,
-      this.store.select(selectSameTypeViewing(this.ads.index)),
+      this.store.select(
+        inspectorSelectors.selectSameTypeViewing(this.ads.index)
+      ),
     ]).pipe(
       map(([pnv, shared, all]) => {
         const period = (shared ? all[0] : pnv)?.period;

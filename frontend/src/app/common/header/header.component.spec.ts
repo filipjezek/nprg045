@@ -16,9 +16,8 @@ import { HeaderComponent } from './header.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { RouterStub } from 'src/app/testing/router.stub';
 import { routerSelectors } from 'src/app/store/selectors/router.selectors';
-import { promiseTimeout } from 'src/app/utils/promise-timeout';
 
-fdescribe('HeaderComponent', () => {
+describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   let el: HTMLElement;
@@ -79,7 +78,7 @@ fdescribe('HeaderComponent', () => {
     expect(component.filesystemOpen).toBeTruthy();
   }));
 
-  fit('should toggle menu', fakeAsync(() => {
+  it('should toggle menu', fakeAsync(() => {
     datastorePath = 'testpath';
     storeStub.subject.next({ fs: { datastores: {} } });
     fixture.detectChanges();
