@@ -20,7 +20,7 @@ import {
 import { diffMeta } from './sql/user-sql-functions/make-diff';
 import { ALASQL } from './sql/alasql';
 import { Ads } from 'src/app/store/reducers/ads.reducer';
-import { SQLBuilder } from './sql/sql-builder';
+import { SQLBuilder, SQLBuilderFactory } from './sql/sql-builder';
 import { changeQuery } from 'src/app/store/actions/navigator.actions';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
 
@@ -45,7 +45,8 @@ export class DsSelectComponent
 
   constructor(
     private store: Store<State>,
-    @Inject(ALASQL) private sql: typeof alasql
+    @Inject(ALASQL) private sql: typeof alasql,
+    private sqlBuilder: SQLBuilderFactory
   ) {
     super();
   }
@@ -113,7 +114,7 @@ export class DsSelectComponent
       tap((data) => this.initDataSource(data)),
       combineLatestWith(this.query$),
       map(([data, query]) => {
-        const builder = new SQLBuilder(query);
+        const builder = this.sqlBuilder.create(query);
 
         let results: any[][] = this.sql(query);
         if (builder.statements > 1) {

@@ -3,6 +3,7 @@ import { isPrimitive } from 'src/app/utils/is-primitive';
 import { formatDialect } from 'sql-formatter';
 import { alasqlDialect } from './sql-dialect';
 import { SortColumn } from 'src/app/store/actions/navigator.actions';
+import { Injectable } from '@angular/core';
 
 interface AST {
   statements: ASTSelectStatement[];
@@ -114,6 +115,16 @@ interface ASTSelectStatement extends ASTAliasable {
   offset?: ASTLiteral;
   top?: ASTLiteral;
   joins?: ASTJoin[];
+}
+
+/**
+ * helps with testing
+ */
+@Injectable({ providedIn: 'root' })
+export class SQLBuilderFactory {
+  public create(initialStatement: string) {
+    return new SQLBuilder(initialStatement);
+  }
 }
 
 /**

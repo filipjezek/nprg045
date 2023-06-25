@@ -73,7 +73,6 @@ describe('DsTabHandleComponent', () => {
     });
     it('should not deselect tab', () => {
       routerState['viewing'] = '3';
-      store.dispatch({});
       tab.click();
       fixture.detectChanges();
       expect(router.navigate).toHaveBeenCalledWith([
@@ -105,7 +104,6 @@ describe('DsTabHandleComponent', () => {
 
     it('should deselect additional tab', () => {
       routerState['viewing'] = '1,3';
-      store.dispatch({});
       tab.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
       fixture.detectChanges();
       expect(router.navigate).toHaveBeenCalledWith([
@@ -121,7 +119,6 @@ describe('DsTabHandleComponent', () => {
 
     it('should insert additional tab into correct place', () => {
       routerState['viewing'] = '0,1,4';
-      store.dispatch({});
       tab.dispatchEvent(new MouseEvent('click', { shiftKey: true }));
       fixture.detectChanges();
       expect(router.navigate).toHaveBeenCalledWith([
@@ -138,7 +135,6 @@ describe('DsTabHandleComponent', () => {
 
   it('should close tab', () => {
     routerState['viewing'] = '0,3,4';
-    store.dispatch({});
     tab.dispatchEvent(new MouseEvent('auxclick', { button: 1 }));
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith([
