@@ -17,6 +17,7 @@ import { startWith, takeUntil, withLatestFrom } from 'rxjs';
 import { State } from 'src/app/store/reducers';
 import { Labelled } from 'src/app/widgets/select/select.component';
 import { FilterBase } from '../filter-base';
+import { SQLBuilderFactory } from '../../../sql/sql-builder';
 
 @Component({
   selector: 'mozaik-filter-number',
@@ -54,8 +55,8 @@ export class FilterNumberComponent
     { label: 'between', value: 'BETWEEN' },
   ];
 
-  constructor(store: Store<State>) {
-    super(store);
+  constructor(store: Store<State>, sqlFactory: SQLBuilderFactory) {
+    super(store, sqlFactory);
   }
 
   writeValue(obj: string): void {

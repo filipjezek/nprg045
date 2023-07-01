@@ -1,6 +1,6 @@
 import { Directive, Input } from '@angular/core';
 import { map } from 'rxjs';
-import { SQLBuilder } from '../../sql/sql-builder';
+import { SQLBuilder, SQLBuilderFactory } from '../../sql/sql-builder';
 import { Store } from '@ngrx/store';
 import { State } from 'src/app/store/reducers';
 import { FormGroup } from '@angular/forms';
@@ -11,14 +11,17 @@ export class FilterBase extends UnsubscribingComponent {
   form: FormGroup;
   protected sqlBuilder = this.store
     .select((x) => x.navigator.query)
-    .pipe(map((x) => new SQLBuilder(x)));
+    .pipe(map((x) => this.sqlFactory.create(x)));
 
   @Input() public key: string;
   @Input() public path: string = '';
 
   private onTouchedCb: () => void;
 
-  constructor(protected store: Store<State>) {
+  constructor(
+    protected store: Store<State>,
+    protected sqlFactory: SQLBuilderFactory
+  ) {
     super();
   }
 

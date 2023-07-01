@@ -17,7 +17,7 @@ import { takeUntil, withLatestFrom } from 'rxjs';
 import { State } from 'src/app/store/reducers';
 import { Labelled } from 'src/app/widgets/select/select.component';
 import { FilterBase } from '../filter-base';
-import { SQLBuilder } from '../../../sql/sql-builder';
+import { SQLBuilder, SQLBuilderFactory } from '../../../sql/sql-builder';
 
 @Component({
   selector: 'mozaik-filter-string',
@@ -59,8 +59,8 @@ export class FilterStringComponent
     { label: 'case insensitive', value: 0 },
   ];
 
-  constructor(store: Store<State>) {
-    super(store);
+  constructor(store: Store<State>, sqlFactory: SQLBuilderFactory) {
+    super(store, sqlFactory);
   }
 
   writeValue(obj: string): void {

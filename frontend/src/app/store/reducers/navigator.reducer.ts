@@ -1,15 +1,14 @@
 import { createReducer, on } from '@ngrx/store';
 import {
-  closeTab,
-  setTabState,
-  toggleDsInfo,
-} from '../actions/inspector.actions';
-import {
   addCondition,
   changeQuery,
   sortByColumn,
 } from '../actions/navigator.actions';
 import { SQLBuilder } from 'src/app/common/ds-select/sql/sql-builder';
+import {
+  FORMAT_SQL,
+  formatterImplementation,
+} from 'src/app/common/ds-select/sql/format-sql';
 
 export const navigatorFeatureKey = 'navigator';
 
@@ -38,10 +37,12 @@ export const reducer = createReducer(
   on(changeQuery, (state, { query }) => ({ ...state, query })),
   on(sortByColumn, (state, col) => ({
     ...state,
-    query: new SQLBuilder(state.query).orderBy(col).toFormattedString(),
+    query: new SQLBuilder(state.query, formatterImplementation)
+      .orderBy(col)
+      .toFormattedString(),
   })),
   on(addCondition, (state, { key, condition }) => {
-    const builder = new SQLBuilder(state.query);
+    const builder = new SQLBuilder(state.query, formatterImplementation);
     if (builder.getAggregatedCols().includes(key)) {
       builder.andHaving(condition);
     } else {

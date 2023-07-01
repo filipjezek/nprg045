@@ -10,7 +10,7 @@ import { SqlHelpComponent } from './sql-help/sql-help.component';
 @Component({ selector: 'mozaik-button' })
 class ButtonStub {}
 
-fdescribe('SqlEditorComponent', () => {
+describe('SqlEditorComponent', () => {
   let component: SqlEditorComponent;
   let fixture: ComponentFixture<SqlEditorComponent>;
   let dialogS: jasmine.SpyObj<DialogService>;

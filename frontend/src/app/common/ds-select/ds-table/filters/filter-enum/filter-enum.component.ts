@@ -20,7 +20,7 @@ import { State } from 'src/app/store/reducers';
 import { Labelled } from 'src/app/widgets/select/select.component';
 import { FilterBase } from '../filter-base';
 import { atLeastOneValidator } from 'src/app/utils/at-least-one.validator';
-import { SQLBuilder } from '../../../sql/sql-builder';
+import { SQLBuilder, SQLBuilderFactory } from '../../../sql/sql-builder';
 
 @Component({
   selector: 'mozaik-filter-enum',
@@ -61,8 +61,8 @@ export class FilterEnumComponent
   }
   private _values: any[];
 
-  constructor(store: Store<State>) {
-    super(store);
+  constructor(store: Store<State>, sqlFactory: SQLBuilderFactory) {
+    super(store, sqlFactory);
   }
 
   writeValue(obj: string): void {

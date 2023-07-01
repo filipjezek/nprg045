@@ -16,7 +16,7 @@ import {
 } from '@angular/forms';
 import { takeUntil, withLatestFrom } from 'rxjs';
 import { Labelled } from 'src/app/widgets/select/select.component';
-import { SQLBuilder } from '../../../sql/sql-builder';
+import { SQLBuilder, SQLBuilderFactory } from '../../../sql/sql-builder';
 
 @Component({
   selector: 'mozaik-filter-array',
@@ -58,9 +58,10 @@ export class FilterArrayComponent
     { label: 'FALSE', value: 0 },
   ];
 
-  constructor(store: Store<State>) {
-    super(store);
+  constructor(store: Store<State>, sqlFactory: SQLBuilderFactory) {
+    super(store, sqlFactory);
   }
+
   writeValue(obj: any): void {
     return;
   }

@@ -1,9 +1,7 @@
 import * as alasql from 'alasql';
-import { isPrimitive } from 'src/app/utils/is-primitive';
-import { formatDialect } from 'sql-formatter';
-import { alasqlDialect } from './sql-dialect';
 import { SortColumn } from 'src/app/store/actions/navigator.actions';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { FORMAT_SQL } from './format-sql';
 
 interface AST {
   statements: ASTSelectStatement[];
@@ -73,7 +71,7 @@ interface ASTOrderClause extends ASTExpressionWrapper {
   direction: 'ASC' | 'DESC';
 }
 
-interface ASTJoin {
+interface ASTJoin extends ASTAliasable {
   joinmode?: string;
   applymode?: string;
   table?: ASTTable;
@@ -122,8 +120,10 @@ interface ASTSelectStatement extends ASTAliasable {
  */
 @Injectable({ providedIn: 'root' })
 export class SQLBuilderFactory {
+  constructor(@Inject(FORMAT_SQL) private formatter: (val: string) => string) {}
+
   public create(initialStatement: string) {
-    return new SQLBuilder(initialStatement);
+    return new SQLBuilder(initialStatement, this.formatter);
   }
 }
 
@@ -140,7 +140,10 @@ export class SQLBuilder {
     return this.ast.statements.length;
   }
 
-  constructor(initialStatement: string) {
+  constructor(
+    initialStatement: string,
+    private formatter: (val: string) => string
+  ) {
     this.ast = this.parser.parse(initialStatement);
     this.stmt = this.ast.statements[this.ast.statements.length - 1];
   }
@@ -215,10 +218,7 @@ export class SQLBuilder {
 
   public toFormattedString() {
     const str = this.toString();
-    return formatDialect(str, {
-      dialect: alasqlDialect,
-      keywordCase: 'upper',
-    });
+    return this.formatter(str);
   }
 
   public andHaving(condition: string): this {
@@ -238,8 +238,12 @@ export class SQLBuilder {
       this.wrap();
     }
 
+    let prefix = 'SELECT * FROM a ';
+    if (type == 'having') {
+      prefix += 'GROUP BY a ';
+    }
     const parsed = this.parser.parse(
-      `SELECT * FROM a ${type.toUpperCase()} ${condition}`
+      `${prefix} ${type.toUpperCase()} ${condition}`
     );
     if (!this.stmt[type]) {
       this.stmt[type] = parsed.statements[0][type] as any;
@@ -257,7 +261,10 @@ export class SQLBuilder {
     const andExpr: ASTBinaryOp = new this.constructors.binaryOp();
     andExpr.op = 'AND';
     andExpr.left = currExpr;
-    andExpr.right = parsed.statements[0].where.expression;
+    andExpr.right =
+      type == 'where'
+        ? parsed.statements[0][type].expression
+        : parsed.statements[0][type];
     if (junction === null) {
       if (type == 'where') this.stmt[type].expression = andExpr;
       else this.stmt[type] = andExpr;
@@ -275,6 +282,7 @@ export class SQLBuilder {
     wrapper.columns = [star];
     wrapper.from = [this.stmt];
     this.stmt = wrapper;
+    this.ast.statements[this.ast.statements.length - 1] = this.stmt;
     return this;
   }
 
@@ -307,7 +315,7 @@ export class SQLBuilder {
     if (val instanceof Array) {
       return '@[' + val.map((x) => this.escapeValue(x)).join(', ') + ']';
     }
-    if (val.prototype === Object) {
+    if (val.prototype === Object || !val.prototype) {
       return (
         '@{' +
         Object.entries(val).map(
@@ -481,7 +489,7 @@ class Stringifier {
   }
 
   public static handleUnaryOp(op: ASTUnaryOp, escape = true): string {
-    let val = op.op ? '' : op.op + ' ';
+    let val = op.op ? op.op + ' ' : '';
     val += this.handleSubExpr(op.right, op.op, false, escape);
     return this.addAlias(val, op, escape);
   }
@@ -556,6 +564,7 @@ class Stringifier {
     if (join.select)
       res += this.handleStatement(join.select, { toplv: false, escape });
     if (join.table) res += this.handleTable(join.table, escape);
+    res = this.addAlias(res, join, escape);
     if (join.using) {
       res +=
         ' USING ' +
