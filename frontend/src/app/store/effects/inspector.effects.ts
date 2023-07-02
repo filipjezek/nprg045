@@ -7,7 +7,7 @@ import {
   toggleSharedControls,
 } from '../actions/inspector.actions';
 import { filter, map, pairwise, switchMap, tap, withLatestFrom } from 'rxjs';
-import { selectViewing } from '../selectors/inspector.selectors';
+import { inspectorSelectors } from '../selectors/inspector.selectors';
 import { AdsIdentifier } from '../reducers/ads.reducer';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class InspectorEffects {
       this.actions$.pipe(
         ofType(toggleSharedControls),
         filter(({ shared }) => shared),
-        switchMap(() => this.store.select(selectViewing)),
+        switchMap(() => this.store.select(inspectorSelectors.selectViewing)),
         withLatestFrom(this.store.select((x) => x.inspector.tabs)),
         tap(([viewing, tabs]) => {
           const firsts = new Map<AdsIdentifier, number>();
@@ -39,7 +39,7 @@ export class InspectorEffects {
   );
 
   unshareControls$ = createEffect(() =>
-    this.store.select(selectViewing).pipe(
+    this.store.select(inspectorSelectors.selectViewing).pipe(
       pairwise(),
       filter(([first, sec]) => first.length >= 2 && sec.length < 2),
       map(() => toggleSharedControls({ shared: false }))
