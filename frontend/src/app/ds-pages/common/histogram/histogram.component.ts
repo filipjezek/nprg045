@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { SVGRef } from 'src/app/utils/svg-ref';
 import * as d3 from 'd3';
-import { Extent } from '../network-graph/network-graph.component';
+import { Extent, defaultScale } from '../scale/scale.component';
 
 type Scales = {
   scaleX: d3.ScaleLinear<number, number>;
@@ -138,9 +138,9 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
 
   private drawBins(bins: d3.Bin<number, number>[], { scaleX, scaleY }: Scales) {
     const interpolate = this.pnv.period
-      ? d3.scaleSequential(d3.interpolateRainbow).domain([0, this.pnv.period])
+      ? d3.scaleSequential(defaultScale(true)).domain([0, this.pnv.period])
       : d3
-          .scaleSequential(d3.interpolateWarm)
+          .scaleSequential(defaultScale(false))
           .domain([this.extent.min, this.extent.max]);
 
     this.svg.el

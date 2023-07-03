@@ -1,0 +1,71 @@
+<mozaik-ds-info [index]="ads.index"></mozaik-ds-info>
+<ng-template #controls>
+  <form [formGroup]="optionsForm">
+    <p class="label" *ngIf="optionsForm.value.visualization == 'histogram'">
+      Approximate bins
+      <mozaik-range
+        formControlName="thresholds"
+        [min]="1"
+        [max]="100"
+        [step]="1"
+      ></mozaik-range>
+    </p>
+    <mozaik-checkbox formControlName="includeIdentity">
+      Include identity
+    </mozaik-checkbox>
+    <p class="label">
+      Visualization type
+      <mozaik-button-radio
+        [options]="visualizations"
+        formControlName="visualization"
+      ></mozaik-button-radio>
+    </p>
+    <p class="label pnpv" formGroupName="pnpv">
+      Filter PerNeuronPairValue
+      <label
+        ><span class="text">From</span>
+        <mozaik-range
+          formControlName="min"
+          [min]="roundFloat | purefn : (extent$ | async)?.min : 'down'"
+          [max]="roundFloat | purefn : (extent$ | async)?.max : 'up'"
+        ></mozaik-range>
+      </label>
+      <label
+        ><span class="text">To</span>
+        <mozaik-range
+          formControlName="max"
+          [min]="roundFloat | purefn : (extent$ | async)?.min : 'down'"
+          [max]="roundFloat | purefn : (extent$ | async)?.max : 'up'"
+        ></mozaik-range>
+      </label>
+    </p>
+  </form>
+</ng-template>
+
+<ng-container *ngIf="!(sharedControls$ | async)">
+  <ng-container *ngTemplateOutlet="controls"></ng-container>
+</ng-container>
+
+<ng-container
+  *ngIf="optionsForm.value.visualization == 'matrix'; else histogram"
+>
+  <mozaik-scale
+    *ngIf="fullAds$ | async"
+    [extent]="filter$ | async"
+    [period]="(fullAds$ | async)?.period"
+    [unit]="(fullAds$ | async)?.unit"
+  ></mozaik-scale>
+  <mozaik-matrix
+    [matrix]="fullAds$ | async"
+    [periodic]="!!(fullAds$ | async)?.period"
+    [unit]="(fullAds$ | async)?.unit"
+    [filter]="filter$ | async"
+  ></mozaik-matrix>
+</ng-container>
+<ng-template #histogram>
+  <mozaik-histogram
+    [pnv]="histogramData$ | async"
+    [extent]="filter$ | async"
+    [thresholds]="thresholds$ | async"
+  ></mozaik-histogram>
+</ng-template>

@@ -39,6 +39,11 @@ export interface PerNeuronValue extends Ads {
   ids: number[];
 }
 
+export interface PerNeuronPairValue extends Ads {
+  values: number[][];
+  ids: number[];
+}
+
 export interface State {
   // ADS will not change until another datastore is loaded
   // therefore duplicated data between allAds and selectedAds

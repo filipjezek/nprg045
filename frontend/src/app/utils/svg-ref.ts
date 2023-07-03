@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
-import { Directional } from '../ds-pages/model-page/network-graph/network-graph.component';
+
+export type AnySelection = d3.Selection<any, any, any, any>;
 
 export class SVGRef {
   /**
@@ -10,7 +11,13 @@ export class SVGRef {
    * the svg root element
    */
   public rootEl: d3.Selection<Element, any, any, any>;
+  /**
+   * does not include margins
+   */
   public width: number;
+  /**
+   * does not include margins
+   */
   public height: number;
   public margin: Directional<number>;
 

@@ -1,0 +1,37 @@
+<div
+  #container
+  class="container"
+  (mousemove)="handleMouseMove($event)"
+  (mouseleave)="x = undefined"
+>
+  <mozaik-tooltip
+    #nodeTooltip
+    *ngIf="matrix && x !== undefined && y !== undefined"
+    [ngStyle]="tooltipPos"
+  >
+    <table>
+      <tbody>
+        <tr>
+          <td>X</td>
+          <td>
+            {{ x }}
+          </td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td>
+            {{ y }}
+          </td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td>
+            {{ z | number : "1.0-4" }}
+            {{ unit == "dimensionless" ? "" : unit }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mozaik-tooltip>
+</div>
+<canvas style="display: none" #canv></canvas>

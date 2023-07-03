@@ -36,7 +36,6 @@ import { State } from 'src/app/store/reducers';
 import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
 import {
   EdgeDirection,
-  Extent,
   PNVData,
 } from './network-graph/network-graph.component';
 import { DsPage, DsPageConstructor } from '../common/ds-page';
@@ -44,8 +43,10 @@ import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
 import { isEqual } from 'lodash-es';
 import { inspectorSelectors } from 'src/app/store/selectors/inspector.selectors';
-import { HistogramData } from './histogram/histogram.component';
+import { HistogramData } from '../common/histogram/histogram.component';
 import * as d3 from 'd3';
+import { Extent } from '../common/scale/scale.component';
+import { roundFloat } from 'src/app/utils/round-float';
 
 type PNVVisualization = 'scatterplot' | 'histogram';
 
@@ -163,24 +164,7 @@ export class ModelPageComponent
     }
   }
 
-  /**
-   * the number input element rounds min and max - we will intentionally set
-   * min and max a little wider to allow the user to select all the required values
-   */
-  roundFloat(x: Number, dir: 'up' | 'down') {
-    if (x === undefined || x === null) return 0;
-    if (Number.isNaN(x) || !Number.isFinite(x)) return +x;
-    const mantissaPrecision = Math.pow(10, 14);
-
-    let [mantissa, exponent] = x
-      .toExponential()
-      .split('e')
-      .map((n) => +n);
-    mantissa =
-      Math[dir == 'down' ? 'floor' : 'ceil'](mantissa * mantissaPrecision) /
-      mantissaPrecision;
-    return mantissa * Math.pow(10, exponent);
-  }
+  roundFloat = roundFloat;
 
   private subscribeForm() {
     this.tabState$

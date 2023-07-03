@@ -1,7 +1,9 @@
 import * as d3 from 'd3';
-import { AnySelection, Extent, PNVData } from './network-graph.component';
+import { PNVData } from './network-graph.component';
 import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
 import { Injectable } from '@angular/core';
+import { AnySelection } from 'src/app/utils/svg-ref';
+import { Extent, defaultScale } from '../../common/scale/scale.component';
 
 /**
  * factory method to allow dependency injection and improve testability
@@ -36,11 +38,11 @@ export class PNVFeature {
 
   private recalcZScales() {
     this.pnvScale.linear = d3
-      .scaleSequential(d3.interpolateWarm)
+      .scaleSequential(defaultScale(false))
       .domain([this.pnvFilter.min, this.pnvFilter.max]);
     if (this.pnv.period) {
       this.pnvScale.periodic = d3
-        .scaleSequential(d3.interpolateRainbow)
+        .scaleSequential(defaultScale(true))
         .domain([0, this.pnv.period]);
     }
   }

@@ -83,6 +83,23 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, **kwargs) -> List[Ser
     }) for a in ads]
 
 
+def get_per_neuron_pair_value(path_to_datastore: str, alg: str, **kwargs) -> List[SerializablePerNeuronValue]:
+    datastore = load_datastore(path_to_datastore)
+    ads = cast(Any, datastore.get_analysis_result(
+        identifier=AdsIdentifier.PerNeuronPairValue.value,
+        analysis_algorithm=alg,
+        **kwargs
+    ))
+
+    print(ads)
+
+    return [cast(SerializablePerNeuronValue, {
+        'ids': [int(id) for id in a.ids],
+        'values': [[None if math.isnan(i) else i for i in row] for row in a.values.tolist()],
+        **__get_ads_base(a)
+    }) for a in ads]
+
+
 def __get_ads_base(ads: Any) -> Ads:
     return cast(Ads, {
         'algorithm': ads.analysis_algorithm,

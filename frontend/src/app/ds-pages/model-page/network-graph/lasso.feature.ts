@@ -2,8 +2,7 @@ import { Store } from '@ngrx/store';
 import * as d3Lasso from 'd3-lasso';
 import { addSelectedNodes } from 'src/app/store/actions/model.actions';
 import { State } from 'src/app/store/reducers';
-import { SVGRef } from 'src/app/utils/svg-ref';
-import { AnySelection } from './network-graph.component';
+import { SVGRef, AnySelection } from 'src/app/utils/svg-ref';
 import { Injectable } from '@angular/core';
 
 /**

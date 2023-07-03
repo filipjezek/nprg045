@@ -1,6 +1,6 @@
 import flask
 import json
-from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value, Ads
+from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value, Ads, get_per_neuron_pair_value
 from .filesystem import find_datastores, get_directory
 from .model import get_model as get_datastore_model, get_sheet_positions, get_connections
 from .parameters import params
@@ -128,6 +128,13 @@ def get_specific_ads():
             # and specifying empty array as a param will
             # filter out everything. Might need to be rectified later
             a = get_per_neuron_value(
+                str(path),
+                alg,
+                value_name=value_name,
+                sheet_name=sheet
+            )
+        case AdsIdentifier.PerNeuronPairValue:
+            a = get_per_neuron_pair_value(
                 str(path),
                 alg,
                 value_name=value_name,

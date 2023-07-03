@@ -10,7 +10,14 @@ import {
 } from '@angular/core';
 import * as d3 from 'd3';
 import { Legend } from 'src/vendor/d3-color-legend';
-import { Directional } from '../network-graph/network-graph.component';
+
+export const defaultScale = (period: boolean) =>
+  period ? d3.interpolateRainbow : d3.interpolateWarm;
+
+export interface Extent {
+  min: number;
+  max: number;
+}
 
 @Component({
   selector: 'mozaik-scale',
@@ -48,9 +55,7 @@ export class ScaleComponent implements AfterViewInit, OnChanges {
     this.container.nativeElement.appendChild(
       Legend(
         d3
-          .scaleSequential(
-            hasPeriod ? d3.interpolateRainbow : d3.interpolateWarm
-          )
+          .scaleSequential(defaultScale(hasPeriod))
           .domain(
             hasPeriod ? [0, this.period] : [this.extent.min, this.extent.max]
           ),

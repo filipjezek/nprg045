@@ -34,19 +34,11 @@ import {
   getIncomingConnections,
   getOutgoingConnections,
 } from 'src/app/utils/network';
-import { SVGRef } from 'src/app/utils/svg-ref';
-import { ZoomFeature, ZoomFeatureFactory } from './zoom.feature';
+import { AnySelection, SVGRef } from 'src/app/utils/svg-ref';
+import { PNVZoomFeature, PNVZoomFeatureFactory } from './zoom.feature';
 import { LassoFeature, LassoFeatureFactory } from './lasso.feature';
 import { PNVFeature, PNVFeatureFactory } from './pnv.feature';
-
-export type AnySelection = d3.Selection<any, any, any, any>;
-
-export interface Directional<T> {
-  top: T;
-  bottom: T;
-  left: T;
-  right: T;
-}
+import { Extent } from '../../common/scale/scale.component';
 
 export enum EdgeDirection {
   incoming = 'incoming',
@@ -58,11 +50,6 @@ export interface PNVData {
   values: Map<number, number>;
   period: number;
   unit: string;
-}
-
-export interface Extent {
-  min: number;
-  max: number;
 }
 
 @Component({
@@ -92,7 +79,7 @@ export class NetworkGraphComponent
   private edges: AnySelection;
   private svg: SVGRef;
   private lasso: LassoFeature;
-  private zoom: ZoomFeature;
+  private zoom: PNVZoomFeature;
   pnvFeature: PNVFeature;
 
   hoveredEdge: Connection;
@@ -103,7 +90,7 @@ export class NetworkGraphComponent
   constructor(
     private store: Store<State>,
     private changeDetector: ChangeDetectorRef,
-    private zoomFactory: ZoomFeatureFactory,
+    private zoomFactory: PNVZoomFeatureFactory,
     private pnvFactory: PNVFeatureFactory,
     private lassoFactory: LassoFeatureFactory
   ) {

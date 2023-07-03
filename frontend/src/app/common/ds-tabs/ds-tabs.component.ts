@@ -143,6 +143,13 @@ export class DsTabsComponent
         return import('../../ds-pages/model-page/model-page.component').then(
           (x) => x.ModelPageComponent
         );
+      case AdsIdentifier.PerNeuronPairValue:
+        await import(
+          '../../ds-pages/per-neuron-pair-value-page/per-neuron-pair-value-page.module'
+        );
+        return import(
+          '../../ds-pages/per-neuron-pair-value-page/per-neuron-pair-value-page.component'
+        ).then((x) => x.PerNeuronPairValuePageComponent);
       default:
         await import(
           '../../ds-pages/single-value-page/single-value-page.module'

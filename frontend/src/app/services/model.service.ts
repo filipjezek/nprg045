@@ -68,9 +68,10 @@ export class ModelService {
           })
         );
         const network = this.prepareSkeleton(m);
-        return this.addPositions(network, m, pathParam).pipe(
-          concatWith(this.addConnections(network, m, pathParam))
-        );
+        return this.addPositions(network, m, pathParam)
+          .pipe
+          // concatWith(this.addConnections(network, m, pathParam))
+          ();
       }),
       last()
     );
