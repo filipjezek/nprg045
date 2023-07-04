@@ -53,10 +53,16 @@ import { FilterEnumComponent } from './common/ds-select/ds-table/filters/filter-
 import { FilterArrayComponent } from './common/ds-select/ds-table/filters/filter-array/filter-array.component';
 import { FilterSwitchComponent } from './common/ds-select/ds-table/filters/filter-dialog/filter-switch/filter-switch.component';
 import { InspectorEffects } from './store/effects/inspector.effects';
+import { AddNeuronComponent } from './common/selected-neurons/add-neuron/add-neuron.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
-})[] = [NetworkTrackerComponent, SqlHelpComponent, FilterDialogComponent];
+})[] = [
+  NetworkTrackerComponent,
+  SqlHelpComponent,
+  FilterDialogComponent,
+  AddNeuronComponent,
+];
 
 @NgModule({
   declarations: [
@@ -91,6 +97,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     FilterEnumComponent,
     FilterArrayComponent,
     FilterSwitchComponent,
+    AddNeuronComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,16 @@
+<h1>Add neuron</h1>
+<form [formGroup]="form">
+  <label>
+    <div class="text" [title]="'Available ids:\n' + sequences">Neuron ID</div>
+    <mozaik-input type="number" formControlName="neuron"></mozaik-input>
+  </label>
+  <mozaik-button-radio
+    [options]="addTypes"
+    formControlName="addType"
+  ></mozaik-button-radio>
+</form>
+
+<div class="actions">
+  <button (click)="close.emit()">Cancel</button>
+  <mozaik-button (click)="submit()" [disabled]="!form.valid">Add</mozaik-button>
+</div>

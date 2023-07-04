@@ -192,7 +192,7 @@ export class ModelPageComponent
       .subscribe(() => {
         this.tabState$
           .pipe(
-            filter((state) => !isEqual(state, this.optionsForm.value)),
+            filter((state) => state && !isEqual(state, this.optionsForm.value)),
             takeUntil(this.onDestroy$)
           )
           .subscribe((state) => {

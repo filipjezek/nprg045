@@ -9,6 +9,7 @@ import {
   takeUntil,
 } from 'rxjs';
 import { UnsubscribingComponent } from 'src/app/mixins/unsubscribing.mixin';
+import { DialogService } from 'src/app/services/dialog.service';
 import {
   addSelectedNodes,
   hoverNode,
@@ -17,6 +18,10 @@ import {
 import { State } from 'src/app/store/reducers';
 import { Connection, NetworkNode } from 'src/app/store/reducers/model.reducer';
 import { getAllIncomingConnections } from 'src/app/utils/network';
+import {
+  AddNeuronComponent,
+  AddNeuronResult,
+} from './add-neuron/add-neuron.component';
 
 @Component({
   selector: 'mozaik-selected-neurons',
@@ -35,7 +40,7 @@ export class SelectedNeuronsComponent
 
   nodeData: { node: NetworkNode; in: { [key: string]: Connection[] } }[];
 
-  constructor(private store: Store<State>) {
+  constructor(private store: Store<State>, private dialogS: DialogService) {
     super();
   }
 
@@ -90,5 +95,22 @@ export class SelectedNeuronsComponent
         all
       );
     }
+  }
+
+  addNeuron() {
+    this.allNodes$.pipe(take(1)).subscribe((nodes) => {
+      const elref = this.dialogS.open(AddNeuronComponent);
+      elref.nodes = nodes;
+      elref.addEventListener('close', () => this.dialogS.close());
+      elref.addEventListener('value', (e: Event) => {
+        this.dialogS.close();
+        const val = (e as CustomEvent<AddNeuronResult>).detail;
+        this.store.dispatch(
+          val.replace
+            ? selectNodes({ nodes: [val.neuron] })
+            : addSelectedNodes({ nodes: [val.neuron] })
+        );
+      });
+    });
   }
 }
