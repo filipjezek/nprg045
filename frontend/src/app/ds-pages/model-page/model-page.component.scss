@@ -13,6 +13,10 @@ form {
   p.label {
     min-width: 0;
     margin: 4px;
+
+    mozaik-checkbox {
+      display: block;
+    }
   }
 
   .pnv label {

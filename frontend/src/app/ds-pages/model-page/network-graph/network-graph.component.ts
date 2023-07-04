@@ -71,6 +71,8 @@ export class NetworkGraphComponent
   selectedNodes$ = this.store.select((x) => x.model.selected);
   private recomputeSelected$ = new Subject<void>();
 
+  @Input() showArrows = true;
+  @Input() highTransparency = false;
   @Input() edgeDir: EdgeDirection;
   @Input() pnv: PNVData = null;
   @Input() pnvFilter: Extent;

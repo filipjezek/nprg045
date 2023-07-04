@@ -56,6 +56,10 @@ export interface ModelTabState extends TabState {
     min: number;
     max: number;
   };
+  visibility: {
+    showArrows: boolean;
+    highTransparency: boolean;
+  };
   visualization: PNVVisualization;
   thresholds: number;
 }
@@ -87,6 +91,10 @@ export class ModelPageComponent
     pnv: this.fb.nonNullable.group({
       min: 0,
       max: 0,
+    }),
+    visibility: this.fb.nonNullable.group({
+      showArrows: true,
+      highTransparency: false,
     }),
     visualization: 'scatterplot',
     thresholds: 1,
@@ -143,6 +151,10 @@ export class ModelPageComponent
               edges: EdgeDirection.outgoing,
               pnv: { ...extent },
               visualization: 'scatterplot',
+              visibility: {
+                highTransparency: false,
+                showArrows: true,
+              },
               // thresholds can be set correctly only when we receive full pnv data, which is too late to init tab state
               thresholds: 1,
             } as ModelTabState,
@@ -157,6 +169,10 @@ export class ModelPageComponent
             edges: EdgeDirection.outgoing,
             pnv: { min: 0, max: 0 },
             visualization: 'scatterplot',
+            visibility: {
+              highTransparency: false,
+              showArrows: true,
+            },
             thresholds: 1,
           } as ModelTabState,
         })

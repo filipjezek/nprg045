@@ -17,6 +17,18 @@
         formControlName="edges"
       ></mozaik-button-radio>
     </p>
+    <p
+      class="label"
+      formGroupName="visibility"
+      *ngIf="optionsForm.value.visualization == 'scatterplot'"
+    >
+      <mozaik-checkbox formControlName="showArrows"
+        >Show arrows</mozaik-checkbox
+      >
+      <mozaik-checkbox formControlName="highTransparency"
+        >High transparency</mozaik-checkbox
+      >
+    </p>
     <p class="label" *ngIf="pnvData$ | async">
       Visualization type
       <mozaik-button-radio
@@ -60,6 +72,8 @@
     [unit]="(fullAds$ | async)?.unit"
   ></mozaik-scale>
   <mozaik-network-graph
+    [showArrows]="optionsForm.value.visibility.showArrows"
+    [highTransparency]="optionsForm.value.visibility.highTransparency"
     [sheetName]="ads.sheet"
     [pnv]="pnvData$ | async"
     [pnvFilter]="pnvFilter$ | async"

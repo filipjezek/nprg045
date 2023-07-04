@@ -5,6 +5,8 @@
   (mouseover)="handleMouseEnter($event)"
   (mouseout)="handleMouseLeave($event)"
   [class.contains-selection]="(selectedNodes$ | async)?.length"
+  [class.no-arrows]="!showArrows"
+  [class.transparent]="highTransparency"
 >
   <h2>
     {{ sheetName }}
