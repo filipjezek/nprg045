@@ -2,8 +2,9 @@ from enum import Enum
 from typing import List, TypedDict, cast, Any, Dict
 from .model import load_datastore, get_serializable_connections_meta
 import math
-import quantities
+from urllib.parse import urlencode
 import ast
+import flask
 
 
 class AdsIdentifier(Enum):
@@ -30,7 +31,21 @@ class Ads(TypedDict):
     unit: str
 
 
+class AdsLink(TypedDict('AdsLink', {'@link': str})):
+    dimensions: List[int]
+
+
 class SerializablePerNeuronValue(Ads):
+    values: List[float]
+    ids: List[int]
+
+
+class SerializablePerNeuronPairValue(Ads):
+    values: AdsLink
+    ids: List[int]
+
+
+class SerializableASL(Ads):
     values: List[float]
     ids: List[int]
 
@@ -77,13 +92,13 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, **kwargs) -> List[Ser
     ))
 
     return [cast(SerializablePerNeuronValue, {
-        'ids': [int(id) for id in a.ids],
-        'values': [None if math.isnan(i) else i for i in a.values.tolist()],
+        'ids': a.ids,
+        'values': a.values,
         **__get_ads_base(a)
     }) for a in ads]
 
 
-def get_per_neuron_pair_value(path_to_datastore: str, alg: str, **kwargs) -> List[SerializablePerNeuronValue]:
+def get_per_neuron_pair_value(path_to_datastore: str, alg: str, **kwargs) -> List[SerializablePerNeuronPairValue]:
     datastore = load_datastore(path_to_datastore)
     ads = cast(Any, datastore.get_analysis_result(
         identifier=AdsIdentifier.PerNeuronPairValue.value,
@@ -91,11 +106,48 @@ def get_per_neuron_pair_value(path_to_datastore: str, alg: str, **kwargs) -> Lis
         **kwargs
     ))
 
-    print(ads)
+    return [cast(SerializablePerNeuronValue, {
+        'ids': a.ids,
+        'values': {
+            '@link': 'analysis_ds/pnpv?' +
+            urlencode(flask.request.args.to_dict()),
+            'dimensions': [len(a.ids)] * 2
+        },
+        **__get_ads_base(a)
+    }) for a in ads]
+
+
+def iter_pnpv_values(path_to_datastore: str, alg: str, stimulus_id, **kwargs):
+    datastore = load_datastore(path_to_datastore)
+    ads = cast(List[Any], datastore.get_analysis_result(
+        identifier=AdsIdentifier.PerNeuronPairValue.value,
+        analysis_algorithm=alg,
+        **kwargs
+    ))
+    for a in ads:
+        if ast.literal_eval(a.stimulus_id) == stimulus_id:
+            for row in a.values:
+                yield row
+            break
+
+
+def get_analog_signal_list(path_to_datastore: str, alg: str, **kwargs) -> List[SerializableASL]:
+    datastore = load_datastore(path_to_datastore)
+    ads = cast(Any, datastore.get_analysis_result(
+        identifier=AdsIdentifier.AnalogSignalList.value,
+        analysis_algorithm=alg,
+        **kwargs
+    ))
 
     return [cast(SerializablePerNeuronValue, {
         'ids': [int(id) for id in a.ids],
-        'values': [[None if math.isnan(i) else i for i in row] for row in a.values.tolist()],
+        'values': [
+            [
+                [None if math.isnan(i) else i for i in pair]
+                for pair in analog_signal
+            ]
+            for analog_signal in a.asl
+        ],
         **__get_ads_base(a)
     }) for a in ads]
 
@@ -109,7 +161,7 @@ def __get_ads_base(ads: Any) -> Ads:
         'sheet': ads.sheet_name,
         'stimulus': ads.stimulus_id and ast.literal_eval(ads.stimulus_id),
         'period': safe_check(ads, 'period') and float(ads.period),
-        'unit': '' if not safe_check(ads, 'value_units') or ads.value_units is quantities.unitquantity.Dimensionless else ads.value_units.dimensionality.unicode,
+        'unit': safe_check(ads, 'value_units') or '',
         'valueName': safe_check(ads, 'value_name'),
     })
 

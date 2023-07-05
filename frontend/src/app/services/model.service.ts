@@ -4,8 +4,6 @@ import {
   auditTime,
   concat,
   concatWith,
-  delay,
-  from,
   last,
   map,
   Observable,
@@ -15,7 +13,6 @@ import {
 } from 'rxjs';
 import { HttpService } from './http.service';
 import { ModelNetwork } from '../store/reducers/model.reducer';
-import * as csv from 'csv/browser/esm';
 import { Action, Store } from '@ngrx/store';
 import { State } from '../store/reducers';
 import {
@@ -23,6 +20,7 @@ import {
   metadataLoaded,
   positionsLoadingProgress,
 } from '../store/actions/model.actions';
+import { parseCSV } from '../utils/parse-csv';
 
 export interface TransportModel {
   sheets: TransportSheet[];
@@ -88,45 +86,6 @@ export class ModelService {
     return network;
   }
 
-  private parseCSV<T extends Record<string, any>>(
-    columns: (keyof T)[]
-  ): (src: Observable<string>) => Observable<T> {
-    return (source: Observable<string>) => {
-      return new Observable<T>((subscriber) => {
-        const parser = csv.parse({ cast: true, columns: columns as string[] });
-        const srcSubscr = source.subscribe({
-          next(value) {
-            parser.write(value);
-          },
-          error(error) {
-            subscriber.error(error);
-          },
-          complete() {
-            parser.end();
-          },
-        });
-
-        parser.on('readable', () => {
-          let record: T;
-          while ((record = parser.read()) !== null) {
-            subscriber.next(record);
-          }
-        });
-        parser.on('error', (error) => {
-          subscriber.error(error);
-        });
-        parser.on('end', () => {
-          subscriber.complete();
-        });
-
-        return () => {
-          srcSubscr.unsubscribe();
-          parser.end();
-        };
-      });
-    };
-  }
-
   private addPositions(
     network: ModelNetwork,
     m: TransportModel,
@@ -145,11 +104,7 @@ export class ModelService {
             method: 'GET',
           })
           .pipe(
-            this.parseCSV<{ id: number; x: number; y: number }>([
-              'id',
-              'x',
-              'y',
-            ]),
+            parseCSV<{ id: number; x: number; y: number }>(['id', 'x', 'y']),
             map(({ id, x, y }, i) => {
               if (!network.nodes[id]) {
                 network.nodes[id] = { id, sheets: {} };
@@ -195,7 +150,7 @@ export class ModelService {
             method: 'GET',
           })
           .pipe(
-            this.parseCSV<{
+            parseCSV<{
               srcIndex: number;
               tgtIndex: number;
               weight: number;

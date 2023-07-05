@@ -1,25 +1,21 @@
 import flask
 import json
-from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value, Ads, get_per_neuron_pair_value
+from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value, Ads, \
+    get_per_neuron_pair_value, get_analog_signal_list, iter_pnpv_values
 from .filesystem import find_datastores, get_directory
 from .model import get_model as get_datastore_model, get_sheet_positions, get_connections
 from .parameters import params
+from .utils import filter_empty
 from pathlib import Path
-from typing import Iterator, Tuple, Dict, Sequence
+from typing import Iterator, Iterable, Dict, Sequence
 import itertools as it
 
 api = flask.Blueprint("api", __name__)
 
 
-def generate_csv(source: Iterator[Tuple], groupby: int = 1000) -> Iterator[str]:
-    activated = iter(source)
-    while True:
-        batch = it.islice(activated, groupby)
-        batch = map(lambda row: ','.join(map(str, row)) + '\n', batch)
-        text = ''.join(batch)
-        if not text:
-            break
-        yield text
+def generate_csv(source: Iterator[Iterable]) -> Iterator[str]:
+    for row in source:
+        yield ','.join(map(lambda x: '' if x is None else str(x), row)) + '\n'
 
 
 def get_path() -> Path:
@@ -114,31 +110,29 @@ def get_specific_ads():
         args = flask.request.args
         path = get_path()
         alg = args['algorithm']
-        value_name = args['valueName']
-        stimulus_id = json.loads(args['stimulus'])
-        neuron = args['neuron']
-        sheet = args['sheet']
         identifier = AdsIdentifier(args['identifier'])
-        tags = args.getlist('tags')
+        optional, stimulus_id = get_optional_ads_params()
+
     except:
         return flask.Response(status=400)
     match identifier:
         case AdsIdentifier.PerNeuronValue:
-            # there are no tags associated with any ds so far
-            # and specifying empty array as a param will
-            # filter out everything. Might need to be rectified later
             a = get_per_neuron_value(
                 str(path),
                 alg,
-                value_name=value_name,
-                sheet_name=sheet
+                **optional
             )
         case AdsIdentifier.PerNeuronPairValue:
             a = get_per_neuron_pair_value(
                 str(path),
                 alg,
-                value_name=value_name,
-                sheet_name=sheet
+                **optional
+            )
+        case AdsIdentifier.AnalogSignalList:
+            a = get_analog_signal_list(
+                str(path),
+                alg,
+                **optional
             )
         case _:
             return flask.Response(status=400)
@@ -146,6 +140,21 @@ def get_specific_ads():
     if len(a) == 0:
         return flask.Response(status=404)
     return flask.jsonify(a[0])
+
+
+@api.route('analysis_ds/pnpv')
+def get_pnpv_values():
+    try:
+        args = flask.request.args
+        path = get_path()
+        alg = args['algorithm']
+        optional, stimulus_id = get_optional_ads_params()
+    except:
+        return flask.Response(status=400)
+
+    return generate_csv(
+        iter_pnpv_values(str(path), alg, stimulus_id, **optional)
+    ), {"Content-Type": "text/csv"}
 
 
 def filter_stimuli(stimulus: Dict, ads: Sequence[Ads]):
@@ -157,3 +166,18 @@ def filter_stimuli(stimulus: Dict, ads: Sequence[Ads]):
     return [
         ds for ds in ads if ds['stimulus'] == stimulus
     ]
+
+
+def get_optional_ads_params():
+    args = flask.request.args
+    value_name = args.get('valueName', None)
+    neuron = args.get('neuron', None)
+    sheet = args.get('sheet', None)
+    tags = args.getlist('tags', None)
+    stimulus_id = json.loads(args.get('stimulus', 'null'))
+
+    return filter_empty(
+        value_name=value_name,
+        sheet_name=sheet,
+        neuron=neuron,
+        tags=tags), stimulus_id

@@ -54,6 +54,7 @@ import { FilterArrayComponent } from './common/ds-select/ds-table/filters/filter
 import { FilterSwitchComponent } from './common/ds-select/ds-table/filters/filter-dialog/filter-switch/filter-switch.component';
 import { InspectorEffects } from './store/effects/inspector.effects';
 import { AddNeuronComponent } from './common/selected-neurons/add-neuron/add-neuron.component';
+import { AdsLoadingComponent } from './common/ads-loading/ads-loading.component';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -98,6 +99,7 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
     FilterArrayComponent,
     FilterSwitchComponent,
     AddNeuronComponent,
+    AdsLoadingComponent,
   ],
   imports: [
     BrowserModule,

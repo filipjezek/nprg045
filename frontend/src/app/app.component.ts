@@ -2,7 +2,7 @@ import { transition, trigger, useAnimation } from '@angular/animations';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 import { Store } from '@ngrx/store';
-import { auditTime } from 'rxjs';
+import { auditTime, map } from 'rxjs';
 import { fade } from './animations';
 import { NetworkTrackerComponent } from './common/network-tracker/network-tracker.component';
 import { DialogService } from './services/dialog.service';
@@ -46,6 +46,9 @@ export class AppComponent implements OnInit {
   overlay$ = this.store.select((x) => x.ui.overlay);
   showNetworkButton$ = this.store.select((x) => x.net.requests.length > 0);
   modelLoading$ = this.store.select((x) => x.model.loading);
+  adsLoading$ = this.store
+    .select((x) => x.ads.loading)
+    .pipe(map((x) => (x.length ? x : null)));
 
   @ViewChild('multiview', { read: ElementRef })
   private multiview: ElementRef<HTMLElement>;

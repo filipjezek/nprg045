@@ -1,0 +1,9 @@
+<section class="ds" *ngFor="let ds of progress">
+  <h1>#{{ ds.index }}</h1>
+  <mozaik-progress
+    *ngFor="let part of ds.parts | keyvalue"
+    [current]="part.value.curr"
+    [total]="part.value.total"
+    [label]="part.key"
+  ></mozaik-progress>
+</section>

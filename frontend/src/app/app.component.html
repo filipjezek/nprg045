@@ -55,6 +55,10 @@
   [progress]="modelLoading$ | async"
   *ngIf="modelLoading$ | async"
 ></mozaik-model-loading>
+<mozaik-ads-loading
+  [progress]="adsLoading$ | async"
+  *ngIf="adsLoading$ | async"
+></mozaik-ads-loading>
 <mozaik-loading-overlay
   @fade
   *ngIf="showLoadingOverlay$ | async"

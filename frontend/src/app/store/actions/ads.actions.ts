@@ -26,3 +26,11 @@ export const apiError = createAction(
   '[ads API] error',
   props<{ error: any }>()
 );
+export const adsLoadingProgress = createAction(
+  '[ads API] ads loading progress',
+  props<{ current: number; index: number; path: string }>()
+);
+export const initAdsLoadingProgress = createAction(
+  '[ads service] init ads loading progress',
+  props<{ index: number; parts: Record<string, number> }>()
+);
