@@ -38,7 +38,7 @@ export class MatrixZoomFeature extends ZoomFeature {
       zoom: [1, (25 / this.svg.width) * this.ids.length],
     };
 
-    const offset = this.svg.width / this.ids.length / 2;
+    const offset = 0;
 
     this.scales.x = d3
       .scaleLinear()
@@ -66,18 +66,24 @@ export class MatrixZoomFeature extends ZoomFeature {
     x = x ?? this.scales.x;
     y = y ?? this.scales.y;
 
+    const xTicks = this.createTicks(x.domain());
+    const yTicks = this.createTicks(y.domain());
     this.axes.bottom.axis = d3
       .axisBottom<number>(x)
-      .tickFormat((val) => this.ids[val] + '');
+      .tickValues(xTicks)
+      .tickFormat((val) => this.ids[val - 0.5] + '');
     this.axes.top.axis = d3
       .axisTop<number>(x)
-      .tickFormat((val) => this.ids[val] + '');
+      .tickValues(xTicks)
+      .tickFormat((val) => this.ids[val - 0.5] + '');
     this.axes.left.axis = d3
       .axisLeft<number>(y)
-      .tickFormat((val) => this.ids[val] + '');
+      .tickValues(yTicks)
+      .tickFormat((val) => this.ids[val - 0.5] + '');
     this.axes.right.axis = d3
       .axisRight<number>(y)
-      .tickFormat((val) => this.ids[val] + '');
+      .tickValues(yTicks)
+      .tickFormat((val) => this.ids[val - 0.5] + '');
     this.axes.bottom.g.call(this.axes.bottom.axis);
     this.axes.top.g.call(this.axes.top.axis);
     this.axes.left.g.call(this.axes.left.axis);
@@ -92,5 +98,14 @@ export class MatrixZoomFeature extends ZoomFeature {
         this.svg.height + this.svg.margin.top / k,
       ],
     ]);
+  }
+
+  private createTicks(domain: number[]) {
+    domain = [domain[0], domain[domain.length - 1]];
+    let ticks = d3.ticks(domain[0], domain[1], 10).map((x) => x - 0.5);
+    ticks.push(ticks[ticks.length - 1] + (ticks[1] - ticks[0])); // add new tick in order to avoid gap by the shift
+    return ticks.filter(
+      (x) => x >= domain[0] && x <= domain[1] && x % 1 == 0.5
+    );
   }
 }

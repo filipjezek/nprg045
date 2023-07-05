@@ -124,6 +124,12 @@ export class ModelService {
             }),
             last(),
             tap(() => {
+              this.store.dispatch(
+                positionsLoadingProgress({
+                  sheet: label,
+                  current: network.sheetNodes[label].length,
+                })
+              );
               sub.unsubscribe();
               reporter.complete();
             })
@@ -172,6 +178,15 @@ export class ModelService {
             }),
             last(),
             tap(() => {
+              this.store.dispatch(
+                connectionsLoadingProgress({
+                  src,
+                  tgt: target,
+                  current: m.connections.find(
+                    (c) => c.src == src && c.target == target
+                  ).size,
+                })
+              );
               sub.unsubscribe();
               reporter.complete();
             })
