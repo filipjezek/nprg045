@@ -77,7 +77,7 @@ export class FilterEnumComponent
         }
         const escapedKey = builder.escapeColumn(this.key) + this.path;
 
-        let condition = `${escapedKey} ${val.must ? '' : 'NOT'} `;
+        let condition = `${escapedKey} ${+val.must ? '' : 'NOT'} `;
         condition += `IN (${this.values
           .filter((x, i) => val.values[i] && x !== null && x !== undefined)
           .map((x) => SQLBuilder.escapeValue(x))
@@ -87,7 +87,7 @@ export class FilterEnumComponent
             (x, i) => (x === null || x === undefined) && val.values[i]
           ) != -1
         ) {
-          condition = val.must
+          condition = +val.must
             ? `(${condition} OR ${escapedKey} IS NULL)`
             : `(${condition} AND ${escapedKey} IS NOT NULL)`;
         }

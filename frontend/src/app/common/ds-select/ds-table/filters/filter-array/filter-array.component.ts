@@ -78,7 +78,7 @@ export class FilterArrayComponent
           converted = !!converted;
         }
 
-        const condition = `${val.must ? '' : 'NOT '}${SQLBuilder.escapeValue(
+        const condition = `${+val.must ? '' : 'NOT '}${SQLBuilder.escapeValue(
           converted
         )}${this.path} IN ${builder.escapeColumn(this.key)}`;
         fn(condition);
