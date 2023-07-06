@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List, TypedDict, cast, Any, Dict
-from .model import load_datastore, get_serializable_connections_meta
+from .model import load_datastore
 from .utils import batched
 from urllib.parse import urlencode
 import ast
@@ -67,19 +67,18 @@ def get_ads_list(path_to_datastore: str) -> List[Ads]:
         )
     ))
 
-    conn_meta = get_serializable_connections_meta(datastore)
     ads_list.extend(sorted(
         (cast(Ads, {
             'algorithm': 'connection storage',
             'identifier': AdsIdentifier.Connections.value,
             'tags': None,
             'neuron': None,
-            'sheet': conn['src'],
+            'sheet': s,
             'stimulus': None,
             'period': None,
             'unit': None,
             'valueName': None
-        }) for conn in conn_meta if conn['src'] == conn['target']),
+        }) for s in datastore.get_neuron_positions()),
         key=lambda d: tuple(d['sheet'])
     ))
 
