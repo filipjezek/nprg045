@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, TypedDict, cast, Any, Dict
 from .model import load_datastore, get_serializable_connections_meta
-import math
+from .utils import batched
 from urllib.parse import urlencode
 import ast
 import flask
@@ -46,7 +46,10 @@ class SerializablePerNeuronPairValue(Ads):
 
 
 class SerializableASL(Ads):
-    values: List[float]
+    values: AdsLink
+    startTime: float
+    timeUnit: str
+    samplingPeriod: float
     ids: List[int]
 
 
@@ -139,17 +142,35 @@ def get_analog_signal_list(path_to_datastore: str, alg: str, **kwargs) -> List[S
         **kwargs
     ))
 
-    return [cast(SerializablePerNeuronValue, {
-        'ids': [int(id) for id in a.ids],
-        'values': [
-            [
-                [None if math.isnan(i) else i for i in pair]
-                for pair in analog_signal
-            ]
-            for analog_signal in a.asl
-        ],
+    assert all(map(lambda ls: ls.shape == ads[0].asl[0].shape,
+               ads[0].asl)), "all analog signals should be the same length"
+    return [cast(SerializableASL, {
+        'ids': a.ids,
+        'timeUnit': a.asl[0].t_start,
+        'startTime': a.asl[0].t_start.magnitude,
+        'samplingPeriod': a.asl[0].sampling_period.magnitude,
+        'values': {
+            '@link': 'analysis_ds/asl?' +
+            urlencode(flask.request.args.to_dict()),
+            'dimensions': [len(a.asl), a.asl[0].shape[0]]
+        },
         **__get_ads_base(a)
     }) for a in ads]
+
+
+def iter_asl_values(path_to_datastore: str, alg: str, stimulus_id, **kwargs):
+    datastore = load_datastore(path_to_datastore)
+    ads = cast(List[Any], datastore.get_analysis_result(
+        identifier=AdsIdentifier.AnalogSignalList.value,
+        analysis_algorithm=alg,
+        **kwargs
+    ))
+    for a in ads:
+        if ast.literal_eval(a.stimulus_id) == stimulus_id:
+            for ls in a.asl:
+                for row in batched(ls.flat, 500):
+                    yield row
+            break
 
 
 def __get_ads_base(ads: Any) -> Ads:

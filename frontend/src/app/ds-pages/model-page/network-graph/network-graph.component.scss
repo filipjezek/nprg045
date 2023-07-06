@@ -1,69 +1,11 @@
 :host {
-  display: block;
-
   .container {
-    max-width: 500px;
-    margin: auto;
-    position: relative;
-
-    h2 {
-      font-size: 1.2em;
-    }
-
-    &.contains-selection ::ng-deep .node {
-      stroke-opacity: 0.3;
-    }
-    &.transparent.contains-selection ::ng-deep .node {
-      stroke-opacity: 0.05;
-
-      &.hovered,
-      &.selected,
-      &.possible,
-      &.neighbor {
-        stroke-opacity: 1;
-      }
-    }
     &:not(.contains-selection) ::ng-deep .node.pnv {
       stroke-opacity: 1;
     }
-    &.no-arrows ::ng-deep {
-      .link,
-      .arrowhead {
-        display: none;
-      }
-    }
 
     ::ng-deep {
-      svg {
-        width: 100%;
-        box-shadow: 0 0 2px #00000078;
-        background-color: white;
-      }
-      .lasso {
-        path {
-          stroke: rgb(80, 80, 80);
-          stroke-width: 2px;
-        }
-        .drawn {
-          fill-opacity: 0.05;
-        }
-        .loop_close {
-          fill: none;
-          stroke-dasharray: 4, 4;
-        }
-        .origin {
-          fill: #3399ff;
-          fill-opacity: 0.5;
-        }
-      }
       .node {
-        stroke-opacity: 0.7;
-        stroke: steelblue;
-        cursor: pointer;
-
-        &.neighbor {
-          stroke: rgb(255, 111, 0);
-        }
         &.selected,
         &.possible {
           stroke: rgb(
@@ -75,80 +17,7 @@
         &.hovered {
           stroke: lime !important; // because pnv is set using element style
         }
-        &.hovered,
-        &.selected,
-        &.possible,
-        &.neighbor {
-          stroke-opacity: 1;
-        }
-        &.not-possible {
-          stroke-opacity: 0.3;
-        }
-        &.hidden {
-          display: none;
-        }
-      }
-      .link {
-        stroke-opacity: 0.5;
-        &.outgoing {
-          stroke: #e91e63;
-        }
-        &.incoming {
-          stroke: #8bc34a;
-        }
-        &.incoming.outgoing {
-          stroke: #9c27b0;
-        }
-        &.hidden {
-          display: none;
-        }
-      }
-      .arrowhead {
-        stroke: none;
-        stroke-width: 0;
-        &.outgoing {
-          fill: #e91e63;
-        }
-        &.incoming {
-          fill: #8bc34a;
-        }
-        &.incoming.outgoing {
-          fill: #9c27b0;
-        }
-      }
-      .domain {
-        display: none;
       }
     }
-
-    mozaik-tooltip {
-      position: absolute;
-      font-size: 0.7em;
-      min-width: 100px;
-      animation: fade 0.1s ease-out 1s backwards;
-
-      h1 {
-        font-size: 1.1em;
-        margin: 3px 0;
-      }
-
-      table {
-        color: #333;
-        width: 100%;
-
-        td:last-child {
-          text-align: right;
-        }
-      }
-    }
-  }
-}
-
-@keyframes fade {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
   }
 }

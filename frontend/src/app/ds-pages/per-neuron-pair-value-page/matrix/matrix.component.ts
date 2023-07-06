@@ -14,6 +14,7 @@ import { Extent, defaultScale } from '../../common/scale/scale.component';
 import * as d3 from 'd3';
 import { MatrixZoomFeature, MatrixZoomFeatureFactory } from './zoom.feature';
 import { fromEvent } from 'rxjs';
+import { recalcTooltipPos } from '../../common/tooltip/recalc-tooltip-pos';
 
 export interface MatrixData {
   ids: number[];
@@ -27,6 +28,9 @@ export interface MatrixData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatrixComponent implements OnChanges, AfterViewInit {
+  private static instances = 0;
+  private id: number;
+
   @Input() matrix: MatrixData;
   @Input() filter: Extent = {
     min: -1,
@@ -49,7 +53,9 @@ export class MatrixComponent implements OnChanges, AfterViewInit {
   y: number;
   z: number;
 
-  constructor(private zoomFactory: MatrixZoomFeatureFactory) {}
+  constructor(private zoomFactory: MatrixZoomFeatureFactory) {
+    this.id = MatrixComponent.instances++;
+  }
 
   ngAfterViewInit(): void {
     this.ctx = this.canv.nativeElement.getContext('2d');
@@ -90,14 +96,16 @@ export class MatrixComponent implements OnChanges, AfterViewInit {
   private initImage() {
     this.svg.el
       .append('clipPath')
-      .attr('id', 'clip-rect')
+      .attr('id', `matrix-${this.id}-clip-rect`)
       .append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', this.svg.width)
       .attr('height', this.svg.height);
 
-    this.clipped = this.svg.el.append('g').attr('clip-path', 'url(#clip-rect)');
+    this.clipped = this.svg.el
+      .append('g')
+      .attr('clip-path', `url(#matrix-${this.id}-clip-rect)`);
     this.image = this.clipped
       .append('image')
       .attr('image-rendering', 'crisp-edges')
@@ -163,7 +171,11 @@ export class MatrixComponent implements OnChanges, AfterViewInit {
 
     if (this.x !== undefined && this.y !== undefined) {
       this.z = this.matrix.values[yI][xI];
-      this.tooltipPos = this.recalcTooltipPos(e.clientX, e.clientY);
+      this.tooltipPos = recalcTooltipPos(
+        e.clientX,
+        e.clientY,
+        this.container.nativeElement
+      );
     }
 
     bbox = this.container.nativeElement.getBoundingClientRect();
@@ -173,23 +185,5 @@ export class MatrixComponent implements OnChanges, AfterViewInit {
     this.crosshair
       .select('rect:last-child')
       .attr('x', e.clientX - bbox.left + 5 - this.svg.margin.left);
-  }
-
-  private recalcTooltipPos(x: number, y: number) {
-    const bboxCont = this.container.nativeElement.getBoundingClientRect();
-    const pos: Partial<Directional<string>> = {};
-
-    if (x - bboxCont.left < 100) {
-      pos.left = x - bboxCont.left + 10 + 'px';
-    } else {
-      pos.right = bboxCont.width - x + bboxCont.left + 10 + 'px';
-    }
-    if (y - bboxCont.top < 100) {
-      pos.top = y - bboxCont.top + 10 + 'px';
-    } else {
-      pos.bottom = bboxCont.height - y + bboxCont.top + 10 + 'px';
-    }
-
-    return pos;
   }
 }

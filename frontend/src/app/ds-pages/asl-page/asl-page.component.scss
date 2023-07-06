@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  padding: 0 30px;
+}
+
+form {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  p.label {
+    min-width: 0;
+    margin: 4px;
+
+    mozaik-checkbox {
+      display: block;
+    }
+  }
+}
+
+.graphs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+  mozaik-network-graph {
+    flex-basis: 440px;
+  }
+  mozaik-lines-graph {
+    flex-grow: 1;
+    max-width: 100%;
+    max-width: 900px;
+    margin-top: 50px;
+    margin-left: 10px;
+  }
+}

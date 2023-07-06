@@ -11,7 +11,11 @@ export function parseCSV(
 ): (src: Observable<string>) => Observable<any> {
   return (source: Observable<string>) => {
     return new Observable((subscriber) => {
-      const parser = csv.parse({ cast: true, columns: columns as string[] });
+      const parser = csv.parse({
+        cast: true,
+        columns: columns as string[],
+        relax_column_count: true,
+      });
       const srcSubscr = source.subscribe({
         next(value) {
           parser.write(value);

@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="swatches">
+    <div
+      class="swatch"
+      *ngFor="let swatch of selected; index as i"
+      (mouseenter)="hoverSwatch(swatch.id)"
+      (mouseleave)="leaveSwatch()"
+    >
+      <div class="color" [style.background-color]="colors(i)"></div>
+      <div class="label">{{ swatch.id }}</div>
+    </div>
+  </div>
+  <div #container class="graph">
+    <mozaik-tooltip
+      #nodeTooltip
+      *ngIf="tooltipPos && false"
+      [ngStyle]="tooltipPos"
+    >
+      <table>
+        <tbody>
+          <tr>
+            <td>X</td>
+            <td>
+              {{ tooltip.x | number : "1.0-4" }}
+              {{ ds.timeUnit }}
+            </td>
+          </tr>
+          <tr>
+            <td>Y</td>
+            <td>
+              {{ tooltip.y | number : "1.0-4" }}
+              {{ ds.unit == "dimensionless" ? "" : ds.unit }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </mozaik-tooltip>
+  </div>
+</div>

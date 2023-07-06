@@ -1,0 +1,40 @@
+<mozaik-ds-info [index]="ads.index"></mozaik-ds-info>
+<ng-template #controls>
+  <form [formGroup]="optionsForm">
+    <p class="label">
+      Displayed edges
+      <mozaik-button-radio
+        [options]="edges"
+        formControlName="edges"
+      ></mozaik-button-radio>
+    </p>
+    <p class="label" formGroupName="visibility">
+      <mozaik-checkbox formControlName="showArrows"
+        >Show arrows</mozaik-checkbox
+      >
+      <mozaik-checkbox formControlName="highTransparency"
+        >High transparency</mozaik-checkbox
+      >
+    </p>
+  </form>
+</ng-template>
+
+<ng-container *ngIf="!(sharedControls$ | async)">
+  <ng-container *ngTemplateOutlet="controls"></ng-container>
+</ng-container>
+
+<div class="graphs">
+  <mozaik-network-graph
+    *ngIf="dsNodes$ | async"
+    [showArrows]="optionsForm.value.visibility.showArrows"
+    [highTransparency]="optionsForm.value.visibility.highTransparency"
+    [sheetName]="ads.sheet"
+    [nodes]="dsNodes$ | async"
+    [edgeDir]="optionsForm.value.edges"
+    [allNodes]="allNodes$ | async"
+  ></mozaik-network-graph>
+  <mozaik-lines-graph
+    [ds]="fullAds$ | async"
+    [selected]="selected$ | async"
+  ></mozaik-lines-graph>
+</div>

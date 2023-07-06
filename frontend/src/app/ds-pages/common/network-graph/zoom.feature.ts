@@ -2,7 +2,7 @@ import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 import * as d3 from 'd3';
 import { AnySelection, SVGRef } from '../../../utils/svg-ref';
 import { Injectable } from '@angular/core';
-import { ZoomCallback, ZoomFeature } from '../../common/features/zoom.feature';
+import { ZoomCallback, ZoomFeature } from '../features/zoom.feature';
 
 /**
  * factory method to allow dependency injection and improve testability
@@ -10,18 +10,18 @@ import { ZoomCallback, ZoomFeature } from '../../common/features/zoom.feature';
 @Injectable({
   providedIn: 'root',
 })
-export class PNVZoomFeatureFactory {
+export class NetworkZoomFeatureFactory {
   public createZoomFeature(
     nodes: NetworkNode[],
     sheetName: string,
     svg: SVGRef,
     zoomCallback?: ZoomCallback
   ) {
-    return new PNVZoomFeature(nodes, sheetName, svg, zoomCallback);
+    return new NetworkZoomFeature(nodes, sheetName, svg, zoomCallback);
   }
 }
 
-export class PNVZoomFeature extends ZoomFeature {
+export class NetworkZoomFeature extends ZoomFeature {
   private grid: AnySelection;
 
   constructor(

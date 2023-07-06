@@ -1,7 +1,7 @@
 import flask
 import json
 from .ads import get_ads_list, AdsIdentifier, get_per_neuron_value, Ads, \
-    get_per_neuron_pair_value, get_analog_signal_list, iter_pnpv_values
+    get_per_neuron_pair_value, get_analog_signal_list, iter_pnpv_values, iter_asl_values
 from .filesystem import find_datastores, get_directory
 from .model import get_model as get_datastore_model, get_sheet_positions, get_connections
 from .parameters import params
@@ -154,6 +154,21 @@ def get_pnpv_values():
 
     return generate_csv(
         iter_pnpv_values(str(path), alg, stimulus_id, **optional)
+    ), {"Content-Type": "text/csv"}
+
+
+@api.route('analysis_ds/asl')
+def get_asl_values():
+    try:
+        args = flask.request.args
+        path = get_path()
+        alg = args['algorithm']
+        optional, stimulus_id = get_optional_ads_params()
+    except:
+        return flask.Response(status=400)
+
+    return generate_csv(
+        iter_asl_values(str(path), alg, stimulus_id, **optional)
     ), {"Content-Type": "text/csv"}
 
 

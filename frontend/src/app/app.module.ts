@@ -12,7 +12,12 @@ import { HeaderComponent } from './common/header/header.component';
 import { reducers, metaReducers, State } from './store/reducers';
 import { LoadingOverlayComponent } from './common/loading-overlay/loading-overlay.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { hoverNode, modelLoaded } from './store/actions/model.actions';
+import {
+  connectionsLoadingProgress,
+  hoverNode,
+  modelLoaded,
+  positionsLoadingProgress,
+} from './store/actions/model.actions';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FilesystemEffects } from './store/effects/filesystem.effects';
 import { FilesystemComponent } from './common/filesystem/filesystem.component';
@@ -55,6 +60,10 @@ import { FilterSwitchComponent } from './common/ds-select/ds-table/filters/filte
 import { InspectorEffects } from './store/effects/inspector.effects';
 import { AddNeuronComponent } from './common/selected-neurons/add-neuron/add-neuron.component';
 import { AdsLoadingComponent } from './common/ads-loading/ads-loading.component';
+import {
+  adsLoadingProgress,
+  specificAdsLoaded,
+} from './store/actions/ads.actions';
 
 const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
   selector: string;
@@ -129,10 +138,30 @@ const customEls: ((new (el: ElementRef, ...args: any[]) => Dialog) & {
           ...s.model,
           currentModel: s.model?.currentModel && {},
         },
+        ads: {
+          ...s.ads,
+          selectedAds: s.ads.selectedAds.map((a: any) => {
+            const copy = { ...a };
+            if ('values' in a) {
+              copy.values = [];
+              copy.ids = [];
+            }
+            return copy;
+          }),
+        },
       }),
-      actionSanitizer: (a) =>
-        a.type === modelLoaded.type ? { ...a, model: {} } : a,
-      actionsBlocklist: [hoverNode.type],
+      actionSanitizer: (a) => {
+        if (a.type === modelLoaded.type) return { ...a, model: {} };
+        if (a.type === specificAdsLoaded.type && 'values' in (a as any).ads)
+          return { ...a, ads: { ...(a as any).ads, values: [], ids: [] } };
+        return a;
+      },
+      actionsBlocklist: [
+        hoverNode.type,
+        adsLoadingProgress.type,
+        positionsLoadingProgress.type,
+        connectionsLoadingProgress.type,
+      ],
       logOnly: environment.production,
     }),
     HttpClientModule,

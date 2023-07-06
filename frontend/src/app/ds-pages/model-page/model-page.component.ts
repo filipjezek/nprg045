@@ -34,10 +34,7 @@ import {
 } from 'src/app/store/reducers/ads.reducer';
 import { State } from 'src/app/store/reducers';
 import { RadioOption } from 'src/app/widgets/button-radio/button-radio.component';
-import {
-  EdgeDirection,
-  PNVData,
-} from './network-graph/network-graph.component';
+import { PNVData } from './network-graph/network-graph.component';
 import { DsPage, DsPageConstructor } from '../common/ds-page';
 import { TabState } from 'src/app/store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
@@ -47,6 +44,7 @@ import { HistogramData } from '../common/histogram/histogram.component';
 import * as d3 from 'd3';
 import { Extent } from '../common/scale/scale.component';
 import { roundFloat } from 'src/app/utils/round-float';
+import { EdgeDirection } from '../common/network-graph/network-graph.component';
 
 type PNVVisualization = 'scatterplot' | 'histogram';
 

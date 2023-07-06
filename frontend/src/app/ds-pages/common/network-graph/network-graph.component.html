@@ -1,0 +1,55 @@
+<div
+  #container
+  class="container"
+  (click)="handleClick($event)"
+  (mouseover)="handleMouseEnter($event)"
+  (mouseout)="handleMouseLeave($event)"
+  [class.contains-selection]="(selectedNodes$ | async)?.length"
+  [class.no-arrows]="!showArrows"
+  [class.transparent]="highTransparency"
+>
+  <h2>
+    {{ sheetName }}
+    <span class="count">({{ nodes?.length }} nodes)</span>
+  </h2>
+  <mozaik-tooltip
+    #nodeTooltip
+    *ngIf="(hoveredNode$ | async)?.sheets[sheetName]"
+    [ngStyle]="tooltipPos"
+  >
+    <h1>Neuron #{{ (hoveredNode$ | async).id }}</h1>
+    <table>
+      <tbody>
+        <tr>
+          <td>X</td>
+          <td>
+            {{ (hoveredNode$ | async).sheets[sheetName].x | number : "1.0-4" }}
+            μm
+          </td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td>
+            {{ (hoveredNode$ | async).sheets[sheetName].y | number : "1.0-4" }}
+            μm
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mozaik-tooltip>
+  <mozaik-tooltip #edgeTooltip *ngIf="hoveredEdge" [ngStyle]="tooltipPos">
+    <h1>Edge #{{ hoveredEdge.from }} -> #{{ hoveredEdge.to }}</h1>
+    <table>
+      <tbody>
+        <tr>
+          <td>Weight</td>
+          <td>{{ hoveredEdge.weight | number : "1.0-4" }}</td>
+        </tr>
+        <tr>
+          <td>Delay</td>
+          <td>{{ hoveredEdge.delay | number : "1.0-4" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </mozaik-tooltip>
+</div>

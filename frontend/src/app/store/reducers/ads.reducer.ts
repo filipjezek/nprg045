@@ -46,6 +46,14 @@ export interface PerNeuronPairValue extends Ads {
   ids: number[];
 }
 
+export interface AnalogSignalList extends Ads {
+  values: number[][];
+  ids: number[];
+  startTime: number;
+  samplingPeriod: number;
+  timeUnit: string;
+}
+
 export interface AdsProgress {
   index: number;
   parts: Record<string, { curr: number; total: number }>;

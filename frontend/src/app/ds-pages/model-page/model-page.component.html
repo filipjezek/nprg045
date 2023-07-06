@@ -71,7 +71,7 @@
     [period]="(fullAds$ | async)?.period"
     [unit]="(fullAds$ | async)?.unit"
   ></mozaik-scale>
-  <mozaik-network-graph
+  <mozaik-pnv-network-graph
     [showArrows]="optionsForm.value.visibility.showArrows"
     [highTransparency]="optionsForm.value.visibility.highTransparency"
     [sheetName]="ads.sheet"
@@ -80,7 +80,7 @@
     [nodes]="(model$ | async)?.sheetNodes[ads.sheet]"
     [edgeDir]="optionsForm.value.edges"
     [allNodes]="(model$ | async)?.nodes"
-  ></mozaik-network-graph>
+  ></mozaik-pnv-network-graph>
 </ng-container>
 <ng-template #histogram>
   <mozaik-histogram

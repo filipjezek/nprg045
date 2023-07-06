@@ -6,6 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TooltipComponent } from './tooltip/tooltip.component';
 import { ScaleComponent } from './scale/scale.component';
 import { HistogramComponent } from './histogram/histogram.component';
+import { NetworkGraphComponent } from './network-graph/network-graph.component';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { HistogramComponent } from './histogram/histogram.component';
     TooltipComponent,
     ScaleComponent,
     HistogramComponent,
+    NetworkGraphComponent,
   ],
   imports: [CommonModule, WidgetsModule, FontAwesomeModule],
   exports: [
@@ -20,6 +22,7 @@ import { HistogramComponent } from './histogram/histogram.component';
     TooltipComponent,
     ScaleComponent,
     HistogramComponent,
+    NetworkGraphComponent,
   ],
 })
 export class DsPagesCommonModule {}

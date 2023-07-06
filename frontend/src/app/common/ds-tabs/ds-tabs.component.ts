@@ -150,6 +150,11 @@ export class DsTabsComponent
         return import(
           '../../ds-pages/per-neuron-pair-value-page/per-neuron-pair-value-page.component'
         ).then((x) => x.PerNeuronPairValuePageComponent);
+      case AdsIdentifier.AnalogSignalList:
+        await import('../../ds-pages/asl-page/asl-page.module');
+        return import('../../ds-pages/asl-page/asl-page.component').then(
+          (x) => x.AslPageComponent
+        );
       default:
         await import(
           '../../ds-pages/single-value-page/single-value-page.module'

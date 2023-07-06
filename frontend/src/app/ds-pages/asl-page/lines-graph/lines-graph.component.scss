@@ -1,0 +1,60 @@
+:host {
+  display: block;
+
+  .container {
+    box-shadow: 0 0 2px #00000078;
+    background-color: white;
+    max-width: 880px;
+  }
+
+  .swatches {
+    padding: 5px 15px 0;
+
+    .swatch {
+      display: inline-block;
+      width: 110px;
+
+      .color {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-right: 5px;
+      }
+      .label {
+        display: inline-block;
+        font-size: 0.8em;
+      }
+    }
+  }
+
+  .graph {
+    position: relative;
+
+    ::ng-deep {
+      svg {
+        width: 100%;
+      }
+    }
+
+    mozaik-tooltip {
+      position: absolute;
+      font-size: 0.7em;
+      min-width: 100px;
+      animation: fade 0.1s ease-out 1s backwards;
+
+      h1 {
+        font-size: 1.1em;
+        margin: 3px 0;
+      }
+
+      table {
+        color: #333;
+        width: 100%;
+
+        td:last-child {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
