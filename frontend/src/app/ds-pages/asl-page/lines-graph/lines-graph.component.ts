@@ -18,7 +18,6 @@ import { LinesZoomFeature, LinesZoomFeatureFactory } from './zoom.feature';
 import { NetworkNode } from 'src/app/store/reducers/model.reducer';
 import { hoverNode } from 'src/app/store/actions/model.actions';
 import { filter, startWith, takeUntil } from 'rxjs';
-import { recalcTooltipPos } from '../../common/tooltip/recalc-tooltip-pos';
 
 @Component({
   selector: 'mozaik-lines-graph',
@@ -45,8 +44,7 @@ export class LinesGraphComponent
   private delaunay: d3.Delaunay<number>;
   private dot: AnySelection;
   colors = d3.scaleOrdinal<number, string>(d3.schemeTableau10);
-  tooltipPos: Partial<Directional<string>> = null;
-  tooltip: { x: number; y: number } = { x: 0, y: 0 };
+  tooltip: { x: number; y: number } = null;
 
   private hoveredNode$ = this.store.select((s) => s.model.hovered);
 
@@ -77,6 +75,7 @@ export class LinesGraphComponent
 
     if (this.ds) {
       this.initZoom();
+      this.initUnits();
     }
   }
 
@@ -84,6 +83,7 @@ export class LinesGraphComponent
     // this should happen only once
     if (changes['ds']?.currentValue && this.svg) {
       this.initZoom();
+      this.initUnits();
     }
     if (changes['selected']?.currentValue) {
       this.selectedSet = new Set(this.selected.map((n) => n.id));
@@ -91,6 +91,29 @@ export class LinesGraphComponent
     if ((changes['ds'] || changes['selected']) && this.ds) {
       this.redraw();
     }
+  }
+
+  private initUnits() {
+    this.svg.el
+      .append('text')
+      .text(this.ds.unit == 'dimensionless' ? '' : this.ds.unit)
+      .style('font-size', '0.7em')
+      .style(
+        'transform',
+        `translate(${10 - this.svg.margin.left}px, ${
+          30 - this.svg.margin.top
+        }px)`
+      );
+    this.svg.el
+      .append('text')
+      .text(this.ds.timeUnit)
+      .style('font-size', '0.7em')
+      .style(
+        'transform',
+        `translate(${this.svg.margin.left + this.svg.width - 60}px, ${
+          this.svg.margin.top + this.svg.height - 10
+        }px)`
+      );
   }
 
   private initPath() {
@@ -180,10 +203,11 @@ export class LinesGraphComponent
   }
 
   onMouseEnter() {
-    this.path
+    const paths = this.path
       .selectChildren('path')
       .style('mix-blend-mode', null)
       .style('opacity', 0.2);
+    if (paths.size() == 0) return;
     d3.select(
       (this.dot.style('display', null).node() as Element).parentElement
     ).raise();
@@ -192,32 +216,29 @@ export class LinesGraphComponent
   onMouseLeave() {
     this.store.dispatch(hoverNode({ node: null }));
     this.dot.style('display', 'none');
-    this.tooltipPos = null;
+    this.tooltip = null;
     this.changeDetector.markForCheck();
   }
   onMouseMove(e: MouseEvent) {
+    const lineIds = this.ds.ids.filter((id) => this.selectedSet.has(id));
+    if (lineIds.length == 0) return;
+
+    // the coords are relative to the path group element
+    // and are already translated, but not scaled
     const coords = d3.pointer(e, this.path.node());
     coords[0] = coords[0] * 128;
     const index = this.delaunay.find(...coords);
     const lineIndex = Math.floor(index / this.ds.values[0].length);
-    const lineIds = this.ds.ids.filter((id) => this.selectedSet.has(id));
     const id = lineIds[lineIndex];
     this.store.dispatch(hoverNode({ node: id }));
 
-    this.dot.attr(
-      'd',
-      `M${this.delaunay.points[index * 2] / 128},${
-        this.delaunay.points[index * 2 + 1]
-      }h0`
-    );
-    this.tooltipPos = recalcTooltipPos(
-      e.clientX,
-      e.clientY,
-      this.container.nativeElement
-    );
+    const dlX = this.delaunay.points[index * 2] / 128;
+    const dlY = this.delaunay.points[index * 2 + 1];
+
+    this.dot.attr('d', `M${dlX},${dlY}h0`);
     this.tooltip = {
-      x: this.zoom.invertX(coords[0]),
-      y: this.zoom.invertY(coords[1]),
+      x: this.zoom.invertX(dlX),
+      y: this.zoom.invertY(dlY),
     };
     this.changeDetector.markForCheck();
   }

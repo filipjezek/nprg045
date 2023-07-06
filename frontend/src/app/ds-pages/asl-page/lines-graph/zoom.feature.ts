@@ -79,7 +79,7 @@ export class LinesZoomFeature extends ZoomFeature {
     this.scales.y = d3
       .scaleLinear()
       .domain(this.extent.y)
-      .range([0, this.svg.height]);
+      .range([this.svg.height, 0]);
   }
 
   private initGrid() {

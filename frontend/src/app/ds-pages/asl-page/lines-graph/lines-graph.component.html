@@ -11,11 +11,7 @@
     </div>
   </div>
   <div #container class="graph">
-    <mozaik-tooltip
-      #nodeTooltip
-      *ngIf="tooltipPos && false"
-      [ngStyle]="tooltipPos"
-    >
+    <mozaik-tooltip #nodeTooltip *ngIf="tooltip">
       <table>
         <tbody>
           <tr>

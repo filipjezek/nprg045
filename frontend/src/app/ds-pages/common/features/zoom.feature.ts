@@ -76,7 +76,7 @@ export class ZoomFeature {
       .scaleLinear()
       .domain(this.extent.y)
       .nice()
-      .range([0, this.svg.height]);
+      .range([this.svg.height, 0]);
 
     this.axes.bottom.g = this.svg.el
       .append('g')
