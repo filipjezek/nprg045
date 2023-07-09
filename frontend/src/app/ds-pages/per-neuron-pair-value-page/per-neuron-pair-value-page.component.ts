@@ -239,7 +239,10 @@ export class PerNeuronPairValuePageComponent
   }
 
   private createHistogramData() {
-    return combineLatest([this.fullAds$, this.filter$]).pipe(
+    return combineLatest([
+      this.fullAds$.pipe(filter((x) => !!x)),
+      this.filter$,
+    ]).pipe(
       map(([ds, filter]: [PerNeuronPairValue, Extent]) => {
         let values = ds.values.flatMap((row) =>
           row.filter((x) => x >= filter.min && x <= filter.max)

@@ -88,7 +88,7 @@ export class LinesGraphComponent
     if (changes['selected']?.currentValue) {
       this.selectedSet = new Set(this.selected.map((n) => n.id));
     }
-    if ((changes['ds'] || changes['selected']) && this.ds) {
+    if ((changes['ds'] || changes['selected']) && this.ds && this.svg) {
       this.redraw();
     }
   }
