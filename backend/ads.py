@@ -5,6 +5,8 @@ from .utils import batched
 from urllib.parse import urlencode
 import ast
 import flask
+import quantities as pq
+import math
 
 
 class AdsIdentifier(Enum):
@@ -53,6 +55,15 @@ class SerializableASL(Ads):
     ids: List[int]
 
 
+def __convert_numeric(val):
+    if isinstance(val, pq.Quantity):
+        val = val.magnitude
+    if math.isnan(val):
+        return None
+    else:
+        return val
+
+
 def get_ads_list(path_to_datastore: str) -> List[Ads]:
     order = ['identifier', 'algorithm', 'stimulus',
              'valueName', 'sheet', 'neuron']
@@ -95,7 +106,7 @@ def get_per_neuron_value(path_to_datastore: str, alg: str, **kwargs) -> List[Ser
 
     return [cast(SerializablePerNeuronValue, {
         'ids': a.ids,
-        'values': a.values,
+        'values': [__convert_numeric(a) for a in a.values],
         **__get_ads_base(a)
     }) for a in ads]
 

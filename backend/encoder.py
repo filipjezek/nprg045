@@ -13,12 +13,13 @@ class JSONEncoder(flask.json.provider.DefaultJSONProvider):
             return obj.dimensionality.unicode
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, (np.integer, np.floating, float, int)):
+            if math.isnan(obj):
+                return None
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):
             return float(obj)
-        if math.isnan(obj):
-            return None
 
         # Let the base class default method raise the TypeError
         return flask.json.provider.DefaultJSONProvider.default(obj)

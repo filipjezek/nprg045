@@ -296,7 +296,10 @@ export class ModelPageComponent
     );
   }
   private createHistogramData() {
-    return combineLatest([this.fullAds$, this.pnvFilter$]).pipe(
+    return combineLatest([
+      this.fullAds$.pipe(filter((x) => !!x)),
+      this.pnvFilter$,
+    ]).pipe(
       map(([ds, filter]: [PerNeuronValue, Extent]) => {
         let values = ds.values.filter(
           (x) => x >= filter.min && x <= filter.max
