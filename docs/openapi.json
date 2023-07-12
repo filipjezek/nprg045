@@ -1,0 +1,671 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mozaik Visualization",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://loacalhost:5000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "filesystem",
+      "description": "Access to the filesystem"
+    },
+    {
+      "name": "model",
+      "description": "Access to sheets and connections"
+    },
+    {
+      "name": "ads",
+      "description": "Everything about analysis data structures"
+    }
+  ],
+  "paths": {
+    "/filesystem": {
+      "get": {
+        "tags": ["filesystem"],
+        "summary": "Get listing of a directory",
+        "description": "Lists all datastores and directories in the provided directory",
+        "operationId": "get_filesystem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "/"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectoryListing"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path supplied"
+          }
+        }
+      }
+    },
+    "/recursive_filesystem": {
+      "get": {
+        "tags": ["filesystem"],
+        "summary": "Get recursive listing of a directory",
+        "description": "Lists all directories in the provided directory and its descendats. Collapses directory paths and filters out paths with no datastores.",
+        "operationId": "get_recursive_filesystem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "/"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecursiveDirectoryListing"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path supplied"
+          }
+        }
+      }
+    },
+    "/model": {
+      "get": {
+        "tags": ["model"],
+        "summary": "Get model metadata",
+        "description": "Get sheet names and count of neurons for each of them, as well as count of connections between each of them",
+        "operationId": "get_model",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sheets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "connections": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "src": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    },
+    "/model/positions": {
+      "get": {
+        "tags": ["model"],
+        "summary": "Get neuron positions for a given sheet",
+        "operationId": "get_model_positions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          },
+          {
+            "name": "sheet",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "description": "id,x,y",
+                  "example": "1,2,3"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    },
+    "/model/connections": {
+      "get": {
+        "tags": ["model"],
+        "summary": "Get connections between two sheets",
+        "operationId": "get_model_connections",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          },
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tgt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "description": "srcIndex,tgtIndex,weight,delay",
+                  "example": "1,2,0.4,1.7"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    },
+    "/analysis_ds_list": {
+      "get": {
+        "tags": ["ads"],
+        "summary": "Get list of all ADS",
+        "operationId": "get_ads",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ADSBase"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    },
+    "/analysis_ds": {
+      "get": {
+        "tags": ["ads"],
+        "summary": "Get specific ADS",
+        "description": "Returns different schema of ADS depending on the provided identifier. May require to issue other requests to get all of the data.",
+        "operationId": "get_specific_ads",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          },
+          {
+            "$ref": "#/components/parameters/ADSIdentifier"
+          },
+          {
+            "$ref": "#/components/parameters/Stimulus"
+          },
+          {
+            "$ref": "#/components/parameters/Sheet"
+          },
+          {
+            "$ref": "#/components/parameters/Algorithm"
+          },
+          {
+            "$ref": "#/components/parameters/ValueName"
+          },
+          {
+            "$ref": "#/components/parameters/Neuron"
+          },
+          {
+            "$ref": "#/components/parameters/Tags"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ADSBase"
+                    },
+                    {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "ids": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer"
+                              }
+                            },
+                            "values": {
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "ids": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer"
+                              }
+                            },
+                            "values": {
+                              "$ref": "#/components/schemas/ADSLink"
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "ids": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer"
+                              }
+                            },
+                            "values": {
+                              "$ref": "#/components/schemas/ADSLink"
+                            },
+                            "startTime": {
+                              "type": "number"
+                            },
+                            "samplingPeriod": {
+                              "type": "number"
+                            },
+                            "timeUnit": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or unimplemented ADS type"
+          }
+        }
+      }
+    },
+    "/analysis_ds/pnpv": {
+      "get": {
+        "tags": ["ads"],
+        "summary": "Get PNPV values",
+        "operationId": "get_pnpv_values",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          },
+          {
+            "$ref": "#/components/parameters/Stimulus"
+          },
+          {
+            "$ref": "#/components/parameters/Sheet"
+          },
+          {
+            "$ref": "#/components/parameters/Algorithm"
+          },
+          {
+            "$ref": "#/components/parameters/ValueName"
+          },
+          {
+            "$ref": "#/components/parameters/Neuron"
+          },
+          {
+            "$ref": "#/components/parameters/Tags"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    },
+    "/analysis_ds/asl": {
+      "get": {
+        "tags": ["ads"],
+        "summary": "Get ASL values",
+        "operationId": "get_asl_values",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Path"
+          },
+          {
+            "$ref": "#/components/parameters/Stimulus"
+          },
+          {
+            "$ref": "#/components/parameters/Sheet"
+          },
+          {
+            "$ref": "#/components/parameters/Algorithm"
+          },
+          {
+            "$ref": "#/components/parameters/ValueName"
+          },
+          {
+            "$ref": "#/components/parameters/Neuron"
+          },
+          {
+            "$ref": "#/components/parameters/Tags"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadParams"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DirectoryListing": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "datastore": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RecursiveDirectoryListing": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "datastore": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecursiveDirectoryListing"
+            }
+          }
+        },
+        "example": {
+          "name": "root",
+          "datastore": false,
+          "content": [
+            {
+              "name": "a",
+              "datastore": true,
+              "content": []
+            },
+            {
+              "name": "b/c",
+              "datastore": true,
+              "content": []
+            }
+          ]
+        }
+      },
+      "ADSIdentifier": {
+        "type": "string",
+        "enum": [
+          "SingleValue",
+          "SingleValueList",
+          "PerNeuronValue",
+          "PerNeuronPairValue",
+          "AnalogSignal",
+          "AnalogSignalList",
+          "PerNeuronPairAnalogSignalList",
+          "ConductanceSignalList",
+          "Connections"
+        ]
+      },
+      "ADSBase": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "$ref": "#/components/schemas/ADSIdentifier"
+          },
+          "algorithm": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sheet": {
+            "type": "string",
+            "nullable": true
+          },
+          "stimulus": {
+            "type": "object"
+          },
+          "valueName": {
+            "type": "string",
+            "nullable": true
+          },
+          "period": {
+            "type": "number",
+            "nullable": true
+          },
+          "neuron": {
+            "type": "integer",
+            "nullable": true
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "ADSLink": {
+        "type": "object",
+        "properties": {
+          "@link": {
+            "type": "string",
+            "example": "/analysis_ds/asl?path=path"
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "Path": {
+        "name": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true,
+        "in": "query"
+      },
+      "ADSIdentifier": {
+        "name": "identifier",
+        "required": true,
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/ADSIdentifier"
+        }
+      },
+      "Stimulus": {
+        "name": "stimulus",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        },
+        "required": false,
+        "in": "query"
+      },
+      "Sheet": {
+        "name": "sheet",
+        "schema": {
+          "type": "string"
+        },
+        "required": false,
+        "in": "query"
+      },
+      "Algorithm": {
+        "name": "algorithm",
+        "schema": {
+          "type": "string"
+        },
+        "required": true,
+        "in": "query"
+      },
+      "ValueName": {
+        "name": "valueName",
+        "schema": {
+          "type": "string"
+        },
+        "required": false,
+        "in": "query"
+      },
+      "Neuron": {
+        "name": "neuron",
+        "schema": {
+          "type": "string"
+        },
+        "required": false,
+        "in": "query"
+      },
+      "Tags": {
+        "name": "tags",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required": false,
+        "explode": true,
+        "in": "query"
+      }
+    },
+    "responses": {
+      "BadParams": {
+        "description": "Invalid parameters supplied"
+      }
+    }
+  }
+}
