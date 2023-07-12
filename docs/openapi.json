@@ -62,7 +62,7 @@
       "get": {
         "tags": ["filesystem"],
         "summary": "Get recursive listing of a directory",
-        "description": "Lists all directories in the provided directory and its descendats. Collapses directory paths and filters out paths with no datastores.",
+        "description": "Lists all directories in the provided directory and its descendants. Collapses directory paths and filters out paths with no datastores.",
         "operationId": "get_recursive_filesystem",
         "parameters": [
           {
