@@ -1,7 +1,8 @@
 from pathlib import Path
 import pytest
 
-from ..filesystem import find_datastores
+from ..api.filesystem.fs_access import find_datastores
+
 
 @pytest.fixture()
 def prepare_directory_structure(tmp_path: Path):
@@ -25,7 +26,7 @@ def prepare_directory_structure(tmp_path: Path):
     f.mkdir(parents=True)
     j = tmp_path / 'a/c/d/i/j'
     j.mkdir(parents=True)
-    
+
     (j / 'datastore.recordings.pickle').write_text("")
     (f / 'datastore.recordings.pickle').write_text("")
     (tmp_path / 'a/c/d/e/datastore.recordings.pickle').write_text("")

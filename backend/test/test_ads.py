@@ -1,5 +1,5 @@
 from pytest_mock import MockerFixture
-from ..ads import Ads, AdsIdentifier, get_ads_list, get_per_neuron_value
+from ..api.ads.transforms import Ads, AdsIdentifier, get_ads_list, get_per_neuron_value
 import pytest
 import numpy as np
 from . import mocks

@@ -3,7 +3,7 @@ from mozaik.storage.datastore import PickledDataStore, DataStore
 from parameters import ParameterSet
 import numpy as np
 from functools import lru_cache
-from .parameters import params
+from ...parameters import params
 
 # these type definitons should correspond to those
 # in /frontend/src/app/services/model.service.ts

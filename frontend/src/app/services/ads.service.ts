@@ -32,7 +32,7 @@ export class AdsService {
 
   public loadAds(path: string): Observable<Omit<Ads, 'index'>[]> {
     return this.http.get<Omit<Ads, 'index'>[]>(
-      'analysis_ds_list',
+      'analysis_ds/all',
       new HttpParams().append('path', path)
     );
   }

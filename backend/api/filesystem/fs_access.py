@@ -1,5 +1,5 @@
 from pathlib import Path
-from .parameters import params
+from ...parameters import params
 from typing import List, Tuple, TypedDict, Union, cast
 
 

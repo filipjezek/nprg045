@@ -1,5 +1,5 @@
 from .app import app
-from .server_api import api
+from .api import api
 from werkzeug.exceptions import NotFound
 import flask
 

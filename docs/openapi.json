@@ -24,7 +24,7 @@
     }
   ],
   "paths": {
-    "/filesystem": {
+    "/fs/directory": {
       "get": {
         "tags": ["filesystem"],
         "summary": "Get listing of a directory",
@@ -58,7 +58,7 @@
         }
       }
     },
-    "/recursive_filesystem": {
+    "/fs/recursive": {
       "get": {
         "tags": ["filesystem"],
         "summary": "Get recursive listing of a directory",
@@ -235,7 +235,7 @@
         }
       }
     },
-    "/analysis_ds_list": {
+    "/analysis_ds/all": {
       "get": {
         "tags": ["ads"],
         "summary": "Get list of all ADS",

@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, TypedDict, cast, Any, Dict
-from .model import load_datastore
-from .utils import batched
+from ..model.transforms import load_datastore
+from ...utils import batched
 from urllib.parse import urlencode
 import ast
 import flask

@@ -1,8 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
 from . import mocks
-from ..model import get_model, load_datastore
+from ..api.model.transforms import get_model, load_datastore
 import numpy as np
+
 
 @pytest.fixture
 def datastore(mocker: MockerFixture):
@@ -10,14 +11,15 @@ def datastore(mocker: MockerFixture):
     mocker.patch('backend.model.load_datastore', return_value=datastore)
     return datastore
 
+
 def test_load_datastore(mocker: MockerFixture):
     patcher = mocker.patch('backend.model.PickledDataStore')
     load_datastore('path1')
     assert patcher.call_count == 1
-    
+
     load_datastore('path1')
     assert patcher.call_count == 1, 'should cache'
-    
+
     load_datastore('path2')
     assert patcher.call_count == 2
 
@@ -25,39 +27,40 @@ def test_load_datastore(mocker: MockerFixture):
     assert patcher.call_count == 2, 'should cache'
     load_datastore('path1')
     assert patcher.call_count == 2, 'should cache at least two calls'
-    
+
+
 def test_get_model(datastore: mocks.DataStoreMock):
     datastore.get_analysis_result.return_value = [
         mocks.MozaikConnectionMock(
             source_name="s1",
             target_name="s1",
             weights=[
-                (0,1,0.9),
-                (0,2,0.4),
-                (1,2,0.2),
-                (2,0,0.87),
+                (0, 1, 0.9),
+                (0, 2, 0.4),
+                (1, 2, 0.2),
+                (2, 0, 0.87),
             ],
             delays=[
-                (0,1,0.1),
-                (0,2,1.2),
-                (1,2,1.4),
-                (2,0,0.7),
+                (0, 1, 0.1),
+                (0, 2, 1.2),
+                (1, 2, 1.4),
+                (2, 0, 0.7),
             ],
         ),
         mocks.MozaikConnectionMock(
             source_name="s1",
             target_name="s2",
             weights=[
-                (1,0,0.1),
-                (0,2,0.2),
-                (1,2,0.3),
-                (0,1,0.4),
+                (1, 0, 0.1),
+                (0, 2, 0.2),
+                (1, 2, 0.3),
+                (0, 1, 0.4),
             ],
             delays=[
-                (1,0,0.5),
-                (0,2,0.6),
-                (1,2,0.7),
-                (0,1,0.8),
+                (1, 0, 0.5),
+                (0, 2, 0.6),
+                (1, 2, 0.7),
+                (0, 1, 0.8),
             ],
         )
     ]
@@ -65,13 +68,13 @@ def test_get_model(datastore: mocks.DataStoreMock):
         's1': np.array([[10, 8, 5], [9, 11, 4]]),
         's2': np.array([[-3, 7, 15], [19, 1, 2]]),
     }
-    
+
     def get_sheet_ids_mock(sheet, indices):
         if (sheet == 's1'):
             return np.array([0, 1, 2])
         return np.array([3, 4, 5])
     datastore.get_sheet_ids.side_effect = get_sheet_ids_mock
-    
+
     assert get_model('path') == {
         'sheets': [
             {'label': 's1', 'neuronPositions': {

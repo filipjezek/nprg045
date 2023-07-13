@@ -13,12 +13,12 @@ export class FilesystemService {
   public loadRecursiveFilesystem(path?: string): Observable<FolderInfo> {
     let params = new HttpParams();
     if (path) params = params.append('path', path);
-    return this.http.get<FolderInfo>('recursive_filesystem', params);
+    return this.http.get<FolderInfo>('fs/recursive', params);
   }
 
   public loadDirectory(path?: string): Observable<FolderInfo> {
     let params = new HttpParams();
     if (path) params = params.append('path', path);
-    return this.http.get<FolderInfo>('filesystem', params);
+    return this.http.get<FolderInfo>('fs/directory', params);
   }
 }
