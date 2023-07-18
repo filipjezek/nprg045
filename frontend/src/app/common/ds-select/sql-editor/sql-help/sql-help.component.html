@@ -161,11 +161,7 @@
 --   &#123;a: &#123;foo: <span class="string">'cow'</span>, x: <span class="number">2</span>&#125;&#125;,
 -- ]</span>
 
-<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a, <span class="number">23</span>) a <span class="keyword">FROM</span> <span class="table">data</span>
-<span class="keyword">WHERE</span> a->foo = <span class="string">'bar'</span>
-<span class="keyword">UNION</span>
-<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a, <span class="number">42</span>) a <span class="keyword">FROM</span> <span class="table">data</span>
-<span class="keyword">WHERE</span> a->foo = <span class="string">'cow'</span>
+<span class="keyword">SELECT</span> <span class="fn">MAKE_DIFF</span>(a, a->foo) a <span class="keyword">FROM</span> <span class="table">data</span>
 <span class="comment">
 -- returns: [
 --   &#123;a: &#123;x: <span class="number">1</span>&#125;&#125;,

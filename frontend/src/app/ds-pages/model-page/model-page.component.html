@@ -84,7 +84,7 @@
 </ng-container>
 <ng-template #histogram>
   <mozaik-histogram
-    [pnv]="histogramData$ | async"
+    [data]="histogramData$ | async"
     [extent]="pnvFilter$ | async"
     [thresholds]="thresholds$ | async"
   ></mozaik-histogram>

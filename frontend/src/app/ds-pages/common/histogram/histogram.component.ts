@@ -38,7 +38,7 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
   private id: number;
 
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
-  @Input() pnv: HistogramData;
+  @Input() data: HistogramData;
   @Input() extent: Extent;
   @Input() thresholds: number | d3.ThresholdCountGenerator<number>;
 
@@ -60,7 +60,7 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
         bottom: 50,
       },
     });
-    if (this.pnv) {
+    if (this.data) {
       this.redraw();
     }
   }
@@ -74,9 +74,9 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private calculate() {
-    const bins = d3.bin().thresholds(this.thresholds)(this.pnv.values);
-    const median = d3.median(this.pnv.values);
-    const mean = d3.mean(this.pnv.values);
+    const bins = d3.bin().thresholds(this.thresholds)(this.data.values);
+    const median = d3.median(this.data.values);
+    const mean = d3.mean(this.data.values);
     return {
       bins,
       median,
@@ -132,13 +132,13 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
           .attr('y', this.svg.margin.bottom - 10)
           .attr('fill', 'currentColor')
           .attr('text-anchor', 'end')
-          .text(`[${this.pnv.unit}]`)
+          .text(`[${this.data.unit}]`)
       );
   }
 
   private drawBins(bins: d3.Bin<number, number>[], { scaleX, scaleY }: Scales) {
-    const interpolate = this.pnv.period
-      ? d3.scaleSequential(defaultScale(true)).domain([0, this.pnv.period])
+    const interpolate = this.data.period
+      ? d3.scaleSequential(defaultScale(true)).domain([0, this.data.period])
       : d3
           .scaleSequential(defaultScale(false))
           .domain([this.extent.min, this.extent.max]);
@@ -175,7 +175,7 @@ export class HistogramComponent implements OnInit, AfterViewInit, OnChanges {
       .text(
         (d) =>
           `${d.x0} ≤ x < ${d.x1}\n${d.length} (${this.format(
-            (d.length * 100) / this.pnv.values.length
+            (d.length * 100) / this.data.values.length
           )}%)`
       );
   }

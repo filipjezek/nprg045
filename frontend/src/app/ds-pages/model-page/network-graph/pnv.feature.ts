@@ -26,7 +26,10 @@ export class PNVFeature {
     linear: d3.ScaleSequential<any, any>;
     periodic: d3.ScaleSequential<any, any>;
   } = { linear: null, periodic: null };
-  public pnvLength = 0;
+  public get pnvLength() {
+    return this._pnvLength;
+  }
+  private _pnvLength = 0;
   private pnv: PNVData;
   private pnvFilter: Extent;
 
@@ -62,13 +65,13 @@ export class PNVFeature {
   }
 
   public filterPnv() {
-    this.pnvLength = 0;
+    this._pnvLength = 0;
     this.circles
       .selectAll<d3.BaseType, NetworkNode>('.node')
       .classed('hidden', (n) => {
         const val = this.pnv.values.get(n.id);
         const res = val < this.pnvFilter.min || val > this.pnvFilter.max;
-        if (!res) ++this.pnvLength;
+        if (!res) ++this._pnvLength;
         return res;
       });
   }
