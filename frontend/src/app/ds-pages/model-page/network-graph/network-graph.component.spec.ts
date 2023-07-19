@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NetworkGraphComponent } from './network-graph.component';
+import { PNVNetworkGraphComponent } from './network-graph.component';
 
 describe('NetworkGraphComponent', () => {
-  let component: NetworkGraphComponent;
-  let fixture: ComponentFixture<NetworkGraphComponent>;
+  let component: PNVNetworkGraphComponent;
+  let fixture: ComponentFixture<PNVNetworkGraphComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NetworkGraphComponent],
+      declarations: [PNVNetworkGraphComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NetworkGraphComponent);
+    fixture = TestBed.createComponent(PNVNetworkGraphComponent);
     component = fixture.componentInstance;
     component.nodes = [];
     component.allNodes = [];
