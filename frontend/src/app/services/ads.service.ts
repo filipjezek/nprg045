@@ -94,7 +94,7 @@ export class AdsService {
    */
   private findLinks(
     ds: any,
-    cb: (parent: any, prop: string, fullPath: string) => void,
+    cb: (parent: any, prop: string | number, fullPath: string) => void,
     path?: string
   ) {
     for (const prop in ds) {
@@ -102,7 +102,13 @@ export class AdsService {
         const el = ds[prop];
         const fullPath = path ? `${path}.${prop}` : prop;
         if (el instanceof Array && el[0] && typeof el[0] == 'object') {
-          el.forEach((inner) => this.findLinks(inner, cb, fullPath));
+          el.forEach((inner, i) => {
+            if ('@link' in inner) {
+              cb(el, i, fullPath + `[${i}]`);
+            } else {
+              this.findLinks(inner, cb, fullPath);
+            }
+          });
         } else if (el && typeof el == 'object') {
           if ('@link' in el) {
             cb(ds, prop, fullPath);

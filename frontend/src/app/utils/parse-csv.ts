@@ -1,7 +1,13 @@
 import { Observable } from 'rxjs';
 import * as csv from 'csv/browser/esm';
 
+/**
+ * RxJS operator to parse CSV data into an array of arrays.
+ */
 export function parseCSV(): (src: Observable<string>) => Observable<any[]>;
+/**
+ * RxJS operator to parse CSV data into an array of objects.
+ */
 export function parseCSV<T extends Record<string, any>>(
   columns: (keyof T)[]
 ): (src: Observable<string>) => Observable<T>;
