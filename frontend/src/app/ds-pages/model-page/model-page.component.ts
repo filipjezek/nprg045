@@ -319,12 +319,9 @@ export class ModelPageComponent
   }
   private createThresholds() {
     this.tabState$
-      .pipe(
-        first((ds) => !!ds),
-        withLatestFrom(this.fullAds$)
-      )
+      .pipe(withLatestFrom(this.fullAds$.pipe(first((ds) => !!ds))))
       .subscribe(([state, ds]) => {
-        if (state.thresholds == 1) {
+        if (state?.thresholds == 1) {
           this.store.dispatch(
             setTabState({
               index: ds.index,

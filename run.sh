@@ -19,7 +19,7 @@ usage() {
     echo "   --restart"
     echo "      restart on crash (default false)"
     echo "   --root"
-    echo "      root folder for looking up datastores (default .)"
+    echo "      root folder for looking up datastores, can be specified multiple times (default .)"
     exit "$1"
 }
 

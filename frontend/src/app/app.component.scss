@@ -37,4 +37,6 @@ mozaik-ads-loading {
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
