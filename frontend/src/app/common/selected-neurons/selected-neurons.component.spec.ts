@@ -122,21 +122,23 @@ describe('SelectedNeuronsComponent', () => {
           }
         },
       } as any);
+      el.querySelector<HTMLElement>('mozaik-button').click();
+      fixture.detectChanges();
     });
 
     it('should open the dialog', () => {
-      el.querySelector<HTMLElement>('mozaik-button').click();
-      fixture.detectChanges();
       expect(dialogS.open).toHaveBeenCalledWith(AddNeuronComponent);
-
+    });
+    it('should replace selection', () => {
       listener({ detail: { neuron: 123, replace: true } } as any);
       expect(store.dispatch).toHaveBeenCalledWith(
         selectNodes({ nodes: [123] })
       );
-
-      listener({ detail: { neuron: 123, replace: true } } as any);
+    });
+    it('should add to selection', () => {
+      listener({ detail: { neuron: 123, replace: false } } as any);
       expect(store.dispatch).toHaveBeenCalledWith(
-        selectNodes({ nodes: [123] })
+        addSelectedNodes({ nodes: [123] })
       );
     });
   });

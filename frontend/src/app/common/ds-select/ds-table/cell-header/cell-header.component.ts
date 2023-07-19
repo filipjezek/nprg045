@@ -15,7 +15,7 @@ import { DialogService } from 'src/app/services/dialog.service';
 import { ColType } from '../ds-table.component';
 import { FilterDialogComponent } from '../filters/filter-dialog/filter-dialog.component';
 import { State } from 'src/app/store/reducers';
-import { selectOrderColumn } from 'src/app/store/selectors/navigator.selectors';
+import { navigatorSelectors } from 'src/app/store/selectors/navigator.selectors';
 import { Store } from '@ngrx/store';
 import {
   addCondition,
@@ -31,7 +31,7 @@ import {
 export class CellHeaderComponent implements OnInit {
   ColType = ColType;
 
-  sort$ = this.store.select(selectOrderColumn);
+  sort$ = this.store.select(navigatorSelectors.selectOrderColumn);
   @Input() key: string;
   @Input() type: ColType;
 
