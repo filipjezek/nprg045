@@ -11,12 +11,19 @@ import {
   hoverNode,
   selectNodes,
 } from 'src/app/store/actions/model.actions';
+import { DialogService } from 'src/app/services/dialog.service';
+import { AddNeuronComponent } from './add-neuron/add-neuron.component';
 
 @Component({
   template: `<ng-content></ng-content>`,
   selector: 'mozaik-collapsible',
 })
 class CollapsibleStub {}
+@Component({
+  template: `<ng-content></ng-content>`,
+  selector: 'mozaik-button',
+})
+class ButtonStub {}
 
 describe('SelectedNeuronsComponent', () => {
   let component: SelectedNeuronsComponent;
@@ -26,8 +33,19 @@ describe('SelectedNeuronsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SelectedNeuronsComponent, PurefnPipe, CollapsibleStub],
-      providers: [{ provide: Store, useClass: StoreStub }],
+      declarations: [
+        SelectedNeuronsComponent,
+        PurefnPipe,
+        CollapsibleStub,
+        ButtonStub,
+      ],
+      providers: [
+        { provide: Store, useClass: StoreStub },
+        {
+          provide: DialogService,
+          useValue: jasmine.createSpyObj('DialogService', ['open', 'close']),
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SelectedNeuronsComponent);
@@ -90,5 +108,36 @@ describe('SelectedNeuronsComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(
       addSelectedNodes({ nodes: [12] })
     );
+  });
+
+  describe('opening dialog', () => {
+    let listener: (e: CustomEvent) => void;
+    let dialogS: jasmine.SpyObj<DialogService>;
+    beforeEach(() => {
+      dialogS = TestBed.inject(DialogService) as jasmine.SpyObj<DialogService>;
+      dialogS.open.and.returnValue({
+        addEventListener: (type: string, cb: (e: CustomEvent) => void) => {
+          if (type === 'value') {
+            listener = cb;
+          }
+        },
+      } as any);
+    });
+
+    it('should open the dialog', () => {
+      el.querySelector<HTMLElement>('mozaik-button').click();
+      fixture.detectChanges();
+      expect(dialogS.open).toHaveBeenCalledWith(AddNeuronComponent);
+
+      listener({ detail: { neuron: 123, replace: true } } as any);
+      expect(store.dispatch).toHaveBeenCalledWith(
+        selectNodes({ nodes: [123] })
+      );
+
+      listener({ detail: { neuron: 123, replace: true } } as any);
+      expect(store.dispatch).toHaveBeenCalledWith(
+        selectNodes({ nodes: [123] })
+      );
+    });
   });
 });
