@@ -129,6 +129,7 @@ export class MultiviewComponent
           .map((p) => p.sort(yOrder))
           .sort((a, b) => xOrder(a[0], b[0]));
       }),
+      // avoid ExpressionChangedAfterItHasBeenCheckedError
       delay(0),
       tap((grid) => {
         if (grid.length != this.ratios.length) {

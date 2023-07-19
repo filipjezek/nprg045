@@ -54,6 +54,7 @@ export class HeaderComponent extends UnsubscribingComponent implements OnInit {
       this.filesystem$.pipe(filter((x) => !!x)),
       this.router.events.pipe(
         filter((e) => e instanceof NavigationEnd),
+        // wait for the router to finish navigating
         delay(0)
       )
     )

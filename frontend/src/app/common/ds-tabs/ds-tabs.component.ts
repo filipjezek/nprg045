@@ -97,6 +97,7 @@ export class DsTabsComponent
   ngAfterViewInit(): void {
     this.viewing$
       .pipe(
+        // avoid ExpressionChangedAfterItHasBeenCheckedError
         delay(0),
         map((viewing) => [this.viewContainerRefs, viewing] as const),
         takeUntil(this.onDestroy$)
@@ -156,12 +157,10 @@ export class DsTabsComponent
           (x) => x.AslPageComponent
         );
       default:
-        await import(
-          '../../ds-pages/single-value-page/single-value-page.module'
-        );
+        await import('../../ds-pages/unsupported-page/unsupported-page.module');
         return import(
-          '../../ds-pages/single-value-page/single-value-page.component'
-        ).then((x) => x.SingleValuePageComponent);
+          '../../ds-pages/unsupported-page/unsupported-page.component'
+        ).then((x) => x.UnsupportedPageComponent);
     }
   }
 
@@ -215,6 +214,7 @@ export class DsTabsComponent
     return (
       this.viewContainerRefs.changes as Observable<QueryList<ViewContainerRef>>
     ).pipe(
+      // next event loop
       delay(0),
       startWith(this.viewContainerRefs),
       delay(0),

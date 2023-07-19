@@ -46,16 +46,6 @@ export class AdsEffects {
       map((path) => loadAds({ path }))
     )
   );
-  adsSelected$ = createEffect(() =>
-    this.store.select(routerSelectors.selectRouteParam('adsIndex')).pipe(
-      filter((x) => !!x), // okay, because it is a string
-      distinctUntilChanged(),
-      withLatestFrom(
-        this.store.select(routerSelectors.selectRouteParam('path'))
-      ),
-      map(([index, path]) => loadSpecificAds({ index: +index, path }))
-    )
-  );
 
   loadingOverlayInc$ = createEffect(() =>
     this.actions$.pipe(

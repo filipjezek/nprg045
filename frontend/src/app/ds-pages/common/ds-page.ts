@@ -1,7 +1,9 @@
 import {
   Injectable,
   Input,
+  OnChanges,
   OnInit,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -21,31 +23,10 @@ export type DsPageConstructor<T extends Ads, U extends TabState> = new (
 
 @Injectable()
 export class DsPage<T extends Ads = Ads, U extends TabState = TabState>
-  implements OnInit
+  implements OnInit, OnChanges
 {
   public controls: TemplateRef<any>;
-  @Input() public set ads(ds: Ads) {
-    if (isEqual(ds, this._ads)) return;
-    this._ads = ds;
-    this.store
-      .select(routerSelectors.selectRouteParam('path'))
-      .pipe(
-        withLatestFrom(this.store.select((x) => x.ads.selectedAds)),
-        take(1)
-      )
-      .subscribe(([path, selected]) => {
-        if (
-          ds.identifier === AdsIdentifier.Connections ||
-          selected.some((s) => s.index == ds.index)
-        )
-          return;
-        this.store.dispatch(loadSpecificAds({ path, index: ds.index }));
-      });
-  }
-  get ads() {
-    return this._ads;
-  }
-  private _ads: Ads;
+  @Input() ads: Ads;
 
   public fullAds$ = this.store
     .select((x) => x.ads.selectedAds)
@@ -65,6 +46,30 @@ export class DsPage<T extends Ads = Ads, U extends TabState = TabState>
         this.initTabState();
       }
     });
+
+    if (this.ads) {
+      // setTimeout is needed to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.loadAds();
+      }, 0);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['ads']) {
+      const ch = changes['ads'];
+      if (isEqual(ch.currentValue, ch.previousValue)) return;
+      this.loadAds();
+    }
+  }
+
+  private loadAds() {
+    this.store
+      .select(routerSelectors.selectRouteParam('path'))
+      .pipe(take(1))
+      .subscribe((path) => {
+        this.store.dispatch(loadSpecificAds({ path, index: this.ads.index }));
+      });
   }
 
   protected initTabState() {
