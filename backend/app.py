@@ -19,8 +19,6 @@ app.config.from_object('backend.config.default')
 if 'APP_MODE' in os.environ and os.environ['APP_MODE'] == 'prod':
     app.config.from_object('backend.config.production')
 
-# Load the configuration from the instance folder
-app.config.from_pyfile('config.py')
 app.json = JSONEncoder(app)
 
 cors = CORS(app)
