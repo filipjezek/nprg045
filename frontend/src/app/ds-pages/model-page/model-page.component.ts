@@ -200,6 +200,7 @@ export class ModelPageComponent
           .pipe(
             startWith(this.optionsForm.value),
             pairwise(),
+            // debounce to avoid heavy computation when user is dragging the slider
             debounce(([one, two]) =>
               one.pnv.max == two.pnv.max &&
               one.pnv.min == two.pnv.min &&
@@ -325,7 +326,7 @@ export class ModelPageComponent
           this.store.dispatch(
             setTabState({
               index: ds.index,
-              state: { thresholds: d3.thresholdSturges(ds.values) },
+              state: { ...state, thresholds: d3.thresholdSturges(ds.values) },
             })
           );
         }

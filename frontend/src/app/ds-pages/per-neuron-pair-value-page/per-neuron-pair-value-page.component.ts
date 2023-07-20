@@ -54,7 +54,6 @@ export interface PNPVTabState extends TabState {
   selector: 'mozaik-per-neuron-pair-value-page',
   templateUrl: './per-neuron-pair-value-page.component.html',
   styleUrls: ['./per-neuron-pair-value-page.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerNeuronPairValuePageComponent
   extends Unsubscribing(
@@ -133,6 +132,7 @@ export class PerNeuronPairValuePageComponent
           .pipe(
             startWith(this.optionsForm.value),
             pairwise(),
+            // debounce to avoid heavy computation when user is dragging the slider
             debounce(([one, two]) =>
               one.pnpv.max == two.pnpv.max &&
               one.pnpv.min == two.pnpv.min &&
@@ -272,6 +272,7 @@ export class PerNeuronPairValuePageComponent
             setTabState({
               index: ds.index,
               state: {
+                ...state,
                 thresholds: d3.thresholdSturges(
                   ds.values.flatMap((row) => row)
                 ),

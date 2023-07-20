@@ -36,7 +36,6 @@ export class DsInfoComponent extends UnsubscribingComponent implements OnInit {
 
   ngOnInit(): void {
     this.collapsed$.pipe(takeUntil(this.onDestroy$)).subscribe((c) => {
-      console.log('collapsed', c);
       this.collapsed = c;
     });
 

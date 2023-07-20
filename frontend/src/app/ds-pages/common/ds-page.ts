@@ -5,14 +5,13 @@ import {
   OnInit,
   SimpleChanges,
   TemplateRef,
-  ViewChild,
 } from '@angular/core';
-import { Ads, AdsIdentifier } from '../../store/reducers/ads.reducer';
+import { Ads } from '../../store/reducers/ads.reducer';
 import { isEqual } from 'lodash-es';
 import { Store } from '@ngrx/store';
 import { State } from '../../store/reducers';
 import { loadSpecificAds } from '../../store/actions/ads.actions';
-import { map, take, withLatestFrom } from 'rxjs';
+import { map, take } from 'rxjs';
 import { routerSelectors } from '../../store/selectors/router.selectors';
 import { TabState } from '../../store/reducers/inspector.reducer';
 import { setTabState } from 'src/app/store/actions/inspector.actions';
