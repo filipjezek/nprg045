@@ -6,10 +6,10 @@ from ...utils import filter_empty
 from typing import Dict, Sequence
 import json
 
-analysis_ds = flask.Blueprint("analysis_ds", __name__)
+ads_bp = flask.Blueprint("analysis_ds", __name__)
 
 
-@analysis_ds.route('all')
+@ads_bp.route('all')
 def get_ads():
     try:
         path = get_path()
@@ -18,7 +18,7 @@ def get_ads():
     return flask.jsonify(get_ads_list(str(path)))
 
 
-@analysis_ds.route('')
+@ads_bp.route('')
 def get_specific_ads():
     try:
         args = flask.request.args
@@ -56,7 +56,7 @@ def get_specific_ads():
     return flask.jsonify(a[0])
 
 
-@analysis_ds.route('pnpv')
+@ads_bp.route('pnpv')
 def get_pnpv_values():
     try:
         args = flask.request.args
@@ -71,7 +71,7 @@ def get_pnpv_values():
     ), {"Content-Type": "text/csv"}
 
 
-@analysis_ds.route('asl')
+@ads_bp.route('asl')
 def get_asl_values():
     try:
         args = flask.request.args

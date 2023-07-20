@@ -5,3 +5,4 @@ __pycache__
 backend/static/frontend_dist/*
 .angular
 package-lock.json
+.pytest_cache

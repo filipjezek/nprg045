@@ -66,6 +66,7 @@ def get_directory(path: Path) -> FolderInfo:
 
 
 def merge_paths(paths: List[Path]) -> Tuple[Path, List[Path]]:
+    """combine all paths into a single path and a list of branches"""
     root = Path('/')
     parts = [p.parts for p in paths]
 

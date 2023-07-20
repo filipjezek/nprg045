@@ -1,9 +1,9 @@
 import flask
-from .ads import analysis_ds
-from .filesystem import fs
-from .model import model
+from .ads import ads_bp
+from .filesystem import fs_bp
+from .model import model_bp
 
-api = flask.Blueprint("api", __name__)
-api.register_blueprint(analysis_ds, url_prefix='/analysis_ds/')
-api.register_blueprint(fs, url_prefix='/fs/')
-api.register_blueprint(model, url_prefix='/model/')
+api_bp = flask.Blueprint("api", __name__)
+api_bp.register_blueprint(ads_bp, url_prefix='/analysis_ds/')
+api_bp.register_blueprint(fs_bp, url_prefix='/fs/')
+api_bp.register_blueprint(model_bp, url_prefix='/model/')

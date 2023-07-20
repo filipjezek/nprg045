@@ -2,10 +2,10 @@ import flask
 from ..utils import generate_csv, get_path
 from .transforms import get_model as get_datastore_model, get_sheet_positions, get_connections
 
-model = flask.Blueprint("model", __name__)
+model_bp = flask.Blueprint("model", __name__)
 
 
-@model.route('')
+@model_bp.route('')
 def get_model():
     try:
         path = get_path()
@@ -14,7 +14,7 @@ def get_model():
     return flask.jsonify(get_datastore_model(str(path)))
 
 
-@model.route('positions')
+@model_bp.route('positions')
 def get_model_positions():
     try:
         path = get_path()
@@ -27,7 +27,7 @@ def get_model_positions():
     ), {"Content-Type": "text/csv"}
 
 
-@model.route('connections')
+@model_bp.route('connections')
 def get_model_connections():
     try:
         path = get_path()

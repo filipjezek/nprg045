@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from ..api.filesystem.fs_access import find_datastores
+from ..api.filesystem.fs_access import find_datastores, get_directory, merge_paths
 
 
 @pytest.fixture()
@@ -67,3 +67,33 @@ def test_find_datastores(tmp_path: Path, prepare_directory_structure):
             }
         ]
     }
+
+
+def test_get_directory(tmp_path: Path, prepare_directory_structure):
+    assert get_directory(tmp_path / 'a/c/d') == {
+        'name': 'd',
+        'datastore': False,
+        'content': [
+            'e',
+            'i'
+        ]
+    }
+    assert get_directory(tmp_path / 'a/c/d/e') == {
+        'name': 'e',
+        'datastore': True,
+        'content': [
+            'f'
+        ]
+    }
+
+
+def test_merge_paths(tmp_path: Path):
+    assert merge_paths([
+        tmp_path / 'a/c/d/e/f/g',
+        tmp_path / 'a/c/d/e/f/g/h'
+    ]) == (tmp_path / 'a/c/d/e/f/g', [Path('.'), Path('h')])
+    assert merge_paths([
+        tmp_path / 'a/c/d/e/f/g',
+        tmp_path / 'a/c/foo/bar/baz',
+        tmp_path / 'a/c/d/e/f/g/h'
+    ]) == (tmp_path / 'a/c', [Path('d/e/f/g'), Path('d/e/f/g/h'), Path('foo/bar/baz')])

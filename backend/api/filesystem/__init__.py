@@ -3,10 +3,10 @@ from pathlib import Path
 from .fs_access import find_datastores, get_directory
 from ...parameters import params
 
-fs = flask.Blueprint("fs", __name__)
+fs_bp = flask.Blueprint("fs", __name__)
 
 
-@fs.route('recursive')
+@fs_bp.route('recursive')
 def get_recursive_filesystem():
     if ('path' in flask.request.args):
         path = Path(flask.request.args['path']).resolve()
@@ -25,7 +25,7 @@ def get_recursive_filesystem():
     })
 
 
-@fs.route('directory')
+@fs_bp.route('directory')
 def get_filesystem():
     if ('path' in flask.request.args):
         path = Path(flask.request.args['path']).resolve()

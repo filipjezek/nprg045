@@ -1,9 +1,9 @@
 from .app import app
-from .api import api
+from .api import api_bp
 from werkzeug.exceptions import NotFound
 import flask
 
-app.register_blueprint(api, url_prefix='/api/')
+app.register_blueprint(api_bp, url_prefix='/api/')
 
 
 @app.errorhandler(404)
