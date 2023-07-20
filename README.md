@@ -3,17 +3,16 @@
 Example session:
 ![example](example.png)
 
-- [developer documentation](docs.md)
-
 ## How to run visualization
 
+- install python (at least 3.10)
 - install mozaik (<https://github.com/antolikjan/mozaik>):
 - install [node.js](https://nodejs.org/en/)
 
 ### Dependencies
 
 ```bash
-pip install -e .
+pip install -r requirements.txt
 npm i -g @angular/cli
 cd frontend
 npm i
@@ -47,18 +46,33 @@ ng serve
 
 - open the app in browser
 - select datastore to examine
-- click any neuron to reveal all connections
-  - selecting more is possible with `shift` key
-  - lasso is also available when dragging with `shift` key
-  - hover on any node or connection to display tooltip with more info
-  - hovering and selection also works in the info sidebar
-- click any analysis data structure in the top listing to load it
-  - currently supports only PerNeuronValue
+- filter ADS using SQL or filter dialogs
+- view selected ADS in tabs in the inspector view
+- multiple tabs can be selected at once using the shift key
+- shift key can also be used to select multiple neurons or draw a lasso in a network graph
+
+## Documentation
+
+Please refer to the accompanying [thesis](thesis.pdf) (in czech, but with pictures)
 
 ## Notes
 
 Datastore selection is constrained to a specific directory. By default, it is the root project directory. This can be changed using the `--root` arg:
 
-```bash
-./run.sh --root /my/path
+```
+Usage: ./run.sh [options]
+
+Options:
+   --expose
+      listen on all network interfaces (default false)
+   -h, --help
+      display this message
+   --port
+      port to listen on (default 5000)
+   --prod
+      use production parameters (default false)
+   --restart
+      restart on crash (default false)
+   --root
+      root folder for looking up datastores, can be specified multiple times (default .)
 ```
