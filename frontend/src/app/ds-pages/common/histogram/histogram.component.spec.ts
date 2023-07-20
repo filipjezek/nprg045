@@ -8,9 +8,8 @@ describe('HistogramComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HistogramComponent ]
-    })
-    .compileComponents();
+      declarations: [HistogramComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HistogramComponent);
     component = fixture.componentInstance;

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MatrixComponent } from './matrix.component';
+import { MatrixZoomFeatureFactory } from './zoom.feature';
 
 describe('MatrixComponent', () => {
   let component: MatrixComponent;
@@ -8,7 +9,16 @@ describe('MatrixComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [MatrixComponent]
+      declarations: [MatrixComponent],
+      providers: [
+        {
+          provide: MatrixZoomFeatureFactory,
+          useValue: {
+            createZoomFeature: () =>
+              jasmine.createSpyObj('MatrixZoomFeature', []),
+          },
+        },
+      ],
     });
     fixture = TestBed.createComponent(MatrixComponent);
     component = fixture.componentInstance;

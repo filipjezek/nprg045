@@ -8,12 +8,12 @@ describe('ModelLoadingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ModelLoadingComponent ]
-    })
-    .compileComponents();
+      declarations: [ModelLoadingComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ModelLoadingComponent);
     component = fixture.componentInstance;
+    component.progress = { connections: [], positions: [] };
     fixture.detectChanges();
   });
 

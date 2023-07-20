@@ -89,5 +89,6 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
     tick();
     expect(component.filesystemOpen).toBeTruthy();
+    datastorePath = null;
   }));
 });
