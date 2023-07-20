@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CellListComponent } from './cell-list.component';
+import { DSCELL_VAL } from '../cell-generic/cell-generic.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('CellListComponent', () => {
   let component: CellListComponent;
@@ -8,9 +10,10 @@ describe('CellListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CellListComponent ]
-    })
-    .compileComponents();
+      declarations: [CellListComponent],
+      providers: [{ provide: DSCELL_VAL, useValue: ['a', 'b'] }],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CellListComponent);
     component = fixture.componentInstance;
